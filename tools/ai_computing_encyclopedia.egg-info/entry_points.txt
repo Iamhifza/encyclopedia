@@ -1,0 +1,2 @@
+[console_scripts]
+enc = encyclopedia.cli:main

@@ -10,7 +10,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
 from encyclopedia.graph import ConceptGraph
 from encyclopedia.loader import load_corpus
 from encyclopedia.model import RELATIONS
