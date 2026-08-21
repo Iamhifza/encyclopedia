@@ -1,0 +1,325 @@
+/* ==========================================================================
+   The AI & Computing Encyclopedia — visual identity
+
+   Reference-book, not dashboard. A cool slate ground with an oxidised-copper
+   accent, a grotesque display face against a serif reading face, and a signal
+   colour system where hue encodes how settled a term is. Colour here is
+   information: amber means the field has not agreed yet.
+   ========================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap");
+
+:root {
+  /* ground */
+  --enc-ink: #16202b;
+  --enc-slate: #43566b;
+  --enc-mist: #e4e9ee;
+  --enc-paper: #f4f6f8;
+
+  /* accents */
+  --enc-verdigris: #17685c;   /* primary: settled knowledge */
+  --enc-amber: #a8600a;       /* caution: unsettled terminology */
+  --enc-rust: #a63a26;        /* contested */
+  --enc-violet: #5c4699;      /* slang and culture */
+
+  --md-primary-fg-color: var(--enc-verdigris);
+  --md-primary-fg-color--light: #23887a;
+  --md-primary-fg-color--dark: #0f4a41;
+  --md-accent-fg-color: var(--enc-amber);
+  --md-default-fg-color: var(--enc-ink);
+
+  --md-text-font: "Source Serif 4";
+  --md-code-font: "JetBrains Mono";
+}
+
+[data-md-color-scheme="slate"] {
+  --md-hue: 215;
+  --enc-mist: #2b3947;
+  --enc-slate: #9fb0c2;
+  --md-primary-fg-color: #2e9484;
+  --md-accent-fg-color: #d99432;
+}
+
+/* --------------------------------------------------------------------------
+   Typography — display grotesque against a serif reading face
+   -------------------------------------------------------------------------- */
+
+.md-header__title,
+.md-nav__title,
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4 {
+  font-family: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.md-typeset h1 {
+  font-size: 2.05rem;
+  line-height: 1.15;
+  color: var(--md-default-fg-color);
+  margin-bottom: 0.35em;
+}
+
+/* Section headings carry a rule that reads as an index divider, echoing the
+   structure of a printed reference work. */
+.md-typeset h2 {
+  font-size: 1.28rem;
+  margin-top: 2.2em;
+  padding-top: 0.55em;
+  border-top: 1px solid var(--enc-mist);
+}
+
+.md-typeset {
+  font-size: 0.79rem;
+  line-height: 1.72;
+}
+
+.md-typeset code,
+.md-typeset pre {
+  font-size: 0.72rem;
+}
+
+/* ASCII diagrams are load-bearing content in this project, so give them room
+   and stop them wrapping. */
+.md-typeset pre > code {
+  line-height: 1.45;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* --------------------------------------------------------------------------
+   Entry chrome
+   -------------------------------------------------------------------------- */
+
+/* The badge line under an entry title: domain · status · difficulty · date */
+.md-typeset h1 + p {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  color: var(--enc-slate);
+  letter-spacing: 0.01em;
+}
+
+.md-typeset h1 + p em {
+  font-family: "Source Serif 4", serif;
+  font-size: 0.78rem;
+}
+
+.md-typeset .admonition.abstract {
+  border-left-width: 3px;
+  font-size: 0.86rem;
+}
+
+.md-typeset .admonition.abstract .admonition-title {
+  font-family: "Bricolage Grotesque", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.62rem;
+}
+
+/* Status codes rendered as inline code get their semantic colour. */
+.md-typeset code {
+  border-radius: 2px;
+}
+
+.entry-meta {
+  border: 1px solid var(--enc-mist);
+  border-left: 3px solid var(--enc-verdigris);
+  padding: 1rem 1.2rem 0.4rem;
+  margin-top: 1.5rem;
+  font-size: 0.72rem;
+  background: color-mix(in srgb, var(--enc-mist) 22%, transparent);
+}
+
+.entry-meta p {
+  margin: 0 0 0.6rem;
+}
+
+/* --------------------------------------------------------------------------
+   Tables — dense, readable, no zebra noise
+   -------------------------------------------------------------------------- */
+
+.md-typeset table:not([class]) {
+  font-size: 0.7rem;
+  border: 1px solid var(--enc-mist);
+}
+
+.md-typeset table:not([class]) th {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-weight: 700;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: color-mix(in srgb, var(--enc-mist) 40%, transparent);
+}
+
+/* --------------------------------------------------------------------------
+   Concept graph explorer — the signature element
+   -------------------------------------------------------------------------- */
+
+#graph-app {
+  --node-foundational: #4a6076;
+  --node-established: var(--enc-verdigris);
+  --node-modern: #2f7fa8;
+  --node-emerging: var(--enc-amber);
+  --node-experimental: #7a8a3c;
+  --node-contested: var(--enc-rust);
+  --node-slang: var(--enc-violet);
+  --node-informal: var(--enc-violet);
+  --node-marketing: #8a8f96;
+  --node-historical: #8a7a5c;
+  --node-deprecated: #8a8f96;
+
+  position: relative;
+  margin: 1.4rem 0;
+  border: 1px solid var(--enc-mist);
+  background: color-mix(in srgb, var(--enc-mist) 18%, transparent);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+#graph-app svg {
+  display: block;
+  width: 100%;
+  height: 560px;
+  cursor: grab;
+  touch-action: none;
+}
+
+#graph-app svg:active {
+  cursor: grabbing;
+}
+
+#graph-app .graph-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--enc-mist);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.64rem;
+}
+
+#graph-app select,
+#graph-app input[type="search"] {
+  font: inherit;
+  padding: 0.28rem 0.45rem;
+  border: 1px solid var(--enc-mist);
+  border-radius: 2px;
+  background: var(--md-default-bg-color);
+  color: var(--md-default-fg-color);
+}
+
+#graph-app .graph-status {
+  margin-left: auto;
+  color: var(--enc-slate);
+}
+
+#graph-app .graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.5rem 0.8rem;
+  border-top: 1px solid var(--enc-mist);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.6rem;
+  color: var(--enc-slate);
+}
+
+#graph-app .graph-legend span::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.35rem;
+  background: currentColor;
+  vertical-align: baseline;
+}
+
+#graph-app .node-label {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 10px;
+  fill: var(--md-default-fg-color);
+  pointer-events: none;
+  paint-order: stroke;
+  stroke: var(--md-default-bg-color);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+#graph-app .link {
+  stroke: var(--enc-slate);
+  stroke-opacity: 0.28;
+}
+
+#graph-app .link.is-highlighted {
+  stroke: var(--enc-amber);
+  stroke-opacity: 0.95;
+  stroke-width: 1.8px;
+}
+
+#graph-app .node circle {
+  stroke: var(--md-default-bg-color);
+  stroke-width: 1.5px;
+  cursor: pointer;
+  transition: stroke 120ms ease;
+}
+
+#graph-app .node.is-dimmed {
+  opacity: 0.16;
+}
+
+#graph-app .node.is-focused circle {
+  stroke: var(--enc-amber);
+  stroke-width: 2.5px;
+}
+
+#graph-app .graph-tooltip {
+  position: absolute;
+  pointer-events: none;
+  max-width: 21rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--enc-mist);
+  background: var(--md-default-bg-color);
+  box-shadow: 0 4px 18px rgb(22 32 43 / 18%);
+  font-size: 0.68rem;
+  line-height: 1.45;
+  opacity: 0;
+  transition: opacity 120ms ease;
+  z-index: 3;
+}
+
+#graph-app .graph-tooltip strong {
+  font-family: "Bricolage Grotesque", sans-serif;
+  display: block;
+  margin-bottom: 0.15rem;
+}
+
+#graph-app .graph-tooltip .meta {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.58rem;
+  color: var(--enc-slate);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+#graph-app .graph-fallback {
+  padding: 1.2rem;
+  font-size: 0.74rem;
+  color: var(--enc-slate);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #graph-app .graph-tooltip {
+    transition: none;
+  }
+}
+
+@media screen and (max-width: 76.1875em) {
+  #graph-app svg {
+    height: 420px;
+  }
+}

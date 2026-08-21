@@ -1,0 +1,220 @@
+# Chronology. Era ids match the `historical_period` field on entries, so every
+# entry appears under its era automatically. Events are curated: dated moments
+# that changed what came next, not a complete history.
+
+eras:
+  - id: pre-computing
+    label: "Before 1936 — the idea of mechanical reasoning"
+    summary: >-
+      Logic, probability and calculation are formalised long before any machine
+      can execute them. Everything in this encyclopedia is downstream of the
+      claim that reasoning can be written as a procedure.
+    events:
+      - year: "1854"
+        what: Boole formalises logic as algebra.
+      - year: "1913"
+        what: Markov analyses letter sequences in Pushkin, prefiguring statistical language modelling.
+
+  - id: early-computing
+    label: "1936–1955 — machines that compute"
+    summary: >-
+      The theoretical machine arrives before the physical one, and the first
+      suggestion that a machine might learn rather than be programmed.
+    events:
+      - year: "1936"
+        what: Turing defines computability and the universal machine.
+      - year: "1943"
+        what: McCulloch and Pitts publish a mathematical model of a neuron.
+        term: neural-network
+      - year: "1948"
+        what: Shannon founds information theory; entropy becomes measurable.
+      - year: "1950"
+        what: Turing proposes the imitation game as a test of machine intelligence.
+      - year: "1950"
+        what: Mooers coins the term "information retrieval".
+        term: information-retrieval
+      - year: "1958"
+        what: Rosenblatt builds the Perceptron, a machine that learns its own weights.
+        term: perceptron
+
+  - id: classical-ai
+    label: "1956–1979 — symbolic AI"
+    summary: >-
+      AI is founded as a field and pursues intelligence through explicit
+      symbols, search and hand-authored knowledge. It produces real systems and
+      promises far more than it delivers.
+    events:
+      - year: "1956"
+        what: The Dartmouth workshop names the field "artificial intelligence".
+      - year: "1965"
+        what: DENDRAL begins; domain knowledge, not general reasoning, is the lever.
+        term: expert-system
+      - year: "1969"
+        what: Minsky and Papert prove a single perceptron cannot learn XOR; funding for connectionism collapses.
+        term: perceptron
+      - year: "1972"
+        what: MYCIN diagnoses infections from around 600 rules and explains its reasoning.
+        term: expert-system
+
+  - id: ai-winter
+    label: "1980–1995 — winter, and quiet groundwork"
+    summary: >-
+      Expert systems boom commercially and then collapse under maintenance cost.
+      Meanwhile the training algorithm that makes deep learning possible is
+      published to little immediate effect.
+    events:
+      - year: "1986"
+        what: Backpropagation is popularised; multilayer networks become trainable.
+        term: backpropagation
+      - year: "1988"
+        what: Sutton formalises temporal-difference learning.
+        term: reinforcement-learning
+      - year: "1990"
+        what: Elman networks establish recurrence for sequence modelling.
+        term: rnn
+
+  - id: statistical-ml
+    label: "1995–2011 — statistics wins"
+    summary: >-
+      Learning from data displaces hand-authored knowledge. Sequence models
+      acquire gates, retrieval acquires BM25, and the hardware that will matter
+      arrives for entirely unrelated reasons.
+    events:
+      - year: "1997"
+        what: LSTM solves vanishing gradients with gating and an additive memory path.
+        term: lstm
+      - year: "1998"
+        what: LeNet demonstrates convolutional networks on handwritten digits.
+      - year: "2006"
+        what: NVIDIA releases CUDA, making GPUs programmable for general computation.
+        term: gpu
+      - year: "2009"
+        what: ImageNet is released; a benchmark reorganises a field.
+        term: benchmark
+
+  - id: deep-learning
+    label: "2012–2016 — the deep learning revolution"
+    summary: >-
+      Scale, data and GPUs converge. Representations are learned rather than
+      designed, and the industry reorients around it within about three years.
+    events:
+      - year: "2012"
+        what: AlexNet wins ImageNet by a wide margin on two consumer GPUs.
+        term: gpu
+      - year: "2013"
+        what: Word2Vec makes meaning geometric and reusable.
+        term: word2vec
+      - year: "2014"
+        what: Attention is introduced to fix the bottleneck in sequence-to-sequence translation.
+        term: attention
+      - year: "2015"
+        what: Knowledge distillation transfers capability into smaller models.
+        term: distillation
+      - year: "2016"
+        what: AlphaGo defeats Lee Sedol; reinforcement learning reaches public attention.
+        term: reinforcement-learning
+
+  - id: transformer
+    label: "2017–2019 — the architecture"
+    summary: >-
+      Recurrence is discarded. Attention alone, applied in parallel over whole
+      sequences, turns out to be enough — and to be exactly what GPUs want.
+    events:
+      - year: "2017"
+        what: "\"Attention Is All You Need\" introduces the Transformer."
+        term: transformer
+      - year: "2018"
+        what: BERT and GPT split the architecture into encoder and decoder lineages; pretraining becomes standard.
+        term: pretraining
+      - year: "2019"
+        what: Multi-query attention proposes shrinking the KV cache, years before it becomes urgent.
+        term: grouped-query-attention
+      - year: "2019"
+        what: Megatron-LM establishes tensor parallelism for models beyond one device.
+        term: tensor-parallelism
+
+  - id: foundation-model
+    label: "2020–2023 — foundation models and the serving problem"
+    summary: >-
+      Scale becomes predictable, capability becomes general, and the bottleneck
+      moves from training research to inference engineering and alignment.
+    events:
+      - year: "2020"
+        what: GPT-3 demonstrates in-context learning; prompting becomes a control surface.
+        term: large-language-model
+      - year: "2020"
+        what: Scaling laws make capability gains extrapolable.
+        term: scaling-laws
+      - year: "2020"
+        what: RAG is named; retrieval and generation are formally combined.
+        term: rag
+      - year: "2021"
+        what: The term "foundation model" is coined at Stanford.
+        term: foundation-model
+      - year: "2021"
+        what: LoRA makes fine-tuning affordable; RoPE becomes the default position encoding.
+        term: lora
+      - year: "2022"
+        what: Chinchilla shows most models are undertrained for their size.
+        term: scaling-laws
+      - year: "2022"
+        what: FlashAttention treats attention as a memory-hierarchy problem.
+        term: flash-attention
+      - year: "2022"
+        what: InstructGPT establishes RLHF as the path from base model to assistant.
+        term: rlhf
+      - year: "2022"
+        what: ChatGPT launches; the vocabulary in this encyclopedia leaves the research community.
+        term: large-language-model
+      - year: "2022"
+        what: Prompt injection is named, weeks after tool-augmented models appear.
+        term: prompt-injection
+      - year: "2023"
+        what: PagedAttention and vLLM apply virtual memory to the KV cache.
+        term: paged-attention
+      - year: "2023"
+        what: Function calling ships; models can request actions in a structured format.
+        term: tool-calling
+      - year: "2023"
+        what: DPO removes the reward model from preference training.
+        term: dpo
+      - year: "2023"
+        what: Sparse autoencoders decompose activations into interpretable features.
+        term: sparse-autoencoder
+
+  - id: agentic
+    label: "2024–present — agents, protocols and reasoning"
+    summary: >-
+      The unit of work stops being a response and becomes a task. Terminology
+      churns fastest here, which is why entries in this era carry review dates.
+    events:
+      - year: "2024"
+        what: Reasoning models make inference-time compute a scaling axis.
+        term: reasoning-model
+      - year: "2024"
+        what: SWE-agent shows the interface around the model changes task success as much as the model does.
+        term: harness
+      - year: "2024"
+        what: Computer use ships; agents operate GUIs by screenshot and cursor.
+        term: computer-use
+      - year: "2024"
+        what: MCP is published, standardising how applications connect models to tools and data.
+        term: mcp
+      - year: "2024"
+        what: "\"Slop\" is adopted for unwanted AI-generated content."
+        term: ai-slop
+      - year: "2025"
+        what: RLVR and open reasoning models make verifiable-reward training mainstream.
+        term: rlvr
+      - year: "2025"
+        what: "\"Vibe coding\" is coined in February and enters dictionaries by year end."
+        term: vibe-coding
+      - year: "2025"
+        what: A2A proposes a protocol for agent-to-agent delegation.
+        term: a2a
+      - year: "2025"
+        what: Context engineering is named as agent context budgets become the binding constraint.
+        term: context-engineering
+      - year: "2025"
+        what: Loadable agent skills package procedural knowledge outside the system prompt.
+        term: agent-skills

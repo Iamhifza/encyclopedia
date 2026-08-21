@@ -1,0 +1,966 @@
+# The queue.
+#
+# Terms from the source brief that have earned an entry but are not written
+# yet. Each carries enough to stand as a *seed* entry -- canonical name,
+# aliases, a one-line definition and its place in the concept graph -- so
+# `enc batch` can create real, navigable records rather than empty stubs.
+#
+#   enc batch --dry-run              see what would be created
+#   enc batch --limit 20             create the next twenty
+#   enc batch --category math-for-ai only one domain
+#   enc todo                         which seeds most deserve full treatment
+#   enc promote "Beam Search"        add the section skeleton and write it
+#
+# Adding to this file is the cheapest useful contribution: one entry here is
+# three lines, and it puts the term into search, the A-Z index and the graph
+# immediately.
+
+terms:
+
+  # -- 01 Computing Foundations ------------------------------------------
+  - term: CPU
+    aliases: [Central Processing Unit, Processor]
+    category: computing-foundations
+    subcategory: architecture
+    status: foundational
+    difficulty: beginner
+    one_liner: The general-purpose processor that runs the operating system and everything a GPU is not doing.
+    tags: [hardware]
+    relations: {alternative_to: [gpu], related_to: [memory-hierarchy]}
+
+  - term: NPU
+    aliases: [Neural Processing Unit, AI Accelerator, TPU]
+    category: computing-foundations
+    subcategory: architecture
+    status: modern
+    difficulty: intermediate
+    one_liner: A chip built specifically for the matrix arithmetic that neural networks spend nearly all their time on.
+    tags: [hardware]
+    relations: {similar_to: [gpu], used_by: [quantization]}
+
+  - term: Operating System
+    aliases: [OS, Kernel]
+    category: computing-foundations
+    subcategory: os
+    status: foundational
+    difficulty: beginner
+    one_liner: The software that shares one machine's processors, memory and devices between many programs.
+    tags: [hardware]
+    relations: {related_to: [paged-attention, memory-hierarchy]}
+
+  - term: Virtual Memory
+    aliases: [Paging, Page Table, Address Translation]
+    category: computing-foundations
+    subcategory: memory
+    status: foundational
+    difficulty: intermediate
+    one_liner: The trick of giving each program its own tidy address space while the real memory underneath is scattered and shared.
+    tags: [hardware]
+    relations: {evolved_into: [paged-attention], part_of: [memory-hierarchy]}
+
+  - term: Parallel Computing
+    aliases: [Concurrency, SIMD, Multiprocessing]
+    category: computing-foundations
+    subcategory: os
+    status: foundational
+    difficulty: intermediate
+    one_liner: Splitting work so that many processors make progress at the same time rather than one doing it all.
+    tags: [hardware]
+    relations: {used_by: [tensor-parallelism, pipeline-parallelism], related_to: [gpu]}
+
+  - term: Distributed Systems
+    aliases: [Distributed Computing, Cluster Computing]
+    category: computing-foundations
+    subcategory: networking
+    status: foundational
+    difficulty: advanced
+    one_liner: Many machines cooperating on one job, and the failure, coordination and consistency problems that come free with that.
+    tags: [hardware]
+    relations: {used_by: [pipeline-parallelism], related_to: [throughput]}
+
+  - term: Compiler
+    aliases: [Compilation, JIT, Kernel Compiler]
+    category: computing-foundations
+    subcategory: toolchain
+    status: foundational
+    difficulty: advanced
+    one_liner: A program that turns code written for humans into instructions a specific machine can execute quickly.
+    tags: [hardware]
+    relations: {used_by: [flash-attention], related_to: [gpu]}
+
+  - term: GPU Kernel
+    aliases: [CUDA Kernel, Custom Kernel, Fused Kernel]
+    category: distributed-ai-systems
+    subcategory: accelerators
+    status: established
+    difficulty: research
+    one_liner: A small program run by thousands of GPU threads at once, and the level at which most inference speedups are actually won.
+    tags: [hardware, inference]
+    relations: {implemented_by: [flash-attention], depends_on: [gpu, memory-hierarchy]}
+
+  - term: CUDA
+    aliases: [CUDA Toolkit, Compute Unified Device Architecture]
+    category: distributed-ai-systems
+    subcategory: accelerators
+    status: established
+    difficulty: intermediate
+    one_liner: NVIDIA's programming platform for running general computation on GPUs, and the moat that kept them dominant.
+    tags: [hardware]
+    relations: {used_by: [gpu-kernel], related_to: [gpu]}
+
+  # -- 02 Mathematics and Statistics for AI --------------------------------
+  - term: Linear Algebra
+    aliases: [Matrices, Vectors, Matrix Multiplication]
+    category: math-for-ai
+    subcategory: linear-algebra
+    status: foundational
+    difficulty: beginner
+    one_liner: The mathematics of vectors and matrices, which is what a neural network is doing in essentially every operation.
+    tags: [training]
+    relations: {used_by: [neural-network, attention, embedding]}
+
+  - term: Probability
+    aliases: [Probability Theory, Distributions]
+    category: math-for-ai
+    subcategory: probability
+    status: foundational
+    difficulty: beginner
+    one_liner: The mathematics of uncertainty, and the language in which every model output is really a distribution rather than an answer.
+    tags: [training]
+    relations: {used_by: [sampling, supervised-learning], related_to: [hallucination]}
+
+  - term: Bayesian Inference
+    aliases: [Bayes' Rule, Bayesian Methods, Priors]
+    category: math-for-ai
+    subcategory: probability
+    status: foundational
+    difficulty: advanced
+    one_liner: Updating a belief in the light of new evidence, in the one way that is mathematically consistent.
+    tags: [training]
+    relations: {related_to: [probability, supervised-learning]}
+
+  - term: Gradient Descent
+    aliases: [SGD, Adam, Optimiser, Stochastic Gradient Descent]
+    category: math-for-ai
+    subcategory: optimisation
+    status: foundational
+    difficulty: intermediate
+    one_liner: Improving a model by repeatedly taking a small step in whichever direction reduces the error fastest.
+    tags: [training]
+    relations: {depends_on: [backpropagation], used_by: [pretraining, neural-network]}
+
+  - term: Loss Function
+    aliases: [Objective Function, Cost Function, Cross-Entropy]
+    category: math-for-ai
+    subcategory: optimisation
+    status: foundational
+    difficulty: beginner
+    one_liner: The single number a model is trying to make smaller, and therefore the only thing it actually cares about.
+    tags: [training]
+    relations: {used_by: [gradient-descent, pretraining], related_to: [reward-hacking]}
+
+  - term: Regularisation
+    aliases: [Regularization, Weight Decay, Dropout, Early Stopping]
+    category: math-for-ai
+    subcategory: optimisation
+    status: foundational
+    difficulty: intermediate
+    one_liner: Deliberately limiting how well a model can fit its training data, so that it fits reality better.
+    tags: [training]
+    relations: {solves: [overfitting], used_by: [supervised-learning]}
+
+  - term: Information Theory
+    aliases: [Entropy, Shannon Entropy, Perplexity, KL Divergence]
+    category: math-for-ai
+    subcategory: information
+    status: foundational
+    difficulty: advanced
+    one_liner: "The mathematics of surprise: how much information a message carries, and how far one distribution sits from another."
+    tags: [training]
+    relations: {used_by: [loss-function, rlhf], related_to: [tokenization]}
+
+  # -- 03 AI Foundations ---------------------------------------------------
+  - term: Symbolic AI
+    aliases: [GOFAI, Good Old-Fashioned AI, Knowledge Representation]
+    category: ai-foundations
+    subcategory: symbolic
+    status: historical
+    difficulty: intermediate
+    one_liner: The approach that treated intelligence as manipulating explicit symbols and rules rather than learning from data.
+    tags: [history, symbolic]
+    relations: {alternative_to: [neural-network], evolved_into: [expert-system]}
+
+  - term: Search Algorithm
+    aliases: [State Space Search, A-star, Tree Search, MCTS]
+    category: ai-foundations
+    subcategory: search-planning
+    status: foundational
+    difficulty: intermediate
+    one_liner: Systematically exploring possible moves or states to find one that reaches a goal.
+    tags: [symbolic]
+    relations: {used_by: [reasoning-model], related_to: [reinforcement-learning]}
+
+  - term: Automated Planning
+    aliases: [Planning, STRIPS, Task Planning]
+    category: ai-foundations
+    subcategory: search-planning
+    status: established
+    difficulty: advanced
+    one_liner: Working out an ordered sequence of actions that gets from the current state to a desired one.
+    tags: [symbolic, agents]
+    relations: {used_by: [ai-agent, agent-loop], related_to: [search-algorithm, world-model]}
+
+  - term: Turing Test
+    aliases: [Imitation Game]
+    category: history
+    subcategory: origins
+    status: historical
+    difficulty: beginner
+    one_liner: Turing's 1950 proposal to replace "can machines think?" with whether a machine's replies are distinguishable from a person's.
+    tags: [history]
+    relations: {related_to: [large-language-model, benchmark]}
+
+  # -- 04 Machine Learning -------------------------------------------------
+  - term: Unsupervised Learning
+    aliases: [Clustering, Dimensionality Reduction]
+    category: machine-learning
+    subcategory: paradigms
+    status: foundational
+    difficulty: beginner
+    one_liner: Finding structure in data that has no labels at all, such as grouping similar items together.
+    tags: [training]
+    relations: {alternative_to: [supervised-learning], related_to: [embedding]}
+
+  - term: Transfer Learning
+    aliases: [Pretrain-Finetune, Domain Adaptation]
+    category: machine-learning
+    subcategory: paradigms
+    status: established
+    difficulty: intermediate
+    one_liner: Reusing what a model learned on one task as the starting point for another, instead of learning from scratch.
+    tags: [training]
+    relations: {used_by: [supervised-fine-tuning, foundation-model], related_to: [pretraining]}
+
+  - term: Few-Shot Learning
+    aliases: [In-Context Learning, Zero-Shot Learning, ICL]
+    category: machine-learning
+    subcategory: paradigms
+    status: established
+    difficulty: intermediate
+    one_liner: Getting a model to do a new task from a handful of examples shown in the prompt, with no training at all.
+    tags: [training]
+    relations: {depends_on: [large-language-model], used_by: [prompt-engineering]}
+
+  - term: Continual Learning
+    aliases: [Lifelong Learning, Online Learning, Catastrophic Forgetting]
+    category: machine-learning
+    subcategory: settings
+    status: experimental
+    difficulty: advanced
+    one_liner: Learning from a stream of new data over time without erasing what was learned before.
+    tags: [training]
+    relations: {related_to: [supervised-fine-tuning, agent-memory]}
+
+  - term: Federated Learning
+    aliases: [Privacy-Preserving Learning, On-Device Training]
+    category: machine-learning
+    subcategory: settings
+    status: established
+    difficulty: advanced
+    one_liner: Training one shared model across many devices without any of their data leaving the device.
+    tags: [training]
+    relations: {related_to: [distributed-systems, supervised-learning]}
+
+  - term: Generalisation
+    aliases: [Generalization, Out-of-Distribution, Bias-Variance Tradeoff]
+    category: machine-learning
+    subcategory: generalisation
+    status: foundational
+    difficulty: intermediate
+    one_liner: Whether a model works on data it has never seen, which is the only thing anyone actually wants from it.
+    tags: [training]
+    relations: {different_from: [overfitting], related_to: [scaling-laws, benchmark]}
+
+  # -- 05 Deep Learning ----------------------------------------------------
+  - term: CNN
+    aliases: [Convolutional Neural Network, ConvNet, Convolution]
+    category: deep-learning
+    subcategory: architectures
+    status: established
+    difficulty: intermediate
+    one_liner: A network that slides the same small filter across an image, so a feature learned in one place is recognised everywhere.
+    tags: [architecture]
+    relations: {is_a: [neural-network], alternative_to: [transformer], related_to: [vision-language-model]}
+
+  - term: Activation Function
+    aliases: [ReLU, GELU, SwiGLU, Sigmoid, Non-linearity]
+    category: deep-learning
+    subcategory: basics
+    status: foundational
+    difficulty: beginner
+    one_liner: The small non-linear bend applied between layers, without which any stack of layers collapses into a single one.
+    tags: [architecture]
+    relations: {part_of: [neural-network], related_to: [transformer]}
+
+  - term: Residual Connection
+    aliases: [Skip Connection, ResNet, Residual Stream]
+    category: deep-learning
+    subcategory: basics
+    status: foundational
+    difficulty: intermediate
+    one_liner: Adding a layer's input to its output, giving gradients a clear path backwards and making very deep networks trainable.
+    tags: [architecture]
+    relations: {part_of: [transformer], successor_of: [lstm], related_to: [mechanistic-interpretability]}
+
+  - term: Layer Normalisation
+    aliases: [LayerNorm, RMSNorm, Normalization]
+    category: deep-learning
+    subcategory: basics
+    status: established
+    difficulty: advanced
+    one_liner: Rescaling a layer's activations to a consistent range so training stays stable at depth.
+    tags: [architecture]
+    relations: {part_of: [transformer], related_to: [residual-connection]}
+
+  - term: Autoencoder
+    aliases: [Encoder-Decoder, Latent Representation, VAE]
+    category: deep-learning
+    subcategory: generative
+    status: established
+    difficulty: intermediate
+    one_liner: A network trained to squeeze its input through a narrow bottleneck and rebuild it, learning a compact representation on the way.
+    tags: [architecture]
+    relations: {evolved_into: [sparse-autoencoder], related_to: [embedding, jepa]}
+
+  - term: GAN
+    aliases: [Generative Adversarial Network, Adversarial Training]
+    category: deep-learning
+    subcategory: generative
+    status: historical
+    difficulty: advanced
+    one_liner: Two networks trained against each other, one producing fakes and one detecting them, until the fakes are convincing.
+    tags: [architecture]
+    relations: {alternative_to: [diffusion-model], is_a: [neural-network]}
+
+  - term: Diffusion Model
+    aliases: [Denoising Diffusion, Latent Diffusion, Stable Diffusion]
+    category: deep-learning
+    subcategory: generative
+    status: established
+    difficulty: advanced
+    one_liner: A generator that starts from pure noise and removes a little of it at a time until an image emerges.
+    tags: [architecture]
+    relations: {is_a: [neural-network], alternative_to: [autoregressive-generation], used_by: [image-generation]}
+
+  - term: Mixture-of-Experts
+    aliases: [MoE, Sparse MoE, Expert Routing]
+    category: deep-learning
+    subcategory: architectures
+    status: modern
+    difficulty: advanced
+    one_liner: A model that holds many specialised sub-networks but activates only a couple per token, so capacity grows without cost growing with it.
+    tags: [architecture, inference]
+    relations: {part_of: [transformer], related_to: [scaling-laws, tensor-parallelism, decode]}
+
+  # -- 06 Transformers -----------------------------------------------------
+  - term: Cross-Attention
+    aliases: [Encoder-Decoder Attention]
+    category: transformers
+    subcategory: attention
+    status: established
+    difficulty: intermediate
+    one_liner: Attention where the questions come from one sequence and the answers from another, used to condition on an image, audio or a source sentence.
+    tags: [architecture]
+    relations: {is_a: [attention], different_from: [self-attention], used_by: [vision-language-model]}
+
+  - term: Positional Encoding
+    aliases: [Position Embedding, Sinusoidal Encoding, ALiBi]
+    category: transformers
+    subcategory: position
+    status: established
+    difficulty: intermediate
+    one_liner: How a model is told where each token sits, since attention on its own treats a sentence as an unordered bag.
+    tags: [architecture]
+    relations: {part_of: [transformer], evolved_into: [rope], related_to: [context-window]}
+
+  - term: Feed-Forward Network
+    aliases: [FFN, MLP Block, Position-wise FFN]
+    category: transformers
+    subcategory: block
+    status: established
+    difficulty: intermediate
+    one_liner: The two-layer network applied to each position separately inside every Transformer block, holding most of the model's parameters.
+    tags: [architecture]
+    relations: {part_of: [transformer], related_to: [mixture-of-experts, mechanistic-interpretability]}
+
+  - term: Encoder-Decoder
+    aliases: [Seq2Seq, Sequence-to-Sequence, T5-style]
+    category: transformers
+    subcategory: variants
+    status: established
+    difficulty: intermediate
+    one_liner: A design that reads the whole input with one stack and writes the output with another, still standard for translation and speech.
+    tags: [architecture]
+    relations: {part_of: [transformer], different_from: [large-language-model], depends_on: [cross-attention]}
+
+  - term: Efficient Attention
+    aliases: [Sparse Attention, Linear Attention, Sliding Window Attention]
+    category: transformers
+    subcategory: variants
+    status: experimental
+    difficulty: research
+    one_liner: The family of attention variants that give up looking at every token in exchange for cost that does not grow quadratically.
+    tags: [architecture, inference]
+    relations: {alternative_to: [self-attention], related_to: [state-space-model, context-window]}
+
+  # -- 07 LLMs and Foundation Models --------------------------------------
+  - term: Small Language Model
+    aliases: [SLM, Edge Model, On-Device Model]
+    category: llms-foundation-models
+    subcategory: models
+    status: modern
+    difficulty: beginner
+    one_liner: A model small enough to run on a laptop or phone, traded against the capability of a large one.
+    tags: [architecture]
+    relations: {is_a: [large-language-model], depends_on: [distillation, quantization], related_to: [open-weight-model]}
+
+  - term: Base Model
+    aliases: [Pretrained Checkpoint, Completion Model]
+    category: llms-foundation-models
+    subcategory: models
+    status: established
+    difficulty: beginner
+    one_liner: The raw model straight out of pretraining, which continues text rather than following instructions.
+    tags: [architecture]
+    relations: {part_of: [pretraining], evolved_into: [supervised-fine-tuning], different_from: [large-language-model]}
+
+  - term: Long-Context Model
+    aliases: [Long Context, Extended Context, Needle in a Haystack]
+    category: llms-foundation-models
+    subcategory: representation
+    status: modern
+    difficulty: advanced
+    one_liner: A model trained or adapted to attend over hundreds of thousands of tokens, with the caveat that advertised length exceeds usable length.
+    tags: [architecture, inference]
+    relations: {depends_on: [rope, context-window], related_to: [kv-cache, rag]}
+
+  - term: Vocabulary
+    aliases: [Token Vocabulary, Vocab Size, Special Tokens]
+    category: llms-foundation-models
+    subcategory: representation
+    status: established
+    difficulty: intermediate
+    one_liner: The fixed set of tokens a model can read or emit, and the reason it can never output a character it has no piece for.
+    tags: [architecture]
+    relations: {part_of: [tokenization], related_to: [sampling]}
+
+  - term: Chain-of-Thought
+    aliases: [CoT, Step-by-Step Reasoning, Scratchpad]
+    category: llms-foundation-models
+    subcategory: capability
+    status: established
+    difficulty: beginner
+    one_liner: Asking a model to work through its reasoning before answering, which measurably improves accuracy on multi-step problems.
+    tags: [architecture]
+    relations: {evolved_into: [reasoning-model], used_by: [prompt-engineering], related_to: [mechanistic-interpretability]}
+
+  # -- 08 Training and Adaptation -----------------------------------------
+  - term: Next-Token Prediction
+    aliases: [Causal Language Modelling, Autoregressive Objective]
+    category: llm-training
+    subcategory: pretraining
+    status: foundational
+    difficulty: beginner
+    one_liner: "The training objective behind every LLM: given everything so far, predict what comes next."
+    tags: [training]
+    relations: {part_of: [pretraining], depends_on: [loss-function], used_by: [autoregressive-generation]}
+
+  - term: RLAIF
+    aliases: [Reinforcement Learning from AI Feedback, Constitutional AI]
+    category: llm-training
+    subcategory: alignment
+    status: modern
+    difficulty: research
+    one_liner: Replacing human preference labels with a model's own judgements against a written set of principles.
+    tags: [training, safety]
+    relations: {successor_of: [rlhf], depends_on: [llm-as-a-judge], related_to: [alignment]}
+
+  - term: GRPO
+    aliases: [Group Relative Policy Optimization, Group Relative Policy Optimisation]
+    category: llm-training
+    subcategory: alignment
+    status: emerging
+    difficulty: research
+    one_liner: A reinforcement learning method that scores a batch of sampled answers against each other, removing the need for a separate value network.
+    tags: [training]
+    relations: {used_by: [rlvr, reasoning-model], alternative_to: [dpo]}
+
+  - term: Data Curation
+    aliases: [Data Filtering, Deduplication, Data Mixture]
+    category: llm-training
+    subcategory: data
+    status: established
+    difficulty: advanced
+    one_liner: Deciding what goes into a training corpus and in what proportion, which decides more about model quality than architecture does.
+    tags: [training]
+    relations: {part_of: [pretraining], related_to: [synthetic-data, benchmark-contamination]}
+
+  - term: Curriculum Learning
+    aliases: [Staged Training, Data Ordering]
+    category: llm-training
+    subcategory: data
+    status: established
+    difficulty: advanced
+    one_liner: Training on easy or general material first and harder or more specialised material later, rather than shuffling everything together.
+    tags: [training]
+    relations: {part_of: [pretraining], related_to: [data-curation]}
+
+  # -- 09 Inference and Serving -------------------------------------------
+  - term: Beam Search
+    aliases: [Beam Decoding]
+    category: llm-inference
+    subcategory: decoding
+    status: historical
+    difficulty: intermediate
+    one_liner: Keeping several candidate continuations alive at once and returning the best-scoring whole sequence, which helps in translation and hurts in chat.
+    tags: [inference]
+    relations: {is_a: [sampling], alternative_to: [sampling], related_to: [autoregressive-generation]}
+
+  - term: Structured Outputs
+    aliases: [Constrained Decoding, JSON Mode, Grammar-Constrained Generation]
+    category: protocols
+    subcategory: calling
+    status: modern
+    difficulty: intermediate
+    one_liner: Forcing a model's output to match a schema or grammar by masking out any token that would break it.
+    tags: [protocol, inference]
+    relations: {depends_on: [sampling], used_by: [tool-calling, ai-workflow], different_from: [tool-calling]}
+
+  - term: Inference Scheduler
+    aliases: [Request Scheduler, Admission Control, Request Queue]
+    category: llm-inference
+    subcategory: batching
+    status: established
+    difficulty: advanced
+    one_liner: The component that decides, every step, which requests run, which wait and which get evicted.
+    tags: [inference]
+    relations: {part_of: [vllm], depends_on: [continuous-batching, paged-attention], related_to: [inference-latency]}
+
+  - term: KV Cache Quantisation
+    aliases: [KV Quantization, FP8 KV Cache]
+    category: llm-inference
+    subcategory: memory
+    status: modern
+    difficulty: advanced
+    one_liner: Storing cached keys and values in fewer bits, halving the memory that decides how many users fit on a GPU.
+    tags: [inference]
+    relations: {is_a: [quantization], solves: [kv-cache], alternative_to: [grouped-query-attention]}
+
+  - term: Disaggregated Inference
+    aliases: [Prefill-Decode Disaggregation, P/D Disaggregation]
+    category: llm-inference
+    subcategory: batching
+    status: emerging
+    difficulty: research
+    one_liner: Running prefill and decode on separate pools of hardware, since one is compute-bound and the other bandwidth-bound.
+    tags: [inference]
+    relations: {depends_on: [prefill, decode], related_to: [inference-scheduler, throughput]}
+
+  - term: SGLang
+    aliases: [RadixAttention]
+    category: llm-inference
+    subcategory: engines
+    status: modern
+    difficulty: intermediate
+    one_liner: An inference engine built around structured LLM programs, with a radix tree that shares cache across branching conversations.
+    tags: [inference]
+    relations: {alternative_to: [vllm], implemented_by: [prefix-caching], depends_on: [paged-attention]}
+
+  - term: TensorRT-LLM
+    aliases: [TRT-LLM]
+    category: llm-inference
+    subcategory: engines
+    status: modern
+    difficulty: advanced
+    one_liner: NVIDIA's inference library that compiles a model into hardware-specific kernels for maximum throughput on its own GPUs.
+    tags: [inference]
+    relations: {alternative_to: [vllm], depends_on: [gpu-kernel, quantization]}
+
+  - term: llama.cpp
+    aliases: [GGUF, llama-cpp]
+    category: llm-inference
+    subcategory: engines
+    status: modern
+    difficulty: beginner
+    one_liner: A C++ inference engine that runs quantised models on ordinary laptops and phones, with no GPU required.
+    tags: [inference]
+    relations: {alternative_to: [vllm], depends_on: [quantization], used_by: [small-language-model]}
+
+  - term: Hugging Face Transformers
+    aliases: [Transformers Library, HF Transformers]
+    category: llm-inference
+    subcategory: engines
+    status: established
+    difficulty: beginner
+    one_liner: The reference Python library for loading and running models, optimised for correctness and breadth rather than serving throughput.
+    tags: [inference]
+    relations: {alternative_to: [vllm], implemented_by: [transformer]}
+
+  # -- 11 RAG and Knowledge -----------------------------------------------
+  - term: Chunking
+    aliases: [Text Splitting, Semantic Chunking, Contextual Retrieval]
+    category: rag-knowledge
+    subcategory: pipelines
+    status: established
+    difficulty: intermediate
+    one_liner: Cutting documents into passages small enough to retrieve precisely and large enough to still make sense on their own.
+    tags: [retrieval]
+    relations: {part_of: [rag], related_to: [embedding, context-window]}
+
+  - term: Reranking
+    aliases: [Cross-Encoder, Reranker, Two-Stage Retrieval]
+    category: rag-knowledge
+    subcategory: retrieval
+    status: established
+    difficulty: intermediate
+    one_liner: A second, slower model that reads each candidate passage alongside the query and reorders the shortlist properly.
+    tags: [retrieval]
+    relations: {part_of: [rag], depends_on: [dense-retrieval], solves: [dense-retrieval]}
+
+  - term: Hybrid Retrieval
+    aliases: [Hybrid Search, Fusion Retrieval, Reciprocal Rank Fusion]
+    category: rag-knowledge
+    subcategory: retrieval
+    status: established
+    difficulty: intermediate
+    one_liner: Running keyword and vector search together and merging the rankings, which beats either alone in almost every measured setting.
+    tags: [retrieval]
+    relations: {depends_on: [dense-retrieval, information-retrieval], part_of: [rag]}
+
+  - term: GraphRAG
+    aliases: [Graph Retrieval, Knowledge Graph RAG]
+    category: rag-knowledge
+    subcategory: structure
+    status: emerging
+    difficulty: advanced
+    one_liner: Building a graph of entities and relationships from a corpus so retrieval can follow connections rather than matching passages.
+    tags: [retrieval]
+    relations: {is_a: [rag], depends_on: [knowledge-graph], related_to: [agentic-rag]}
+
+  - term: Knowledge Graph
+    aliases: [Ontology, Triple Store, Semantic Network]
+    category: rag-knowledge
+    subcategory: structure
+    status: established
+    difficulty: intermediate
+    one_liner: Facts stored as entities joined by named relationships, so questions can be answered by traversing rather than reading.
+    tags: [retrieval, symbolic]
+    relations: {successor_of: [symbolic-ai], used_by: [graphrag], related_to: [information-retrieval]}
+
+  - term: Grounding
+    aliases: [Groundedness, Attribution, Citation]
+    category: rag-knowledge
+    subcategory: pipelines
+    status: established
+    difficulty: intermediate
+    one_liner: Tying every claim in an answer to a specific retrieved passage, so it can be checked rather than trusted.
+    tags: [retrieval, safety]
+    relations: {part_of: [rag], solves: [hallucination], related_to: [llm-as-a-judge]}
+
+  # -- 12 Agents ------------------------------------------------------------
+  - term: Orchestration
+    aliases: [Orchestrator, Agent Orchestration, Routing]
+    category: agents
+    subcategory: topologies
+    status: emerging
+    difficulty: intermediate
+    one_liner: The layer that decides which model, agent or tool handles each part of a task, and in what order.
+    tags: [agents]
+    relations: {part_of: [multi-agent-system, harness], related_to: [ai-workflow, model-routing]}
+
+  - term: Reflection
+    aliases: [Self-Critique, Self-Correction, Self-Refine]
+    category: agents
+    subcategory: cognition
+    status: emerging
+    difficulty: intermediate
+    one_liner: Having a model review and criticise its own output before acting on it or returning it.
+    tags: [agents]
+    relations: {part_of: [agent-loop], related_to: [llm-as-a-judge, reasoning-model]}
+
+  - term: Sandboxing
+    aliases: [Sandbox, Isolated Execution, Container Isolation]
+    category: agent-engineering
+    subcategory: control
+    status: established
+    difficulty: intermediate
+    one_liner: Running an agent's actions inside a confined environment so that mistakes and attacks cannot reach anything that matters.
+    tags: [agents, safety]
+    relations: {part_of: [guardrails, harness], solves: [prompt-injection], related_to: [coding-agent]}
+
+  - term: Human-in-the-Loop
+    aliases: [HITL, Human-on-the-Loop, Approval Gate]
+    category: agent-engineering
+    subcategory: control
+    status: established
+    difficulty: beginner
+    one_liner: Requiring a person to approve consequential actions, rather than trusting an autonomous system to get them right.
+    tags: [agents, safety, culture]
+    relations: {part_of: [guardrails], related_to: [ai-agent, coding-agent]}
+
+  # -- 14 Protocols ---------------------------------------------------------
+  - term: AI Gateway
+    aliases: [LLM Gateway, Model Proxy, LLM Proxy]
+    category: protocols
+    subcategory: infrastructure
+    status: modern
+    difficulty: intermediate
+    one_liner: A single endpoint in front of many model providers that handles keys, quotas, retries, logging and cost tracking.
+    tags: [protocol]
+    relations: {related_to: [model-routing, guardrails, throughput]}
+
+  - term: Model Routing
+    aliases: [Model Router, LLM Routing, Cascading]
+    category: industry-culture
+    subcategory: stack
+    status: modern
+    difficulty: intermediate
+    one_liner: Sending each request to the cheapest model that can handle it, and escalating only when it cannot.
+    tags: [protocol, inference]
+    relations: {depends_on: [ai-gateway], related_to: [reasoning-model, throughput]}
+
+  - term: Agent Identity
+    aliases: [Agent Authentication, Agent Authorisation, Delegated Authority]
+    category: protocols
+    subcategory: infrastructure
+    status: emerging
+    difficulty: advanced
+    one_liner: Establishing who an agent is acting for and what it is permitted to do on their behalf.
+    tags: [protocol, safety]
+    relations: {depends_on: [a2a], related_to: [guardrails, prompt-injection]}
+
+  # -- 15 Multimodal --------------------------------------------------------
+  - term: Image Generation
+    aliases: [Text-to-Image, Image Synthesis]
+    category: multimodal
+    subcategory: generation
+    status: established
+    difficulty: intermediate
+    one_liner: Producing an image from a text description, in practice almost always with a diffusion model.
+    tags: [architecture]
+    relations: {depends_on: [diffusion-model], related_to: [vision-language-model, ai-slop]}
+
+  - term: Speech Recognition
+    aliases: [ASR, Automatic Speech Recognition, Speech-to-Text]
+    category: multimodal
+    subcategory: audio
+    status: established
+    difficulty: intermediate
+    one_liner: Turning spoken audio into text, now usually with the same Transformer machinery used for language.
+    tags: [architecture]
+    relations: {depends_on: [transformer], related_to: [text-to-speech, vision-language-model]}
+
+  - term: Text-to-Speech
+    aliases: [TTS, Speech Synthesis, Voice Cloning]
+    category: multimodal
+    subcategory: audio
+    status: established
+    difficulty: intermediate
+    one_liner: Generating natural-sounding speech from text, increasingly with the speaker's voice and tone under control.
+    tags: [architecture]
+    relations: {related_to: [speech-recognition, diffusion-model]}
+
+  - term: Video Understanding
+    aliases: [Video-Language Model, Temporal Understanding]
+    category: multimodal
+    subcategory: vision-language
+    status: emerging
+    difficulty: advanced
+    one_liner: Reasoning over footage rather than stills, which multiplies the token cost and adds the problem of time.
+    tags: [architecture]
+    relations: {is_a: [vision-language-model], related_to: [world-model, jepa]}
+
+  # -- 16 World Models and Embodied AI -------------------------------------
+  - term: Embodied AI
+    aliases: [Physical AI, Robot Learning]
+    category: world-models-embodied
+    subcategory: robotics
+    status: emerging
+    difficulty: advanced
+    one_liner: AI that acts through a physical body, where mistakes have consequences that cannot be undone with a retry.
+    tags: [agents]
+    relations: {depends_on: [vision-language-action-model, sim-to-real], related_to: [world-model, reinforcement-learning]}
+
+  - term: Digital Twin
+    aliases: [Simulation Twin, Virtual Replica]
+    category: world-models-embodied
+    subcategory: simulation
+    status: established
+    difficulty: advanced
+    one_liner: A running simulation kept in step with a real system, used to test changes before making them for real.
+    tags: [training]
+    relations: {related_to: [sim-to-real, world-model]}
+
+  - term: Model-Based Reinforcement Learning
+    aliases: [Model-Based RL, Dyna, Planning with a Model]
+    category: world-models-embodied
+    subcategory: world-models
+    status: established
+    difficulty: research
+    one_liner: Learning how the environment behaves and then practising inside that learned model instead of in the real world.
+    tags: [training]
+    relations: {is_a: [reinforcement-learning], depends_on: [world-model], related_to: [sim-to-real]}
+
+  # -- 17 AI Coding and Culture --------------------------------------------
+  - term: AI Pair Programming
+    aliases: [AI-Assisted Coding, Code Completion, Copilot-style Assistance]
+    category: ai-coding-culture
+    subcategory: practice
+    status: established
+    difficulty: beginner
+    one_liner: A model suggesting code as you type, with you accepting, rejecting or editing every suggestion.
+    tags: [culture]
+    relations: {different_from: [vibe-coding], evolved_into: [coding-agent], related_to: [human-in-the-loop]}
+
+  - term: AI Engineer
+    aliases: [Agent Engineer, LLM Engineer, Applied AI Engineer]
+    category: ai-coding-culture
+    subcategory: roles
+    status: emerging
+    difficulty: beginner
+    one_liner: The role that builds products on top of existing models rather than training new ones, which is now most AI work.
+    tags: [culture]
+    relations: {related_to: [context-engineering, evaluation-harness, harness]}
+
+  - term: Superworker
+    aliases: [One-Person Engineering, AI-Augmented Worker]
+    category: ai-coding-culture
+    subcategory: slang
+    status: marketing
+    difficulty: beginner
+    one_liner: The claim that one person with AI tools can now do the work of a whole team, used in hiring copy more often than in evidence.
+    tags: [culture]
+    relations: {related_to: [vibe-coding, coding-agent, ai-native]}
+
+  - term: Prompt-to-App
+    aliases: [AI App Builder, Text-to-App, No-Code AI]
+    category: ai-coding-culture
+    subcategory: practice
+    status: emerging
+    difficulty: beginner
+    one_liner: Tools that generate a working application from a description, aimed at people who will never read the code.
+    tags: [culture]
+    relations: {depends_on: [coding-agent], related_to: [vibe-coding, ai-slop]}
+
+  # -- 18 Evaluation and Safety --------------------------------------------
+  - term: Jailbreaking
+    aliases: [Jailbreak, Safety Bypass, Adversarial Prompting]
+    category: evaluation-safety
+    subcategory: adversarial
+    status: established
+    difficulty: intermediate
+    one_liner: A user manipulating a model into behaviour its training was meant to prevent.
+    tags: [safety]
+    relations: {different_from: [prompt-injection], related_to: [alignment, red-teaming]}
+
+  - term: Red Teaming
+    aliases: [Adversarial Testing, Safety Testing]
+    category: evaluation-safety
+    subcategory: adversarial
+    status: established
+    difficulty: intermediate
+    one_liner: Deliberately attacking your own system to find the failures before someone else does.
+    tags: [safety]
+    relations: {part_of: [evaluation-harness], related_to: [jailbreaking, prompt-injection, alignment]}
+
+  - term: Data Poisoning
+    aliases: [Training Data Poisoning, Backdoor Attack, Model Poisoning]
+    category: evaluation-safety
+    subcategory: adversarial
+    status: established
+    difficulty: advanced
+    one_liner: Corrupting a model by planting material in the data it will be trained or fine-tuned on.
+    tags: [safety]
+    relations: {related_to: [pretraining, data-curation, benchmark-contamination]}
+
+  - term: Observability
+    aliases: [Tracing, LLM Observability, Monitoring, Spans]
+    category: evaluation-safety
+    subcategory: operations
+    status: established
+    difficulty: intermediate
+    one_liner: Recording every prompt, tool call and response so you can reconstruct what a system actually did when it went wrong.
+    tags: [safety, agents]
+    relations: {part_of: [harness], related_to: [evaluation-harness, drift, agent-loop]}
+
+  - term: Drift
+    aliases: [Model Drift, Data Drift, Regression]
+    category: evaluation-safety
+    subcategory: operations
+    status: established
+    difficulty: intermediate
+    one_liner: A system quietly getting worse over time because the world, the data or the model behind an API changed.
+    tags: [safety]
+    relations: {related_to: [observability, evaluation-harness, benchmark]}
+
+  # -- 19 Interpretability ---------------------------------------------------
+  - term: Explainability
+    aliases: [XAI, Feature Attribution, Saliency, SHAP]
+    category: interpretability
+    subcategory: approaches
+    status: established
+    difficulty: intermediate
+    one_liner: Producing a human-readable account of why a model made a particular decision, usually by attributing it to inputs.
+    tags: [safety]
+    relations: {different_from: [mechanistic-interpretability], related_to: [alignment]}
+
+  - term: Model Editing
+    aliases: [Knowledge Editing, ROME, Weight Editing]
+    category: interpretability
+    subcategory: methods
+    status: experimental
+    difficulty: research
+    one_liner: Changing a specific fact or behaviour by directly modifying weights, without retraining the model.
+    tags: [safety]
+    relations: {depends_on: [mechanistic-interpretability], alternative_to: [lora, activation-steering]}
+
+  # -- 20 Industry and Culture ----------------------------------------------
+  - term: AI-Native
+    aliases: [AI-First, AI-Native Startup]
+    category: industry-culture
+    subcategory: strategy
+    status: marketing
+    difficulty: beginner
+    one_liner: A company or product designed around models from the start rather than adding them later — a real distinction, and a much-abused label.
+    tags: [culture]
+    relations: {related_to: [superworker, frontier-model, ai-stack]}
+
+  - term: AI Stack
+    aliases: [Agent Stack, Inference Stack, LLM Stack]
+    category: industry-culture
+    subcategory: stack
+    status: informal
+    difficulty: beginner
+    one_liner: The layered set of components between raw hardware and an AI product, and a phrase used to mean whichever layer the speaker sells.
+    tags: [culture]
+    relations: {related_to: [ai-gateway, model-routing, vllm, harness]}
+
+  - term: Inference Provider
+    aliases: [Model Provider, Serving Provider, API Provider]
+    category: industry-culture
+    subcategory: model-economy
+    status: modern
+    difficulty: beginner
+    one_liner: A company that runs models on its own hardware and sells access by the token.
+    tags: [culture]
+    relations: {depends_on: [vllm, throughput], related_to: [open-weight-model, model-routing]}
+
+  - term: Data Flywheel
+    aliases: [Synthetic Data Flywheel, Feedback Loop]
+    category: industry-culture
+    subcategory: strategy
+    status: marketing
+    difficulty: beginner
+    one_liner: The claim that usage produces data which improves the product which attracts more usage — sometimes true, often asserted without evidence.
+    tags: [culture]
+    relations: {related_to: [synthetic-data, model-collapse, evaluation-harness]}

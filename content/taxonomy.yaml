@@ -1,0 +1,340 @@
+# The conceptual map. Ordered from silicon upward, then outward into practice
+# and culture. A concept belongs to exactly one category -- its home -- and
+# reaches every other context through relations, paths and tags.
+
+categories:
+  - id: computing-foundations
+    number: "01"
+    name: Computing Foundations
+    summary: >-
+      The machine underneath everything. Architecture, memory hierarchies,
+      operating systems, concurrency, networking and compilers. Most AI
+      performance work is really systems work wearing a new hat.
+    subcategories:
+      - id: architecture
+        name: Processors and architecture
+      - id: memory
+        name: Memory and storage
+      - id: os
+        name: Operating systems and concurrency
+      - id: networking
+        name: Networking and distributed systems
+      - id: toolchain
+        name: Compilers, kernels and drivers
+
+  - id: math-for-ai
+    number: "02"
+    name: Mathematics and Statistics for AI
+    summary: >-
+      The small amount of mathematics that does the heavy lifting: linear
+      algebra, probability, optimisation and information theory.
+    subcategories:
+      - id: linear-algebra
+        name: Linear algebra
+      - id: probability
+        name: Probability and statistics
+      - id: optimisation
+        name: Optimisation
+      - id: information
+        name: Information theory
+
+  - id: ai-foundations
+    number: "03"
+    name: Artificial Intelligence Foundations
+    summary: >-
+      What "AI" meant before it meant neural networks: symbolic reasoning,
+      search, planning, knowledge representation and the long argument about
+      what intelligence in a machine would even be.
+    subcategories:
+      - id: symbolic
+        name: Symbolic AI and logic
+      - id: search-planning
+        name: Search and planning
+      - id: paradigms
+        name: Paradigms and definitions
+
+  - id: machine-learning
+    number: "04"
+    name: Machine Learning
+    summary: >-
+      Learning a function from data instead of writing it. Supervision regimes,
+      generalisation, and the failure modes that never go away.
+    subcategories:
+      - id: paradigms
+        name: Learning paradigms
+      - id: generalisation
+        name: Generalisation and model selection
+      - id: settings
+        name: Distributed and continual settings
+
+  - id: deep-learning
+    number: "05"
+    name: Deep Learning
+    summary: >-
+      Stacked differentiable layers trained by gradient descent. The
+      architectures that dominated before Transformers, and the generative
+      families that run alongside them.
+    subcategories:
+      - id: basics
+        name: Networks and training
+      - id: architectures
+        name: Classic architectures
+      - id: generative
+        name: Generative models
+      - id: sequence
+        name: Sequence and state-space models
+
+  - id: transformers
+    number: "06"
+    name: Transformers
+    summary: >-
+      The architecture that ate the field. Attention, positional information,
+      the block structure, and the efficiency variants that made it affordable.
+    subcategories:
+      - id: attention
+        name: Attention mechanisms
+      - id: position
+        name: Positional information
+      - id: block
+        name: Block components
+      - id: variants
+        name: Variants and efficiency
+
+  - id: llms-foundation-models
+    number: "07"
+    name: LLMs and Foundation Models
+    summary: >-
+      What you get when a Transformer is trained on enough text: general
+      capability, plus a new vocabulary for describing, sizing and licensing it.
+    subcategories:
+      - id: models
+        name: Model classes
+      - id: representation
+        name: Tokens, embeddings and context
+      - id: capability
+        name: Capability and reasoning
+
+  - id: llm-training
+    number: "08"
+    name: LLM Training and Adaptation
+    summary: >-
+      How a model is made and then bent to a purpose: pretraining, supervised
+      fine-tuning, preference optimisation, parameter-efficient adaptation,
+      distillation and the data work that dominates all of it.
+    subcategories:
+      - id: pretraining
+        name: Pretraining
+      - id: alignment
+        name: Preference and alignment training
+      - id: adaptation
+        name: Efficient adaptation
+      - id: data
+        name: Data and scaling
+
+  - id: llm-inference
+    number: "09"
+    name: LLM Inference and Serving
+    summary: >-
+      Where the money is spent. Prefill and decode, the KV cache, batching,
+      memory management, decoding strategies, the metrics that matter and the
+      engines that implement all of it.
+    subcategories:
+      - id: mechanics
+        name: Generation mechanics
+      - id: memory
+        name: Cache and memory management
+      - id: batching
+        name: Scheduling and batching
+      - id: decoding
+        name: Decoding and sampling
+      - id: metrics
+        name: Performance metrics
+      - id: engines
+        name: Engines and kernels
+
+  - id: distributed-ai-systems
+    number: "10"
+    name: Distributed AI and AI Systems
+    summary: >-
+      Models too large for one device. Parallelism strategies, collective
+      communication, and the accelerator stack they run on.
+    subcategories:
+      - id: parallelism
+        name: Parallelism strategies
+      - id: communication
+        name: Collective communication
+      - id: accelerators
+        name: Accelerators and kernels
+
+  - id: rag-knowledge
+    number: "11"
+    name: RAG and Knowledge Systems
+    summary: >-
+      Giving a model access to information it was not trained on. Fifty years of
+      information retrieval, rediscovered and renamed.
+    subcategories:
+      - id: retrieval
+        name: Retrieval methods
+      - id: infrastructure
+        name: Indexes and vector stores
+      - id: pipelines
+        name: RAG pipelines
+      - id: structure
+        name: Structured knowledge
+
+  - id: agents
+    number: "12"
+    name: Agents and Agentic AI
+    summary: >-
+      Models that act in a loop: choosing tools, observing results and deciding
+      what to do next. The fastest-moving and least settled vocabulary in the
+      field.
+    subcategories:
+      - id: core
+        name: Core concepts
+      - id: cognition
+        name: Planning, reasoning and reflection
+      - id: memory
+        name: Agent memory
+      - id: topologies
+        name: Multi-agent topologies
+      - id: applied
+        name: Applied agents
+
+  - id: agent-engineering
+    number: "13"
+    name: Agent Engineering
+    summary: >-
+      The craft of building agent systems, and the contested vocabulary that
+      came with it. Where "harness", "scaffold" and "context engineering" are
+      pinned down as far as honesty allows.
+    subcategories:
+      - id: context
+        name: Context and prompting
+      - id: structure
+        name: Scaffolds, harnesses and runtimes
+      - id: capability
+        name: Skills and tools
+      - id: control
+        name: Guardrails, permissions and sandboxing
+      - id: process
+        name: Process and evaluation
+
+  - id: protocols
+    number: "14"
+    name: AI Protocols and Interoperability
+    summary: >-
+      How models, tools and agents talk to each other. Function calling,
+      structured outputs, MCP, agent-to-agent protocols, identity and gateways.
+    subcategories:
+      - id: calling
+        name: Calling conventions
+      - id: mcp
+        name: Model Context Protocol
+      - id: agent-protocols
+        name: Agent-to-agent protocols
+      - id: infrastructure
+        name: Gateways, routing and identity
+
+  - id: multimodal
+    number: "15"
+    name: Multimodal AI
+    summary: >-
+      Models that handle more than text: vision, audio, video, and the agents
+      that operate screens.
+    subcategories:
+      - id: vision-language
+        name: Vision and language
+      - id: generation
+        name: Generation
+      - id: audio
+        name: Speech and audio
+      - id: agents
+        name: Multimodal agents
+
+  - id: world-models-embodied
+    number: "16"
+    name: World Models and Embodied AI
+    summary: >-
+      The line of research that does not assume language models are the whole
+      future. Predictive world models, robotics, sim-to-real and physical AI.
+    subcategories:
+      - id: world-models
+        name: World models and prediction
+      - id: robotics
+        name: Robotics and control
+      - id: simulation
+        name: Simulation and transfer
+
+  - id: ai-coding-culture
+    number: "17"
+    name: AI Coding and Developer Culture
+    summary: >-
+      How software is actually being written now, including the informal
+      vocabulary that grew up around it. Slang is documented here, and labelled.
+    subcategories:
+      - id: practice
+        name: Practices and workflows
+      - id: roles
+        name: Roles and identities
+      - id: slang
+        name: Slang and critique
+
+  - id: evaluation-safety
+    number: "18"
+    name: Evaluation, Safety and Reliability
+    summary: >-
+      Knowing whether the thing works, and what happens when it does not.
+      Benchmarks, evals, failure modes, attacks, guardrails and observability.
+    subcategories:
+      - id: measurement
+        name: Measurement
+      - id: failure-modes
+        name: Failure modes
+      - id: adversarial
+        name: Adversarial behaviour
+      - id: alignment
+        name: Alignment
+      - id: operations
+        name: Monitoring and operations
+
+  - id: interpretability
+    number: "19"
+    name: Interpretability
+    summary: >-
+      Opening the model. Explaining behaviour, finding features and circuits,
+      and steering activations directly.
+    subcategories:
+      - id: approaches
+        name: Approaches
+      - id: methods
+        name: Methods and tooling
+
+  - id: industry-culture
+    number: "20"
+    name: AI Industry and Culture
+    summary: >-
+      The vocabulary of labs, job ads, funding decks and conference talks --
+      with technical terminology separated from marketing.
+    subcategories:
+      - id: model-economy
+        name: Models as products
+      - id: stack
+        name: Stacks and infrastructure
+      - id: strategy
+        name: Strategy language
+
+  - id: history
+    number: "21"
+    name: Historical Foundations
+    summary: >-
+      Concepts whose primary significance is historical: the ideas modern work
+      is standing on. Every modern entry also carries an era, so the timeline
+      view spans all domains.
+    subcategories:
+      - id: origins
+        name: Origins of computing and AI
+      - id: connectionism
+        name: Connectionism
+      - id: statistical
+        name: Statistical era

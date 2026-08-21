@@ -1,0 +1,99 @@
+# Base configuration. `enc build` reads this file, injects the generated nav,
+# and writes build/mkdocs.yml. Edit this file, never the generated one.
+
+site_name: The AI & Computing Encyclopedia
+site_description: >-
+  A map of AI and computing concepts, from the perceptron to agent harnesses.
+  One canonical entry per concept, connected by typed relationships.
+site_author: AI & Computing Encyclopedia contributors
+repo_url: https://github.com/Iamhifza/encyclopedia
+repo_name: ai-computing-encyclopedia
+edit_uri: edit/main/content/entries/
+copyright: >-
+  Content licensed CC BY-SA 4.0 · Code licensed MIT
+
+theme:
+  name: material
+  language: en
+  font: false
+  icon:
+    repo: fontawesome/brands/github
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.action.edit
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+extra_css:
+  - assets/stylesheets/encyclopedia.css
+
+extra_javascript:
+  - assets/javascripts/graph.js
+  - assets/javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.smartsymbols
+  - pymdownx.caret
+  - pymdownx.tilde
+
+plugins:
+  - search:
+      separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Iamhifza/encyclopedia
+      name: Source on GitHub
+  generator: false
+
+not_in_nav: |
+  api/*.json
+  terms/*.md

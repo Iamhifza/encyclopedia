@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Iamhifza/encyclopedia/schema/collections.schema.json",
+  "title": "Encyclopedia collections",
+  "description": "Schemas for the non-entry source files: taxonomy, learning paths and timeline.",
+  "$defs": {
+    "taxonomy": {
+      "type": "object",
+      "required": ["categories"],
+      "additionalProperties": false,
+      "properties": {
+        "categories": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["id", "number", "name", "summary"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+              "number": { "type": "string", "pattern": "^[0-9]{2}$" },
+              "name": { "type": "string" },
+              "summary": { "type": "string" },
+              "subcategories": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["id", "name"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+                    "name": { "type": "string" },
+                    "summary": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "learningPaths": {
+      "type": "object",
+      "required": ["paths"],
+      "additionalProperties": false,
+      "properties": {
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "audience", "summary", "steps"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+              "name": { "type": "string" },
+              "audience": { "type": "string" },
+              "summary": { "type": "string" },
+              "estimated_effort": { "type": "string" },
+              "steps": {
+                "type": "array",
+                "minItems": 2,
+                "items": {
+                  "type": "object",
+                  "required": ["term"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "term": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+                    "why": { "type": "string" },
+                    "optional": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "timeline": {
+      "type": "object",
+      "required": ["eras"],
+      "additionalProperties": false,
+      "properties": {
+        "eras": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "label", "summary"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+              "label": { "type": "string" },
+              "summary": { "type": "string" },
+              "events": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["year", "what"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "year": { "type": "string" },
+                    "what": { "type": "string" },
+                    "term": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+                    "note": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
