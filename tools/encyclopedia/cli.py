@@ -44,7 +44,7 @@ def _load():
         return load_corpus(CONTENT)
     except ContentError as exc:
         print(f"{RED}content error{RESET}: {exc}", file=sys.stderr)
-        raise SystemExit(2)
+        raise SystemExit(2) from exc
 
 
 def cmd_validate(args) -> int:
@@ -311,7 +311,7 @@ def cmd_path(args) -> int:
         print(f"{YELLOW}no path{RESET} between '{args.start}' and '{args.goal}'")
         return 1
     print(" → ".join(corpus.entries[s].term for s in trail))
-    for a, b in zip(trail, trail[1:]):
+    for a, b in zip(trail, trail[1:], strict=False):
         for key, targets in graph.neighbours(a).items():
             if b in targets:
                 print(f"{DIM}  {corpus.entries[a].term} --{key}--> {corpus.entries[b].term}{RESET}")
