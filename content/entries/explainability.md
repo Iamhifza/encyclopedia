@@ -1,16 +1,112 @@
 ---
 term: Explainability
-aliases: [XAI, Feature Attribution, Saliency, SHAP]
+aliases: [XAI, Feature Attribution, Saliency, SHAP, LIME]
 category: interpretability
 subcategory: approaches
-depth: seed
+depth: full
 status: established
 difficulty: intermediate
 one_liner: "Producing a human-readable account of why a model made a particular decision, usually by attributing it to inputs."
 tags: [safety]
 relations:
   different_from: [mechanistic-interpretability]
-  related_to: [alignment]
-sources: []
+  related_to: [alignment, reasoning-model, attention]
+prerequisites: [neural-network]
+encountered_in: [research-papers, job-descriptions, standards, conferences]
+sources:
+  - type: paper
+    title: '"Why Should I Trust You?" Explaining the Predictions of Any Classifier (LIME)'
+    url: https://arxiv.org/abs/1602.04938
+    year: 2016
+  - type: paper
+    title: "A Unified Approach to Interpreting Model Predictions (SHAP)"
+    url: https://arxiv.org/abs/1705.07874
+    year: 2017
+  - type: paper
+    title: "The Mythos of Model Interpretability"
+    url: https://arxiv.org/abs/1606.03490
+    year: 2016
 updated: 2026-08-21
 ---
+
+## Simple Explanation
+
+A model denies a loan application. The applicant, and increasingly the regulator,
+wants to know why. Explainability is the set of techniques that produce an
+answer — usually of the form "these inputs pushed the decision this way, by this
+much".
+
+The uncomfortable part, well documented, is that such an explanation may describe
+what the model *responds to* without describing what it actually *computed*.
+
+## Technical Definition
+
+Methods producing human-interpretable accounts of model behaviour. The dominant
+family is feature attribution: assigning each input feature a contribution to a
+particular output, either by perturbation (LIME fits a simple local model around
+the input), by cooperative game theory (SHAP computes Shapley values), or by
+gradients (saliency and integrated gradients).
+
+## Why Does It Exist?
+
+Accountability, debugging and regulation. Where a decision materially affects
+someone — credit, employment, healthcare, criminal justice — "the model said so"
+is not an acceptable answer, and in several jurisdictions it is not a lawful one.
+
+## What Problem Does It Solve?
+
+It gives a decision a stated rationale, supports debugging by revealing spurious
+features, and satisfies documentation requirements.
+
+## How Does It Work?
+
+```text
+input                 attribution              output
+income      ████████████ +0.31
+postcode    ███ +0.08          ← spurious feature, caught by inspection
+age         ██ −0.05
+history     ██████████████████ +0.44
+                                          ▶ approved
+
+perturbation: change one feature, observe the change in output
+gradients:    ∂output/∂input, at this input
+```
+
+## Mental Model
+
+A weather forecaster explaining a prediction by pointing at pressure and humidity.
+Genuinely informative, and not the same as the simulation the model ran.
+
+## Example
+
+The classic catch: attribution methods revealed a husky-versus-wolf classifier was
+keying on *snow in the background*. That is exactly what explainability is for.
+The equally classic caveat: two attribution methods frequently disagree on the
+same prediction, and there is no ground truth to adjudicate between them.
+
+## Real-World Usage
+
+Regulated decision-making, model debugging, and dataset auditing. In LLMs, the
+usual "explanation" is the model's own chain-of-thought — which is generated text
+that may rationalise rather than report, a distinction interpretability research
+has demonstrated repeatedly and which makes it a weaker form of evidence than it
+appears.
+
+## Common Confusions
+
+* **Explainability vs mechanistic interpretability** — this field describes
+  behaviour by attributing it to inputs; mechanistic work seeks the actual
+  internal computation, with causal evidence. Attribution is correlational.
+* **Attention weights are not explanations** — high attention does not establish
+  causal reliance, a point argued extensively in the literature.
+* **Stated reasoning is not a log** — a model's explanation of itself is more
+  output, not introspection.
+* **Interpretable models are an alternative** — sometimes the right answer is a
+  simpler model that needs no explaining, rather than a complex one with an
+  explanation bolted on.
+
+## Why Should I Care?
+
+It is where AI meets regulation, and knowing the difference between an
+explanation that describes behaviour and one that describes computation is the
+difference between informed trust and reassurance.
