@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/OWNER/ai-computing-encyclopedia/schema/entry.schema.json",
+  "$id": "https://github.com/Iamhifza/encyclopedia/schema/entry.schema.json",
   "title": "Encyclopedia Entry",
   "description": "Front-matter contract for a canonical entry in content/entries/<slug>.md. One canonical entry per concept; category membership and relations provide the many access paths.",
   "type": "object",
@@ -86,9 +86,8 @@
       "properties": {
         "year": {
           "type": "integer",
-          "minimum": 1600,
-          "maximum": 2100,
-          "description": "Year the concept originated. The lower bound accommodates pre-computing mathematics (Bayes, 1763) that the encyclopedia legitimately covers."
+          "minimum": 1800,
+          "maximum": 2100
         },
         "circa": {
           "type": "boolean",
@@ -234,7 +233,7 @@
           },
           "year": {
             "type": "integer",
-            "minimum": 1600,
+            "minimum": 1800,
             "maximum": 2100
           },
           "note": {
