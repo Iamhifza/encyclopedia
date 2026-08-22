@@ -16,7 +16,7 @@ relations:
   alternative_to: [neural-network]
   evolved_into: [expert-system, knowledge-graph]
   related_to: [search-algorithm, automated-planning, reasoning-model]
-prerequisites: [expert-system]
+prerequisites: []
 encountered_in: [research-papers, conferences, interviews]
 sources:
   - type: paper

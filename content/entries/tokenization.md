@@ -15,7 +15,7 @@ relations:
   part_of: [large-language-model]
   used_by: [context-window, embedding]
   related_to: [hallucination]
-prerequisites: [large-language-model]
+prerequisites: []
 encountered_in: [production-systems, github, interviews, documentation]
 sources:
   - type: paper

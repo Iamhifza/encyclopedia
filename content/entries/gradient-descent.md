@@ -12,7 +12,7 @@ relations:
   depends_on: [backpropagation, loss-function]
   used_by: [pretraining, neural-network, supervised-learning]
   related_to: [gpu]
-prerequisites: [backpropagation, loss-function]
+prerequisites: [loss-function]
 encountered_in: [research-papers, interviews, github]
 sources:
   - type: paper

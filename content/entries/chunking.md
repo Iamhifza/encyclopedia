@@ -11,7 +11,7 @@ tags: [retrieval]
 relations:
   part_of: [rag]
   related_to: [embedding, context-window, dense-retrieval, reranking]
-prerequisites: [rag, embedding]
+prerequisites: [embedding]
 encountered_in: [production-systems, github, technical-blogs]
 sources:
   - type: post

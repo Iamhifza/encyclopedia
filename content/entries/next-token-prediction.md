@@ -13,7 +13,7 @@ relations:
   depends_on: [loss-function]
   used_by: [autoregressive-generation]
   related_to: [self-supervised-learning, information-theory, tokenization]
-prerequisites: [pretraining, loss-function]
+prerequisites: [loss-function]
 encountered_in: [research-papers, interviews, technical-blogs]
 sources:
   - type: paper

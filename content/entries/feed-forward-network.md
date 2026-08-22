@@ -11,7 +11,7 @@ tags: [architecture]
 relations:
   part_of: [transformer]
   related_to: [mixture-of-experts, mechanistic-interpretability, activation-function]
-prerequisites: [transformer, neural-network]
+prerequisites: [neural-network]
 encountered_in: [research-papers, interviews, github]
 sources:
   - type: paper

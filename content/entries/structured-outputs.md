@@ -13,7 +13,7 @@ relations:
   used_by: [tool-calling, ai-workflow]
   different_from: [tool-calling]
   related_to: [hallucination, evaluation-harness]
-prerequisites: [sampling, tool-calling]
+prerequisites: [sampling]
 encountered_in: [documentation, production-systems, github]
 sources:
   - type: repo

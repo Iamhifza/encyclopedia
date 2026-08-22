@@ -1,8 +1,184 @@
 # Ordered routes through existing entries. A path adds no new content -- it is a
 # reading order, with a note on why each step comes where it does. Steps must be
 # entry slugs, and an entry's prerequisites should appear before it.
+#
+# Grouped roughly: foundations, then the model, then the modern stack, then
+# practice and culture. Most entries appear in more than one path, which is the
+# point -- the same concept is reached from whichever direction the reader came.
 
 paths:
+
+  # ---------------------------------------------------------------- foundations
+  - id: learn-mathematics
+    name: The Mathematics You Actually Need
+    audience: Anyone who wants to read papers without bouncing off the notation
+    estimated_effort: A weekend
+    summary: >-
+      Not a mathematics course. The specific handful of ideas that do the work in
+      machine learning, in the order they depend on each other, with every symbol
+      explained where it appears.
+    steps:
+      - term: linear-algebra
+        why: Every operation in every model is a matrix multiply. Start by reading shapes.
+      - term: probability
+        why: Model outputs are distributions, not answers. This is the frame for everything after.
+      - term: information-theory
+        why: Entropy and cross-entropy — what the training objective actually measures.
+      - term: loss-function
+        why: The one number the model minimises, and therefore the only thing it cares about.
+      - term: gradient-descent
+        why: How the number gets smaller.
+      - term: backpropagation
+        why: How the gradient is computed for millions of parameters at once.
+      - term: overfitting
+        why: The failure mode all of the above can produce.
+      - term: regularisation
+        why: The classical defence against it.
+      - term: generalisation
+        why: What you were actually trying to achieve throughout.
+      - term: bayesian-inference
+        why: The correct treatment of uncertainty, and what deep learning gives up by ignoring it.
+        optional: true
+
+  - id: learn-ml-foundations
+    name: Machine Learning Foundations
+    audience: Developers moving into ML from software engineering
+    estimated_effort: Three or four days
+    summary: >-
+      The learning paradigms and the vocabulary that predates the LLM era, and
+      that every practitioner still reasons in.
+    steps:
+      - term: supervised-learning
+        why: The default framing, and the baseline everything else is compared against.
+      - term: overfitting
+        why: The failure that motivates most of ML practice.
+      - term: generalisation
+        why: The property you are actually buying.
+      - term: unsupervised-learning
+        why: What to do when there are no labels at all.
+      - term: self-supervised-learning
+        why: Labels manufactured from the data — the trick that made scale possible.
+      - term: transfer-learning
+        why: Reusing what one model learned for another task.
+      - term: reinforcement-learning
+        why: Learning from outcomes rather than from answers.
+      - term: continual-learning
+        why: Why models have a knowledge cutoff, and why that is hard to fix.
+      - term: federated-learning
+        why: Learning from data you are not permitted to collect.
+        optional: true
+
+  - id: learn-ml-systems
+    name: ML Systems and Hardware
+    audience: Engineers who need to know why the machine behaves as it does
+    estimated_effort: A week
+    summary: >-
+      The layer beneath the model. Most AI performance problems are systems
+      problems, and this is the vocabulary for diagnosing them.
+    steps:
+      - term: cpu
+        why: What runs everything the accelerator is not doing — and a frequent hidden bottleneck.
+      - term: gpu
+        why: Why throughput hardware suits neural networks.
+      - term: memory-hierarchy
+        why: The single most useful idea here. Nearly every performance result is a memory result.
+      - term: virtual-memory
+        why: A 1960s idea you will meet again as PagedAttention.
+      - term: operating-system
+        why: Scheduling, paging and isolation — all of which LLM serving rebuilt under new names.
+      - term: parallel-computing
+        why: Amdahl's law, and why decode latency cannot be fixed with more hardware.
+      - term: cuda
+        why: The platform that made GPUs programmable, and the industry's real moat.
+      - term: gpu-kernel
+        why: Where inference speedups are actually won.
+      - term: compiler
+        why: How a graph of operations becomes fast device code.
+      - term: distributed-systems
+        why: Beyond one machine, everything becomes this.
+      - term: npu
+        why: What happens when you specialise the silicon further.
+        optional: true
+
+  - id: learn-history
+    name: How AI Got Here
+    audience: Anyone who wants the modern field to make sense rather than seem arbitrary
+    estimated_effort: A day, read as a narrative
+    summary: >-
+      Seventy years in fifteen entries. Read in order, each step exists because
+      the previous one had a specific, nameable defect.
+    steps:
+      - term: turing-test
+        why: Where the field's central question was first posed carefully.
+      - term: symbolic-ai
+        why: What AI meant for thirty years — intelligence as rules and symbols.
+      - term: search-algorithm
+        why: How those systems actually explored possibilities — and it is quietly back.
+      - term: expert-system
+        why: Symbolic AI's commercial peak, and the maintenance costs that ended it.
+      - term: perceptron
+        why: "The other tradition: a machine that learned its own weights."
+      - term: neural-network
+        why: Stacking perceptrons, once anyone could train them.
+      - term: backpropagation
+        why: The algorithm that made depth trainable, published to little immediate effect.
+      - term: rnn
+        why: The first serious answer to sequences.
+      - term: lstm
+        why: Gating, and the additive path that lets gradients survive.
+      - term: cnn
+        why: The architecture that started the deep learning era in 2012.
+      - term: word2vec
+        why: Meaning becomes geometry.
+      - term: attention
+        why: The fixed-memory bottleneck disappears.
+      - term: transformer
+        why: Recurrence discarded entirely.
+      - term: large-language-model
+        why: What scale turned that architecture into.
+      - term: reasoning-model
+        why: The second scaling axis, opened in 2024.
+      - term: ai-agent
+        why: Where the field is now, and why the vocabulary is so unsettled.
+
+  # ------------------------------------------------------------------- the model
+  - id: learn-deep-learning
+    name: Deep Learning Architectures
+    audience: Anyone who wants to read an architecture diagram and know what it does
+    estimated_effort: Four or five days
+    summary: >-
+      The components every model is assembled from, and the architecture families
+      that ran the field before Transformers — several of which still win on their
+      own ground.
+    steps:
+      - term: neural-network
+        why: Layers, weights and a non-linearity. Everything else is wiring.
+      - term: activation-function
+        why: The small bend without which depth is pointless.
+      - term: backpropagation
+        why: Credit assignment across millions of parameters.
+      - term: residual-connection
+        why: One plus sign, and networks a hundred layers deep become trainable.
+      - term: layer-normalisation
+        why: The other component keeping deep training stable.
+      - term: cnn
+        why: Building translation invariance into the architecture itself.
+      - term: rnn
+        why: Sequences, and the two defects that led to attention.
+      - term: lstm
+        why: Gating as the fix for vanishing gradients.
+      - term: autoencoder
+        why: Compression as a way of learning representations.
+      - term: gan
+        why: The generative approach that dominated and then lost on trainability.
+      - term: diffusion-model
+        why: The one that replaced it, and why.
+      - term: mixture-of-experts
+        why: Capacity without proportional cost — now standard at frontier scale.
+      - term: state-space-model
+        why: The current architectural challenge to attention.
+        optional: true
+
   - id: learn-transformers
     name: Learn Transformers
     audience: Anyone who wants to understand the architecture behind modern models
@@ -17,21 +193,119 @@ paths:
       - term: backpropagation
         why: Why depth became trainable at all, and why training needs so much memory.
       - term: rnn
-        why: The first serious answer to sequences, and the source of the two problems attention solves.
+        why: The first serious answer to sequences, and the source of the problems attention solves.
       - term: lstm
         why: Gating and additive memory paths — the trick that reappears as residual connections.
       - term: attention
         why: The fixed-size memory bottleneck disappears here.
       - term: self-attention
         why: Attention turned inward, plus the causal mask that makes generation possible.
+      - term: positional-encoding
+        why: Attention is order-blind. Something has to say where each token sits.
+      - term: rope
+        why: The scheme that won, and the reason context windows can be extended.
+      - term: residual-connection
+        why: The bus every block reads from and writes to.
+      - term: layer-normalisation
+        why: Where it sits relative to that bus decides whether deep models train at all.
+      - term: feed-forward-network
+        why: Two-thirds of the parameters live here, not in attention.
       - term: transformer
         why: The block assembled. After this, most model differences are configuration.
-      - term: rope
-        why: How position is encoded, and therefore how context windows get extended.
+      - term: cross-attention
+        why: Conditioning on something outside the sequence — images, audio, a source text.
+      - term: encoder-decoder
+        why: The original design, still standard for translation and speech.
       - term: grouped-query-attention
         why: The first place architecture is shaped by serving cost rather than quality.
+      - term: efficient-attention
+        why: The attempts to beat quadratic cost, and why most of them lost.
         optional: true
 
+  - id: learn-llms
+    name: Understanding Language Models
+    audience: Developers who use LLMs and want to know what they are using
+    estimated_effort: Three days
+    summary: >-
+      What a language model is made of, from the tokens going in to the
+      capabilities coming out — and what the numbers on a model card mean.
+    steps:
+      - term: tokenization
+        why: The model reads fragments, not words. This sets cost and a lot of odd behaviour.
+      - term: vocabulary
+        why: The fixed alphabet, chat templates, and why some languages cost more.
+      - term: embedding
+        why: Meaning as coordinates.
+      - term: transformer
+        why: The architecture underneath.
+      - term: pretraining
+        why: Where all the knowledge comes from.
+      - term: base-model
+        why: What pretraining actually produces, before it is taught to answer.
+      - term: large-language-model
+        why: What that becomes at scale, after adaptation.
+      - term: foundation-model
+        why: The role it plays for everything built on top.
+      - term: context-window
+        why: The one hard constraint you design around.
+      - term: long-context-model
+        why: Why advertised context exceeds usable context.
+      - term: chain-of-thought
+        why: Intermediate tokens as computation.
+      - term: reasoning-model
+        why: What happens when that behaviour is trained in rather than requested.
+      - term: small-language-model
+        why: The other direction, and often the right one for production.
+
+  # -------------------------------------------------------------------- training
+  - id: learn-training
+    name: How Models Are Made
+    audience: Engineers and researchers who want the training pipeline end to end
+    estimated_effort: A week
+    summary: >-
+      From raw text to a deployed assistant, in the order the stages actually
+      happen — and with the honest note that data work dominates all of it.
+    steps:
+      - term: supervised-learning
+        why: The baseline framing everything else is measured against.
+      - term: self-supervised-learning
+        why: "Why scale was possible: supervision that never runs out."
+      - term: backpropagation
+        why: The credit assignment underneath every stage.
+      - term: next-token-prediction
+        why: The objective itself, and why capability emerged as a side effect of it.
+      - term: pretraining
+        why: Where capability and knowledge come from.
+      - term: data-curation
+        why: What goes into the corpus decides more than architecture does.
+      - term: curriculum-learning
+        why: And when it goes in — the annealing phase punches above its weight.
+      - term: scaling-laws
+        why: How the size of the run gets decided.
+      - term: supervised-fine-tuning
+        why: Turning a text predictor into something that answers.
+      - term: rlhf
+        why: Optimising for judgement that cannot be written down.
+      - term: dpo
+        why: The same objective, without the reinforcement learning machinery.
+      - term: rlaif
+        why: Replacing the human labeller with a written constitution.
+      - term: rlvr
+        why: What happens when the reward can be checked automatically.
+      - term: grpo
+        why: The algorithm that made that practical at scale.
+      - term: reasoning-model
+        why: The capability all of the above produced.
+      - term: lora
+        why: Adaptation you can afford.
+      - term: distillation
+        why: Getting frontier behaviour into a servable model.
+      - term: synthetic-data
+        why: Where most post-training data now comes from.
+      - term: model-collapse
+        why: And the limit on that.
+
+  # ------------------------------------------------------------------- inference
   - id: learn-llm-inference
     name: Learn LLM Inference
     audience: Engineers who have to make a model fast, cheap or both
@@ -50,6 +324,11 @@ paths:
         why: The compute-bound half, and where time to first token is spent.
       - term: decode
         why: The bandwidth-bound half, and where per-token cost is spent.
+      - term: sampling
+        why: How logits become a token — and half of "the model is unreliable".
+      - term: beam-search
+        why: The decoding strategy that works for translation and fails for chat.
+        optional: true
       - term: continuous-batching
         why: The largest throughput lever, and why it costs so little latency.
       - term: paged-attention
@@ -58,8 +337,12 @@ paths:
         why: The highest-leverage optimisation for agent and chat workloads.
       - term: chunked-prefill
         why: How long prompts stop wrecking everyone else's streaming.
+      - term: inference-scheduler
+        why: The component that decides all of the above, every single step.
       - term: quantization
         why: Fewer bytes per weight means proportionally faster decoding.
+      - term: kv-cache-quantisation
+        why: The same argument applied to the other tenant of GPU memory.
       - term: speculative-decoding
         why: Buying latency with the arithmetic capacity that decode leaves idle.
       - term: flash-attention
@@ -70,10 +353,86 @@ paths:
         why: And the metric that sets the bill.
       - term: vllm
         why: See all of it implemented in one place.
-      - term: tensor-parallelism
-        why: When one device is not enough.
-        optional: true
 
+  - id: learn-serving-at-scale
+    name: Serving at Scale
+    audience: Anyone choosing an engine or sizing a deployment
+    estimated_effort: Three or four days
+    summary: >-
+      Past a single GPU and a single user. Which engine, how many devices, and
+      what the trade-offs actually are. Read the inference path first.
+    steps:
+      - term: throughput
+        why: The metric that decides cost per token, and therefore the architecture.
+      - term: inference-latency
+        why: The constraint throughput is maximised subject to.
+      - term: inference-scheduler
+        why: Where fairness, priority and preemption policy live.
+      - term: tensor-parallelism
+        why: Splitting a model within a layer, when it does not fit on one device.
+      - term: pipeline-parallelism
+        why: Splitting between layers, when it does not fit in one node.
+      - term: disaggregated-inference
+        why: Separating prefill and decode onto hardware sized for each.
+      - term: vllm
+        why: The portable default.
+      - term: sglang
+        why: Built for prefix-heavy agent workloads.
+      - term: tensorrt-llm
+        why: Maximum throughput on NVIDIA hardware, minimum portability.
+      - term: llama-cpp
+        why: The opposite end entirely — one user, one laptop, no GPU.
+      - term: hugging-face-transformers
+        why: The reference implementation, and why it is not a serving engine.
+      - term: inference-provider
+        why: The build-versus-buy decision, stated in terms of utilisation.
+      - term: model-routing
+        why: Not every request needs the largest model.
+      - term: ai-gateway
+        why: Where keys, quotas, logging and failover belong.
+
+  # ---------------------------------------------------------------- retrieval
+  - id: learn-rag
+    name: Learn RAG and Retrieval
+    audience: Anyone connecting a model to a body of documents
+    estimated_effort: Three or four days
+    summary: >-
+      Retrieval-augmented generation is an information retrieval project with a
+      language model at the end. Learning it in that order prevents most of the
+      usual disappointments.
+    steps:
+      - term: information-retrieval
+        why: Fifty years of prior art, and the metrics you will need to diagnose failures.
+      - term: embedding
+        why: Meaning as geometry; the representation everything downstream depends on.
+      - term: dense-retrieval
+        why: Semantic matching, and precisely where it loses to keyword search.
+      - term: hybrid-retrieval
+        why: Combining both, which beats either — and is usually a configuration flag.
+      - term: vector-database
+        why: Making nearest-neighbour search fast enough to serve.
+      - term: chunking
+        why: The unglamorous decision that sets retrieval quality.
+      - term: reranking
+        why: Precision at the top of the list, where it matters.
+      - term: rag
+        why: The pipeline assembled, with the failure modes named.
+      - term: grounding
+        why: The difference between an answer you must trust and one you can check.
+      - term: hallucination
+        why: What retrieval reduces, and what it does not.
+      - term: context-window
+        why: The budget that determines how much you can retrieve.
+      - term: knowledge-graph
+        why: When your questions are about relationships rather than passages.
+      - term: graphrag
+        why: Retrieval that traverses structure instead of matching text.
+      - term: agentic-rag
+        why: When one retrieval is not enough.
+      - term: llm-as-a-judge
+        why: How to measure whether any of it improved.
+
+  # -------------------------------------------------------------------- agents
   - id: learn-ai-agents
     name: Learn AI Agents
     audience: Developers building systems that act, not just answer
@@ -87,12 +446,18 @@ paths:
         why: The component in the middle of the loop.
       - term: tool-calling
         why: The mechanism that turns generated text into action.
+      - term: structured-outputs
+        why: The machinery underneath it, and how you stop parse failures entirely.
       - term: agent-loop
         why: The actual cycle. Everything else is a decision about this loop.
       - term: ai-agent
         why: What the loop adds up to — and why the word is contested.
       - term: ai-workflow
         why: The alternative you should usually reach for first.
+      - term: automated-planning
+        why: What a real planner guarantees, and what an LLM's "plan" does not.
+      - term: reflection
+        why: Self-correction, and the condition under which it actually works.
       - term: context-window
         why: The budget every agent design is negotiating with.
       - term: context-engineering
@@ -101,53 +466,40 @@ paths:
         why: What survives when the window does not.
       - term: harness
         why: The runtime around the model, and the vocabulary war around the word.
+      - term: scaffold
+        why: The other half of that argument, and what it means in evaluation.
       - term: agent-skills
         why: How procedural knowledge gets loaded only when needed.
+      - term: orchestration
+        why: Four different things this word means. Ask which.
+      - term: multi-agent-system
+        why: When splitting the work helps, and when it just multiplies the bill.
       - term: mcp
         why: How the agent reaches systems it did not ship with.
+      - term: a2a
+        why: And how it reaches agents it did not build.
+      - term: agent-identity
+        why: Whose authority it acts under — currently the weakest link.
       - term: prompt-injection
         why: Read this before granting an agent any real permission.
+      - term: sandboxing
+        why: Bounding what a manipulated agent can reach.
+      - term: human-in-the-loop
+        why: Where the approval gate goes.
       - term: guardrails
         why: Enforce in code what you cannot enforce in a prompt.
       - term: evaluation-harness
         why: Without this you cannot tell whether any of the above helped.
 
-  - id: learn-rag
-    name: Learn RAG and Retrieval
-    audience: Anyone connecting a model to a body of documents
-    estimated_effort: Two or three days
-    summary: >-
-      Retrieval-augmented generation is an information retrieval project with a
-      language model at the end. Learning it in that order prevents most of the
-      usual disappointments.
-    steps:
-      - term: information-retrieval
-        why: Fifty years of prior art, and the metrics you will need to diagnose failures.
-      - term: embedding
-        why: Meaning as geometry; the representation everything downstream depends on.
-      - term: dense-retrieval
-        why: Semantic matching, and precisely where it loses to keyword search.
-      - term: vector-database
-        why: Making nearest-neighbour search fast enough to serve.
-      - term: rag
-        why: The pipeline assembled, with the failure modes named.
-      - term: hallucination
-        why: What retrieval reduces, and what it does not.
-      - term: context-window
-        why: The budget that determines how much you can retrieve.
-      - term: agentic-rag
-        why: When one retrieval is not enough.
-      - term: llm-as-a-judge
-        why: How to measure whether any of it improved.
-
+  # ---------------------------------------------------------------- practice
   - id: learn-ai-engineering
     name: Modern AI Engineering
     audience: Developers moving from using models to shipping systems
     estimated_effort: Several weeks
     summary: >-
       The practical spine: what a model is, how to steer it, how to give it
-      knowledge and hands, and how to know whether it works. This is the closest
-      thing here to a job description.
+      knowledge and hands, and how to know whether it works. The closest thing
+      here to a job description.
     steps:
       - term: large-language-model
         why: What you are actually building on.
@@ -157,8 +509,12 @@ paths:
         why: The one hard constraint you design around.
       - term: prompt-engineering
         why: The cheapest lever, and where every debugging session should start.
+      - term: few-shot-learning
+        why: What examples in a prompt actually convey — and what they do not.
       - term: sampling
         why: Half of "the model is unreliable" is a temperature setting.
+      - term: structured-outputs
+        why: Turning parse failures from unlikely into impossible.
       - term: rag
         why: Giving the model knowledge it was not trained on.
       - term: tool-calling
@@ -173,50 +529,55 @@ paths:
         why: Managing what the model sees once the system has moving parts.
       - term: evaluation-harness
         why: The practice that separates shipping from guessing.
+      - term: observability
+        why: Because you cannot debug what you did not record.
+      - term: drift
+        why: The failure with no error message.
       - term: prompt-injection
         why: The security review you will be asked about.
+      - term: guardrails
+        why: What you can actually enforce.
       - term: inference-latency
         why: What users feel, and which half of the system to fix.
+      - term: model-routing
+        why: Not every request needs the most expensive model.
       - term: open-weight-model
         why: The build-versus-buy decision, stated precisely.
+      - term: ai-engineer
+        why: The role all of this adds up to.
 
-  - id: learn-training
-    name: How Models Are Made
-    audience: Engineers and researchers who want the training pipeline end to end
-    estimated_effort: A week
+  - id: learn-ai-coding
+    name: AI-Assisted Software Development
+    audience: Working developers deciding how much to delegate
+    estimated_effort: Two days
     summary: >-
-      From raw text to a deployed assistant, in the order the stages actually
-      happen — and with the honest note that data work dominates all of it.
+      How software is actually being written now, including the informal
+      vocabulary — and where each practice stops being appropriate.
     steps:
-      - term: supervised-learning
-        why: The baseline framing everything else is measured against.
-      - term: self-supervised-learning
-        why: "Why scale was possible: supervision that never runs out."
-      - term: backpropagation
-        why: The credit assignment underneath every stage.
-      - term: pretraining
-        why: Where capability and knowledge come from.
-      - term: scaling-laws
-        why: How the size of that run gets decided.
-      - term: supervised-fine-tuning
-        why: Turning a text predictor into something that answers.
-      - term: rlhf
-        why: Optimising for judgement that cannot be written down.
-      - term: dpo
-        why: The same objective, without the reinforcement learning machinery.
-      - term: rlvr
-        why: What happens when the reward can be checked automatically.
-      - term: reasoning-model
-        why: The capability that produced, and the second scaling axis.
-      - term: lora
-        why: Adaptation you can afford.
-      - term: distillation
-        why: Getting frontier behaviour into a servable model.
-      - term: synthetic-data
-        why: Where most post-training data now comes from.
-      - term: model-collapse
-        why: And the limit on that.
+      - term: ai-pair-programming
+        why: Suggestions in your editor. You read every one.
+      - term: coding-agent
+        why: Multi-step action across a repository. You review the diff instead.
+      - term: vibe-coding
+        why: Not reading it at all — and precisely when that is defensible.
+      - term: prompt-to-app
+        why: The product category built on that, and where the abstraction leaks.
+      - term: spec-driven-development
+        why: "The considered counterpart: state acceptance before implementation."
+      - term: human-in-the-loop
+        why: Where the approval gate belongs once an agent can act.
+      - term: sandboxing
+        why: What contains it when the agent runs code.
+      - term: evaluation-harness
+        why: Tests are the verifier the whole loop depends on.
+      - term: ai-slop
+        why: The failure mode of cheap generation, named.
+      - term: superworker
+        why: The productivity claim, and what the evidence actually supports.
+      - term: ai-engineer
+        why: Where the role is heading.
 
+  # ------------------------------------------------------------------- safety
   - id: learn-ai-safety
     name: Evaluation and Safety
     audience: Anyone responsible for whether an AI system is fit to deploy
@@ -241,17 +602,88 @@ paths:
         why: Why every metric you build becomes a target.
       - term: sycophancy
         why: A concrete, measurable instance of both of the above.
+      - term: jailbreaking
+        why: The user attacking the model's own policies.
       - term: prompt-injection
-        why: The defining security problem of systems that act.
+        why: A third party attacking the user through the model. Different problem entirely.
+      - term: data-poisoning
+        why: The attack that happens before the model exists.
+      - term: red-teaming
+        why: Finding all of the above before someone else does.
       - term: guardrails
-        why: What you can actually enforce.
+        why: What you can actually enforce in code.
+      - term: sandboxing
+        why: Bounding the blast radius of what you cannot.
+      - term: observability
+        why: Reconstructing what happened when it goes wrong.
+      - term: drift
+        why: Detecting the degradation that raises no alert.
       - term: mechanistic-interpretability
         why: The route from observing behaviour to understanding it.
+
+  - id: learn-interpretability
+    name: Opening the Model
+    audience: Researchers and engineers who want to know what is inside
+    estimated_effort: Three or four days
+    summary: >-
+      From attributing behaviour to inputs, to locating the computation itself.
+      Read the Transformer path first — you cannot inspect what you cannot read.
+    steps:
+      - term: transformer
+        why: The object being inspected.
+      - term: residual-connection
+        why: The residual stream is the channel interpretability actually studies.
+      - term: feed-forward-network
+        why: Where knowledge appears to be stored.
+      - term: explainability
+        why: Attributing decisions to inputs — correlational, regulated, widely used.
+      - term: mechanistic-interpretability
+        why: "The stronger claim: finding the computation, with causal evidence."
+      - term: sparse-autoencoder
+        why: Decomposing tangled activations into nameable features.
+      - term: activation-steering
+        why: Turning description into intervention.
+      - term: model-editing
+        why: The attempt to change one fact directly — and why it mostly does not work yet.
+      - term: chain-of-thought
+        why: Why a model's stated reasoning is weak evidence about its actual reasoning.
+      - term: alignment
+        why: What all of this is ultimately in service of.
+
+  # --------------------------------------------------------------- other bets
+  - id: learn-multimodal
+    name: Beyond Text
+    audience: Developers working with images, audio or video
+    estimated_effort: Three days
+    summary: >-
+      What changes when the input is not text — and what stays exactly the same,
+      because it is all sequences of vectors underneath.
+    steps:
+      - term: transformer
+        why: The same architecture underlies all of it.
+      - term: cross-attention
+        why: How one modality conditions on another.
+      - term: embedding
+        why: Everything becomes vectors in a shared space.
+      - term: vision-language-model
+        why: Images as tokens the language model can read.
+      - term: diffusion-model
+        why: The generative approach behind almost everything non-textual.
+      - term: image-generation
+        why: Diffusion applied, with the controls that actually matter.
+      - term: speech-recognition
+        why: Audio as a sequence — translation with a spectrogram.
+      - term: text-to-speech
+        why: The return direction, and the ethics that arrived after the capability.
+      - term: video-understanding
+        why: Where the token budget breaks, and where time becomes the problem.
+      - term: computer-use
+        why: An agent operating a screen, with all the exposure that implies.
 
   - id: learn-world-models
     name: Beyond Language Models
     audience: People who want the research directions that do not assume LLMs are the whole answer
-    estimated_effort: Two or three days
+    estimated_effort: Three or four days
     summary: >-
       Language models are one bet. This path covers the main technical
       alternative — models that predict environment dynamics — and how it reaches
@@ -263,6 +695,8 @@ paths:
         why: The learning signal both branches depend on.
       - term: world-model
         why: Predicting what happens next, rather than what is said next.
+      - term: model-based-reinforcement-learning
+        why: Practising inside the learned model instead of the real world.
       - term: jepa
         why: The strongest technical statement of the dissenting position.
       - term: state-space-model
@@ -273,3 +707,43 @@ paths:
         why: Where foundation models meet motors.
       - term: sim-to-real
         why: How any of it survives contact with physical hardware.
+      - term: digital-twin
+        why: "The industrial version: a simulation kept in step with one real system."
+      - term: embodied-ai
+        why: What changes when mistakes cannot be undone with a retry.
+
+  - id: read-the-industry
+    name: Reading the Industry
+    audience: Anyone parsing job adverts, funding decks and vendor claims
+    estimated_effort: An afternoon
+    summary: >-
+      The vocabulary of AI as a business, with technical terminology separated
+      from positioning. Several of these entries are labelled marketing on
+      purpose — each comes with the question that tests the claim.
+    steps:
+      - term: foundation-model
+        why: The reusable base everything is built on.
+      - term: frontier-model
+        why: A policy category and a marketing claim wearing the same word.
+      - term: open-weight-model
+        why: Weights available is not open source. Read the licence.
+      - term: small-language-model
+        why: Why the largest model is usually the wrong default.
+      - term: inference-provider
+        why: Who owns the GPUs, and what you are actually buying.
+      - term: model-routing
+        why: The largest lever on unit economics.
+      - term: ai-gateway
+        why: Where keys, spend and policy live.
+      - term: ai-stack
+        why: A useful mental model and a much-abused diagram.
+      - term: ai-native
+        why: "One question tests it: what breaks if you remove the model?"
+      - term: data-flywheel
+        why: Four conditions the loop needs. Most products meet none.
+      - term: superworker
+        why: A labour claim wearing a technology claim's clothes.
+      - term: ai-slop
+        why: What the economics of cheap generation produce.
+      - term: scaling-laws
+        why: The curve the entire capital structure of the industry rests on.
