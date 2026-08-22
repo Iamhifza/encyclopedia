@@ -35,6 +35,8 @@ jobs:
         run: enc validate
       - uses: actions/configure-pages@v5
         id: pages
+        with:
+          enablement: true
       - name: Generate and render
         run: enc build --site --site-url "${{ steps.pages.outputs.base_url }}"
       - uses: actions/upload-pages-artifact@v3
