@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: intermediate
 one_liner: "Cutting documents into passages small enough to retrieve precisely and large enough to still make sense on their own."
+historical_period: foundation-model
 tags: [retrieval]
 relations:
   part_of: [rag]

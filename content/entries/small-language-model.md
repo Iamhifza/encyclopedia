@@ -7,6 +7,7 @@ depth: full
 status: modern
 difficulty: beginner
 one_liner: "A model small enough to run on a laptop or phone, traded against the capability of a large one."
+historical_period: agentic
 tags: [architecture]
 relations:
   is_a: [large-language-model]

@@ -7,6 +7,7 @@ depth: full
 status: foundational
 difficulty: beginner
 one_liner: "The general-purpose processor that runs the operating system and everything a GPU is not doing."
+historical_period: early-computing
 tags: [hardware]
 relations:
   alternative_to: [gpu]

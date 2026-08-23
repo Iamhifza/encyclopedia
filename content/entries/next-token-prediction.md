@@ -7,6 +7,7 @@ depth: full
 status: foundational
 difficulty: beginner
 one_liner: "The training objective behind every LLM: given everything so far, predict what comes next."
+historical_period: transformer
 tags: [training]
 relations:
   part_of: [pretraining]

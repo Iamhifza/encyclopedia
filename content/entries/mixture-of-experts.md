@@ -7,6 +7,7 @@ depth: full
 status: modern
 difficulty: advanced
 one_liner: "A model that holds many specialised sub-networks but activates only a couple per token, so capacity grows without cost growing with it."
+historical_period: foundation-model
 tags: [architecture, inference]
 relations:
   part_of: [transformer]

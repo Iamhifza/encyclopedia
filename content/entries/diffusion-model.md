@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: advanced
 one_liner: "A generator that starts from pure noise and removes a little of it at a time until an image emerges."
+historical_period: deep-learning
 tags: [architecture]
 relations:
   is_a: [neural-network]

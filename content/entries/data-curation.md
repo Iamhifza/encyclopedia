@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: advanced
 one_liner: "Deciding what goes into a training corpus and in what proportion, which decides more about model quality than architecture does."
+historical_period: foundation-model
 tags: [training]
 relations:
   part_of: [pretraining]

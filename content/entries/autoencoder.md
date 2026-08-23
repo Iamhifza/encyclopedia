@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: intermediate
 one_liner: "A network trained to squeeze its input through a narrow bottleneck and rebuild it, learning a compact representation on the way."
+historical_period: statistical-ml
 tags: [architecture]
 relations:
   evolved_into: [sparse-autoencoder]

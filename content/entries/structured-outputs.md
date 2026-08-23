@@ -7,6 +7,7 @@ depth: full
 status: modern
 difficulty: intermediate
 one_liner: "Forcing a model's output to match a schema or grammar by masking out any token that would break it."
+historical_period: agentic
 tags: [protocol, inference]
 relations:
   depends_on: [sampling]
@@ -27,6 +28,7 @@ sources:
     title: "Anthropic — tool use and structured output"
     url: https://docs.claude.com/en/docs/agents-and-tools/tool-use/overview
 updated: 2026-08-21
+review_by: 2026-12-01
 ---
 
 ## Simple Explanation

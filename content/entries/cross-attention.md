@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: intermediate
 one_liner: "Attention where the questions come from one sequence and the answers from another, used to condition on an image, audio or a source sentence."
+historical_period: transformer
 tags: [architecture]
 relations:
   is_a: [attention]

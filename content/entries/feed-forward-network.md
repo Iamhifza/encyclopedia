@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: intermediate
 one_liner: "The two-layer network applied to each position separately inside every Transformer block, holding most of the model's parameters."
+historical_period: transformer
 tags: [architecture]
 relations:
   part_of: [transformer]

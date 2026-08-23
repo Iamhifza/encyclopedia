@@ -7,6 +7,7 @@ depth: full
 status: foundational
 difficulty: advanced
 one_liner: "Many machines cooperating on one job, and the failure, coordination and consistency problems that come free with that."
+historical_period: early-computing
 tags: [hardware]
 relations:
   used_by: [pipeline-parallelism, tensor-parallelism]

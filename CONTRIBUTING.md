@@ -210,11 +210,23 @@ Cite at least one, best first, using this order of preference:
 
 Paraphrase and link. Do not paste text from sources.
 
-### Dates and staleness
+### Dates, eras and staleness
 
-Set `updated` to the date you last checked the entry against reality. For
-anything fast-moving, also set `review_by`. `enc validate` reports overdue
-entries and the coverage page lists them publicly.
+Set `updated` to the date you last checked the entry against reality.
+
+Two further fields are effectively required, and the validator warns without
+them:
+
+* **`historical_period`** — which era the concept belongs to. Without it the
+  entry is invisible in the timeline view, which is a silent failure rather than
+  a loud one.
+* **`review_by`** — mandatory in practice for any entry whose status is
+  `emerging`, `modern`, `contested`, `slang`, `marketing` or `experimental`.
+  Fast-moving terminology goes stale quietly, and the monthly staleness workflow
+  can only flag entries that carry a date.
+
+Foundational and historical entries rarely need a review date: the perceptron is
+not going to change.
 
 ## Pull request checklist
 

@@ -32,6 +32,7 @@ sources:
     url: https://transformer-circuits.pub/2023/monosemantic-features/index.html
     year: 2023
 updated: 2026-08-21
+review_by: 2027-02-01
 ---
 
 ## Simple Explanation

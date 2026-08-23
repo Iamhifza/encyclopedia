@@ -7,6 +7,7 @@ depth: full
 status: foundational
 difficulty: intermediate
 one_liner: "Whether a model works on data it has never seen, which is the only thing anyone actually wants from it."
+historical_period: early-computing
 tags: [training]
 relations:
   different_from: [overfitting]

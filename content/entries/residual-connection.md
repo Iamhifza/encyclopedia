@@ -7,6 +7,7 @@ depth: full
 status: foundational
 difficulty: intermediate
 one_liner: "Adding a layer's input to its output, giving gradients a clear path backwards and making very deep networks trainable."
+historical_period: deep-learning
 tags: [architecture]
 relations:
   part_of: [transformer]

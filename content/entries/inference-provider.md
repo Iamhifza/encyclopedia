@@ -7,6 +7,7 @@ depth: full
 status: modern
 difficulty: beginner
 one_liner: "A company that runs models on its own hardware and sells access by the token."
+historical_period: agentic
 tags: [culture]
 relations:
   depends_on: [vllm, throughput]

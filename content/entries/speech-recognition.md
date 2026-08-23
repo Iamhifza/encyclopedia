@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: intermediate
 one_liner: "Turning spoken audio into text, now usually with the same Transformer machinery used for language."
+historical_period: foundation-model
 tags: [architecture]
 relations:
   depends_on: [transformer, encoder-decoder]

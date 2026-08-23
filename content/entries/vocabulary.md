@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: intermediate
 one_liner: "The fixed set of tokens a model can read or emit, and the reason it can never output a character it has no piece for."
+historical_period: transformer
 tags: [architecture]
 relations:
   part_of: [tokenization]

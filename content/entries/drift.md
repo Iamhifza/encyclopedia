@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: intermediate
 one_liner: "A system quietly getting worse over time because the world, the data or the model behind an API changed."
+historical_period: statistical-ml
 tags: [safety]
 relations:
   related_to: [observability, evaluation-harness, benchmark, llm-as-a-judge]

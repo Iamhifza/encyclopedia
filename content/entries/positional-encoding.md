@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: intermediate
 one_liner: "How a model is told where each token sits, since attention on its own treats a sentence as an unordered bag."
+historical_period: transformer
 tags: [architecture]
 relations:
   part_of: [transformer]

@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: intermediate
 one_liner: "A design that reads the whole input with one stack and writes the output with another, still standard for translation and speech."
+historical_period: deep-learning
 tags: [architecture]
 relations:
   part_of: [transformer]

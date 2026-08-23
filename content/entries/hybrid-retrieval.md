@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: intermediate
 one_liner: "Running keyword and vector search together and merging the rankings, which beats either alone in almost every measured setting."
+historical_period: statistical-ml
 tags: [retrieval]
 relations:
   depends_on: [dense-retrieval, information-retrieval]

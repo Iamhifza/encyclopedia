@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: intermediate
 one_liner: "Generating natural-sounding speech from text, increasingly with the speaker's voice and tone under control."
+historical_period: foundation-model
 tags: [architecture]
 relations:
   related_to: [speech-recognition, diffusion-model, autoregressive-generation, tokenization]

@@ -7,6 +7,7 @@ depth: full
 status: modern
 difficulty: advanced
 one_liner: "A model trained or adapted to attend over hundreds of thousands of tokens, with the caveat that advertised length exceeds usable length."
+historical_period: agentic
 tags: [architecture, inference]
 relations:
   depends_on: [rope, context-window]

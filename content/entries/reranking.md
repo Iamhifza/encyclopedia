@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: intermediate
 one_liner: "A second, slower model that reads each candidate passage alongside the query and reorders the shortlist properly."
+historical_period: foundation-model
 tags: [retrieval]
 relations:
   part_of: [rag]

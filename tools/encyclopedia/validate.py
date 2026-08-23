@@ -10,11 +10,10 @@ Two severities:
 from __future__ import annotations
 
 import json
-from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 
 from jsonschema import Draft202012Validator
 
@@ -236,6 +235,22 @@ def validate(corpus: Corpus, today: date | None = None) -> Report:
                 )
         if entry.meta.get("disputed") and not entry.is_seed and "Terminology Note" not in entry.sections:
             report.error(where, "disputed entries must include '## Terminology Note'")
+
+        # Every entry belongs to an era, or the timeline view silently omits it.
+        if not entry.meta.get("historical_period"):
+            report.warn(
+                where,
+                "no 'historical_period'; the entry will not appear in the timeline view",
+            )
+
+        # Fast-moving terminology goes stale quietly. A review date is what makes
+        # the staleness workflow able to see it at all.
+        FAST_MOVING = {"emerging", "modern", "contested", "slang", "marketing", "experimental"}
+        if entry.status in FAST_MOVING and not entry.meta.get("review_by"):
+            report.warn(
+                where,
+                f"status '{entry.status}' is fast-moving but has no 'review_by' date",
+            )
 
         review_by = entry.meta.get("review_by")
         if review_by and str(review_by) < today.isoformat():

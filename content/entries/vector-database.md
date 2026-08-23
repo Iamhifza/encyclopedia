@@ -27,6 +27,7 @@ sources:
     title: "FAISS"
     url: https://github.com/facebookresearch/faiss
 updated: 2026-08-21
+review_by: 2027-02-01
 ---
 
 ## Simple Explanation

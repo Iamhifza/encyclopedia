@@ -7,6 +7,7 @@ depth: full
 status: modern
 difficulty: intermediate
 one_liner: "A single endpoint in front of many model providers that handles keys, quotas, retries, logging and cost tracking."
+historical_period: agentic
 tags: [protocol]
 relations:
   used_by: [model-routing]

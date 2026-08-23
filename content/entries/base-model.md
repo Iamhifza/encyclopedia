@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: beginner
 one_liner: "The raw model straight out of pretraining, which continues text rather than following instructions."
+historical_period: foundation-model
 tags: [architecture]
 relations:
   part_of: [pretraining]

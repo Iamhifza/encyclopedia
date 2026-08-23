@@ -7,6 +7,7 @@ depth: full
 status: foundational
 difficulty: beginner
 one_liner: "The single number a model is trying to make smaller, and therefore the only thing it actually cares about."
+historical_period: early-computing
 tags: [training]
 relations:
   used_by: [gradient-descent, pretraining, supervised-learning]

@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: intermediate
 one_liner: "Recording every prompt, tool call and response so you can reconstruct what a system actually did when it went wrong."
+historical_period: agentic
 tags: [safety, agents]
 relations:
   part_of: [harness]

@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: research
 one_liner: "A small program run by thousands of GPU threads at once, and the level at which most inference speedups are actually won."
+historical_period: deep-learning
 tags: [hardware, inference]
 relations:
   implemented_by: [flash-attention]

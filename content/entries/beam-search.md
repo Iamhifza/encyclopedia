@@ -7,6 +7,7 @@ depth: full
 status: historical
 difficulty: intermediate
 one_liner: "Keeping several candidate continuations alive at once and returning the best-scoring whole sequence, which helps in translation and hurts in chat."
+historical_period: statistical-ml
 tags: [inference]
 relations:
   is_a: [sampling]

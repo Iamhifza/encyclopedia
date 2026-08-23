@@ -7,6 +7,7 @@ depth: full
 status: modern
 difficulty: intermediate
 one_liner: "Sending each request to the cheapest model that can handle it, and escalating only when it cannot."
+historical_period: agentic
 tags: [protocol, inference]
 relations:
   depends_on: [ai-gateway]

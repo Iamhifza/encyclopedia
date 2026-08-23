@@ -7,6 +7,7 @@ depth: full
 status: foundational
 difficulty: intermediate
 one_liner: "Splitting work so that many processors make progress at the same time rather than one doing it all."
+historical_period: early-computing
 tags: [hardware]
 relations:
   used_by: [tensor-parallelism, pipeline-parallelism]

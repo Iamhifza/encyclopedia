@@ -7,6 +7,7 @@ depth: full
 status: foundational
 difficulty: beginner
 one_liner: "The small non-linear bend applied between layers, without which any stack of layers collapses into a single one."
+historical_period: statistical-ml
 tags: [architecture]
 relations:
   part_of: [neural-network, feed-forward-network]

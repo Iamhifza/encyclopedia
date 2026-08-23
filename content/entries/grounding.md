@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: intermediate
 one_liner: "Tying every claim in an answer to a specific retrieved passage, so it can be checked rather than trusted."
+historical_period: foundation-model
 tags: [retrieval, safety]
 relations:
   part_of: [rag]

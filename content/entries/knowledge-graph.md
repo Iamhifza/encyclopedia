@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: intermediate
 one_liner: "Facts stored as entities joined by named relationships, so questions can be answered by traversing rather than reading."
+historical_period: classical-ai
 tags: [retrieval, symbolic]
 relations:
   successor_of: [symbolic-ai]

@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: intermediate
 one_liner: "Deliberately attacking your own system to find the failures before someone else does."
+historical_period: foundation-model
 tags: [safety]
 relations:
   part_of: [evaluation-harness]

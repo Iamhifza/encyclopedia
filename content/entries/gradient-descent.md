@@ -7,6 +7,7 @@ depth: full
 status: foundational
 difficulty: intermediate
 one_liner: "Improving a model by repeatedly taking a small step in whichever direction reduces the error fastest."
+historical_period: early-computing
 tags: [training]
 relations:
   depends_on: [backpropagation, loss-function]

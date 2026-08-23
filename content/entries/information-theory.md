@@ -7,6 +7,7 @@ depth: full
 status: foundational
 difficulty: advanced
 one_liner: "The mathematics of surprise: how much information a message carries, and how far one distribution sits from another."
+historical_period: early-computing
 tags: [training]
 relations:
   used_by: [loss-function, rlhf, tokenization]

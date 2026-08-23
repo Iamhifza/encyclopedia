@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: intermediate
 one_liner: "Producing a human-readable account of why a model made a particular decision, usually by attributing it to inputs."
+historical_period: statistical-ml
 tags: [safety]
 relations:
   different_from: [mechanistic-interpretability]

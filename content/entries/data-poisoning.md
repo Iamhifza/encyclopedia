@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: advanced
 one_liner: "Corrupting a model by planting material in the data it will be trained or fine-tuned on."
+historical_period: foundation-model
 tags: [safety]
 relations:
   related_to: [pretraining, data-curation, benchmark-contamination, synthetic-data, red-teaming]

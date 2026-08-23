@@ -7,6 +7,7 @@ depth: full
 status: foundational
 difficulty: intermediate
 one_liner: "The trick of giving each program its own tidy address space while the real memory underneath is scattered and shared."
+historical_period: early-computing
 tags: [hardware]
 relations:
   evolved_into: [paged-attention]

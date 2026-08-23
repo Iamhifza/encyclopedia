@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: beginner
 one_liner: "Requiring a person to approve consequential actions, rather than trusting an autonomous system to get them right."
+historical_period: agentic
 tags: [agents, safety, culture]
 relations:
   part_of: [guardrails]

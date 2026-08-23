@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: intermediate
 one_liner: "Running an agent's actions inside a confined environment so that mistakes and attacks cannot reach anything that matters."
+historical_period: agentic
 tags: [agents, safety]
 relations:
   part_of: [guardrails, harness]

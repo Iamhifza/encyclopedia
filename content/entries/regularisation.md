@@ -7,6 +7,7 @@ depth: full
 status: foundational
 difficulty: intermediate
 one_liner: "Deliberately limiting how well a model can fit its training data, so that it fits reality better."
+historical_period: early-computing
 tags: [training]
 relations:
   solves: [overfitting]

@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: intermediate
 one_liner: "Producing an image from a text description, in practice almost always with a diffusion model."
+historical_period: foundation-model
 tags: [architecture]
 relations:
   depends_on: [diffusion-model, embedding]

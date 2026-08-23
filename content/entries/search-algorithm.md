@@ -7,6 +7,7 @@ depth: full
 status: foundational
 difficulty: intermediate
 one_liner: "Systematically exploring possible moves or states to find one that reaches a goal."
+historical_period: classical-ai
 tags: [symbolic]
 relations:
   used_by: [reasoning-model, automated-planning]

@@ -7,6 +7,7 @@ depth: full
 status: foundational
 difficulty: beginner
 one_liner: "The mathematics of vectors and matrices, which is what a neural network is doing in essentially every operation."
+historical_period: pre-computing
 tags: [training]
 relations:
   used_by: [neural-network, attention, embedding, gpu]

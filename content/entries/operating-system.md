@@ -7,6 +7,7 @@ depth: full
 status: foundational
 difficulty: beginner
 one_liner: "The software that shares one machine's processors, memory and devices between many programs."
+historical_period: early-computing
 tags: [hardware]
 relations:
   related_to: [paged-attention, memory-hierarchy, virtual-memory, cpu, inference-scheduler]

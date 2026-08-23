@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: advanced
 one_liner: "The component that decides, every step, which requests run, which wait and which get evicted."
+historical_period: foundation-model
 tags: [inference]
 relations:
   part_of: [vllm]

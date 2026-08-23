@@ -10,6 +10,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+
 from encyclopedia.graph import ConceptGraph
 from encyclopedia.loader import load_corpus
 from encyclopedia.model import RELATIONS
@@ -159,3 +160,19 @@ def test_graph_connects_distant_concepts(graph):
     """The point of the graph is navigation between unlike things."""
     assert graph.shortest_path("attention", "vllm")
     assert graph.shortest_path("perceptron", "mcp")
+
+
+def test_every_entry_has_an_era(corpus):
+    """Without a period an entry is invisible in the timeline view."""
+    for entry in corpus.entries.values():
+        assert entry.meta.get("historical_period"), f"{entry.slug} has no historical_period"
+
+
+def test_fast_moving_entries_carry_a_review_date(corpus):
+    """The staleness workflow can only flag entries that carry a date."""
+    fast = {"emerging", "modern", "contested", "slang", "marketing", "experimental"}
+    for entry in corpus.entries.values():
+        if entry.status in fast:
+            assert entry.meta.get("review_by"), (
+                f"{entry.slug} is '{entry.status}' but has no review_by date"
+            )

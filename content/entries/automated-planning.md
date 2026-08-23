@@ -7,6 +7,7 @@ depth: full
 status: established
 difficulty: advanced
 one_liner: "Working out an ordered sequence of actions that gets from the current state to a desired one."
+historical_period: classical-ai
 tags: [symbolic, agents]
 relations:
   used_by: [ai-agent, agent-loop]

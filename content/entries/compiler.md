@@ -7,6 +7,7 @@ depth: full
 status: foundational
 difficulty: advanced
 one_liner: "A program that turns code written for humans into instructions a specific machine can execute quickly."
+historical_period: early-computing
 tags: [hardware]
 relations:
   used_by: [flash-attention, gpu-kernel]

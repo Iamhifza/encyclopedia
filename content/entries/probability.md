@@ -7,6 +7,7 @@ depth: full
 status: foundational
 difficulty: beginner
 one_liner: "The mathematics of uncertainty, and the language in which every model output is really a distribution rather than an answer."
+historical_period: pre-computing
 tags: [training]
 relations:
   used_by: [sampling, supervised-learning, loss-function]
