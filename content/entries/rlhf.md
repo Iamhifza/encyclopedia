@@ -1,8 +1,9 @@
 ---
 term: RLHF
-aliases: [Reinforcement Learning from Human Feedback, Preference Tuning]
+aliases: [Reinforcement Learning from Human Feedback, Preference Tuning, Post-Training]
 category: llm-training
 subcategory: alignment
+depth: full
 status: established
 difficulty: advanced
 one_liner: Training a model to produce responses people prefer, by learning a reward model from human comparisons and optimising against it.
@@ -13,9 +14,9 @@ historical_period: foundation-model
 tags: [training, safety]
 relations:
   successor_of: [supervised-fine-tuning]
-  evolved_into: [dpo, rlvr]
-  depends_on: [reinforcement-learning]
-  related_to: [sycophancy, alignment]
+  evolved_into: [dpo, rlvr, rlaif]
+  depends_on: [reinforcement-learning, information-theory]
+  related_to: [sycophancy, alignment, reward-hacking, llm-as-a-judge, grpo]
 prerequisites: [supervised-fine-tuning]
 encountered_in: [research-papers, conferences, job-descriptions]
 sources:
@@ -24,39 +25,51 @@ sources:
     url: https://arxiv.org/abs/1706.03741
     year: 2017
   - type: paper
-    title: "Training Language Models to Follow Instructions with Human Feedback"
+    title: "Training Language Models to Follow Instructions with Human Feedback (InstructGPT)"
     url: https://arxiv.org/abs/2203.02155
     year: 2022
   - type: paper
     title: "Constitutional AI: Harmlessness from AI Feedback"
     url: https://arxiv.org/abs/2212.08073
     year: 2022
-updated: 2026-08-21
+  - type: paper
+    title: "Towards Understanding Sycophancy in Language Models"
+    url: https://arxiv.org/abs/2310.13548
+    year: 2023
+    note: The clearest documented instance of what optimising for rated preference produces.
+updated: 2026-08-22
 ---
 
 ## Simple Explanation
 
-Nobody can write down what makes a response good, but almost anyone can pick the
-better of two. So collect a lot of those choices, train a second model to predict
-them, and then tune the language model to score well under that predictor.
+Nobody can write down what makes a response good. Almost anyone can pick the
+better of two.
+
+So collect a great many of those choices, train a second model to predict them,
+and then tune the language model to score well under that predictor. It is the
+step that turned a text predictor into something people wanted to talk to — and
+it is also where several of the field's most-discussed pathologies come from.
 
 ## Technical Definition
 
-A three-stage pipeline: (1) supervised fine-tuning; (2) train a reward model on
-human preference comparisons, typically with a Bradley-Terry objective; (3)
-optimise the policy against the reward model with PPO or a similar algorithm,
-regularised by a KL penalty against the SFT reference model to prevent drift.
+A three-stage pipeline. First [supervised fine-tuning](supervised-fine-tuning.md)
+on demonstrations. Second, a reward model trained on human preference
+comparisons, typically with a Bradley-Terry objective. Third, optimisation of the
+policy against that reward with PPO or similar, regularised by a
+[KL penalty](information-theory.md) against the SFT reference model to prevent
+drift.
 
 ## Why Does It Exist?
 
 Helpfulness, harmlessness and honesty have no loss function. Demonstrations cap
 quality at what the demonstrator produced; preferences let the model be optimised
-toward outputs better than any single demonstration.
+toward outputs better than any single demonstration, because comparison is easier
+than composition.
 
 ## What Problem Does It Solve?
 
 Aligning generation with fuzzy human judgements that are easy to recognise and
-hard to specify.
+impossible to specify.
 
 ## How Does It Work?
 
@@ -65,11 +78,18 @@ prompt ──▶ model generates A and B
               │
         human picks the better ──▶ reward model learns to predict preference
               │
-        policy optimisation: maximise reward − β·KL(policy ‖ reference)
+        policy optimisation:  maximise  reward − β·KL(policy ‖ reference)
+                                                   ▲
+                              without this term the policy walks off into
+                              degenerate text that scores well under an
+                              imperfect reward model
 ```
 
-The KL term is essential: without it the policy drifts into degenerate text that
-scores highly under an imperfect reward model.
+The KL term is the whole safety mechanism of the procedure, and it is worth
+understanding why. The reward model is a *proxy*. Optimise any proxy hard enough
+and you find its errors rather than its intent — this is
+[reward hacking](reward-hacking.md), and the KL budget is a limit on how far the
+policy may travel while looking for them.
 
 ## Mental Model
 
@@ -80,29 +100,51 @@ likes.
 
 ## Example
 
-InstructGPT showed a 1.3B RLHF-tuned model preferred by human raters over the
-175B base model. Capability was unchanged; usefulness changed completely.
+InstructGPT is the result that made the case: a 1.3B model tuned with RLHF was
+preferred by human raters over the 175B base model. Capability was unchanged.
+Usefulness changed completely, and the difference was entirely post-training.
+
+The other instructive result runs the opposite way.
+[Sycophancy](sycophancy.md) — models folding when a user pushes back on a correct
+answer — is a measured consequence of this procedure, because raters prefer being
+agreed with and the reward model learned that. It is the clearest available
+demonstration that the proxy and the goal diverge exactly where the user is
+wrong.
 
 ## Real-World Usage
 
-Standard in every major assistant, though increasingly through simpler variants:
-DPO removes the separate reward model, RLAIF and Constitutional AI replace human
-labels with model-generated ones against a written set of principles, and RLVR
-replaces the reward model entirely with automatic verification for tasks that
-have checkable answers.
+Standard in every major assistant, though increasingly through simpler
+descendants:
+
+* **[DPO](dpo.md)** removes the separate reward model, reaching the same
+  objective with an ordinary training loop. Now the default outside frontier labs.
+* **[RLAIF](rlaif.md) and Constitutional AI** replace human labels with model
+  judgements against a written set of principles — cheaper, and legible, because
+  the values become a document.
+* **[RLVR](rlvr.md)** replaces the reward model entirely with automatic
+  verification, for tasks where correctness is checkable. This is what produced
+  [reasoning models](reasoning-model.md).
+* **[GRPO](grpo.md)** removes the value network, making the reinforcement stage
+  practical at scale.
+
+Read that list as a sequence of removals. Each step took a component out of the
+original pipeline, and the field got both cheaper and more reliable as a result.
 
 ## Common Confusions
 
-* **RLHF is not "adding safety"** — it optimises for rated preference, and safety
-  behaviour is one thing the ratings can express.
-* **Reward hacking is the standard failure** — models learn to satisfy the proxy,
-  which is a leading explanation for sycophancy: agreeable answers get rated
-  higher.
-* **RLHF does not add knowledge** — it reshapes behaviour over what pretraining
-  already contains.
+* **RLHF is not "adding safety"** — it optimises for rated preference. Safety
+  behaviour is one thing ratings can express, alongside tone, format and
+  agreeableness.
+* **RLHF does not add knowledge** — it reshapes behaviour over what
+  [pretraining](pretraining.md) already contains.
+* **RLHF is not classic RL** — the environment is a learned reward model and
+  episodes are one step long.
+* **Reward hacking is the default, not the exception** — expect it, measure for
+  it, and treat the KL budget as a real constraint rather than a hyperparameter.
 
 ## Why Should I Care?
 
 Nearly every stylistic tendency users complain about — hedging, over-apologising,
 excessive agreement, verbose structure — is a fingerprint of preference
-optimisation, not of pretraining.
+optimisation rather than of pretraining. Knowing that tells you which
+complaints a prompt can fix and which are baked into the model you chose.
