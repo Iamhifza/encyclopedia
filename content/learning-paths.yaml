@@ -96,6 +96,10 @@ paths:
         why: How a graph of operations becomes fast device code.
       - term: distributed-systems
         why: Beyond one machine, everything becomes this.
+      - term: all-reduce
+        why: The one operation that turns many GPUs into a single training run.
+      - term: gpu-cluster
+        why: The bandwidth hierarchy that dictates how a model may be split.
       - term: npu
         why: What happens when you specialise the silicon further.
         optional: true
@@ -128,6 +132,10 @@ paths:
         why: Gating, and the additive path that lets gradients survive.
       - term: cnn
         why: The architecture that started the deep learning era in 2012.
+      - term: computer-vision
+        why: The field it transformed, and the benchmark culture language modelling inherited.
+      - term: tf-idf
+        why: The other lineage — text as vectors, twenty years before neural networks.
       - term: word2vec
         why: Meaning becomes geometry.
       - term: attention
@@ -282,6 +290,8 @@ paths:
         why: And when it goes in — the annealing phase punches above its weight.
       - term: scaling-laws
         why: How the size of the run gets decided.
+      - term: data-parallelism
+        why: The default way a run spans many GPUs, and where it stops working.
       - term: supervised-fine-tuning
         why: Turning a text predictor into something that answers.
       - term: rlhf
@@ -368,10 +378,16 @@ paths:
         why: The constraint throughput is maximised subject to.
       - term: inference-scheduler
         why: Where fairness, priority and preemption policy live.
+      - term: data-parallelism
+        why: Replication first — the simplest way to use more than one device.
       - term: tensor-parallelism
         why: Splitting a model within a layer, when it does not fit on one device.
       - term: pipeline-parallelism
         why: Splitting between layers, when it does not fit in one node.
+      - term: expert-parallelism
+        why: What mixture-of-experts forces on you, and the all-to-all it costs.
+      - term: gpu-cluster
+        why: The topology all of the above is really a statement about.
       - term: disaggregated-inference
         why: Separating prefill and decode onto hardware sized for each.
       - term: vllm
@@ -403,6 +419,10 @@ paths:
     steps:
       - term: information-retrieval
         why: Fifty years of prior art, and the metrics you will need to diagnose failures.
+      - term: tf-idf
+        why: Where representing text as vectors began.
+      - term: bm25
+        why: The lexical baseline that still wins on identifiers and rare terms.
       - term: embedding
         why: Meaning as geometry; the representation everything downstream depends on.
       - term: dense-retrieval
@@ -665,12 +685,16 @@ paths:
         why: How one modality conditions on another.
       - term: embedding
         why: Everything becomes vectors in a shared space.
+      - term: computer-vision
+        why: The field that went first — and where most of deep learning was proved.
       - term: vision-language-model
         why: Images as tokens the language model can read.
       - term: diffusion-model
         why: The generative approach behind almost everything non-textual.
       - term: image-generation
         why: Diffusion applied, with the controls that actually matter.
+      - term: video-generation
+        why: The same idea across time, where consistency becomes the whole problem.
       - term: speech-recognition
         why: Audio as a sequence — translation with a spectrogram.
       - term: text-to-speech

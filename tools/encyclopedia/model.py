@@ -158,14 +158,17 @@ RECOMMENDED_SECTIONS = [
     "Why Should I Care?",
 ]
 
+# Two sections were dropped after review: "Visual Explanation", because ASCII
+# diagrams belong inside "How Does It Work?" where the explanation is, and
+# "Where Will I Encounter It?", because the `encountered_in` front-matter field
+# already generates that. Neither was used once in the corpus. A section nobody
+# writes is documentation debt, not a standard.
 OPTIONAL_SECTIONS = [
-    "Visual Explanation",
     "Formula",
     "Historical Origin",
     "Evolution",
     "Differences",
     "Terminology Note",
-    "Where Will I Encounter It?",
 ]
 
 GENERATED_SECTIONS = [
@@ -186,7 +189,6 @@ SECTION_ORDER = [
     "What Problem Does It Solve?",
     "How Does It Work?",
     "Mental Model",
-    "Visual Explanation",
     "Formula",
     "Example",
     "Real-World Usage",
@@ -196,7 +198,6 @@ SECTION_ORDER = [
     "Common Confusions",
     "Differences",
     "Why Should I Care?",
-    "Where Will I Encounter It?",
 ]
 
 ALL_KNOWN_SECTIONS = set(

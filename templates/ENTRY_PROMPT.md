@@ -37,8 +37,11 @@ Required sections, as `## ` headings, in this order:
   Why Should I Care?
 
 Optional, include only where they genuinely add something:
-  Visual Explanation · Formula · Historical Origin · Evolution ·
-  Terminology Note · Differences · Where Will I Encounter It?
+  Formula · Historical Origin · Evolution · Terminology Note · Differences
+
+Do NOT write a "Visual Explanation" section — ASCII diagrams belong inside
+"How Does It Work?". Do NOT write "Where Will I Encounter It?" — that is
+generated from the `encountered_in` front-matter field.
 
 HOUSE STYLE — follow these exactly:
 

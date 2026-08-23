@@ -40,7 +40,7 @@ the most useful one to write next is always at the top.
 
 ## Adding entries in batches
 
-The queue lives in [`content/backlog.yaml`](https://github.com/Iamhifza/encyclopedia/blob/main/content/backlog.yaml). Each item
+The queue lives in [`content/backlog.yaml`](https://github.com/OWNER/ai-computing-encyclopedia/blob/main/content/backlog.yaml). Each item
 carries enough to stand as a seed entry, so generating them produces real
 navigable records rather than empty stubs.
 
@@ -79,7 +79,7 @@ $EDITOR content/entries/beam-search.md
 enc validate --strict
 ```
 
-Drafting with a model? Use [`templates/ENTRY_PROMPT.md`](https://github.com/Iamhifza/encyclopedia/blob/main/templates/ENTRY_PROMPT.md),
+Drafting with a model? Use [`templates/ENTRY_PROMPT.md`](https://github.com/OWNER/ai-computing-encyclopedia/blob/main/templates/ENTRY_PROMPT.md),
 which encodes the house style — then verify every number and every source
 yourself. Plausible-and-wrong is the failure mode this project exists to
 document.
@@ -100,7 +100,7 @@ review; a PR that adds twenty seeds and rewrites three entries is not.
 ## Does this term deserve an entry?
 
 Run it past these seven questions. A term that fails 2 and 3 is a buzzword and
-belongs on the [watchlist](https://Iamhifza.github.io/encyclopedia/meta/watchlist/), not in the corpus.
+belongs on the [watchlist](https://OWNER.github.io/ai-computing-encyclopedia/meta/watchlist/), not in the corpus.
 
 1. Is it genuinely new, or an old idea renamed?
 2. Does it name something a practitioner must be able to talk about?
@@ -125,7 +125,7 @@ section skeleton. Fill in the TODOs.
 
 ### Front matter
 
-Validated against [`schema/entry.schema.json`](https://github.com/Iamhifza/encyclopedia/blob/main/schema/entry.schema.json). Required:
+Validated against [`schema/entry.schema.json`](https://github.com/OWNER/ai-computing-encyclopedia/blob/main/schema/entry.schema.json). Required:
 `term`, `category`, `status`, `difficulty`, `one_liner`, `updated`.
 
 Relationships are declared **once**, from whichever side reads naturally. The
@@ -161,8 +161,19 @@ Recommended — CI warns, `--strict` fails:
 `What Problem Does It Solve?` · `Mental Model` · `Real-World Usage` ·
 `Common Confusions` · `Why Should I Care?`
 
-Optional: `Visual Explanation`, `Formula`, `Historical Origin`, `Evolution`,
-`Terminology Note`, `Differences`, `Where Will I Encounter It?`
+Optional: `Formula`, `Historical Origin`, `Evolution`, `Terminology Note`,
+`Differences`
+
+Two things deliberately have no section of their own:
+
+* **Diagrams** go inside `How Does It Work?`, next to the explanation they
+  illustrate, not in a separate block.
+* **Where you will meet a term** comes from the `encountered_in` front-matter
+  field, which the build renders into the entry footer.
+
+`Differences` is for a contrast that only makes sense inside one entry. When two
+concepts are genuinely confused with each other, write a page in
+`content/comparisons/` instead — it is reachable from both entries.
 
 **Never hand-write these** — they are generated from front matter and CI will
 reject them in the body: One-Line Definition, Related Concepts, Prerequisites,
@@ -225,4 +236,4 @@ and usually with an invitation to add it to the watchlist.
 
 ## Code of conduct
 
-Participation is governed by the [Code of Conduct](https://github.com/Iamhifza/encyclopedia/blob/main/CODE_OF_CONDUCT.md).
+Participation is governed by the [Code of Conduct](https://github.com/OWNER/ai-computing-encyclopedia/blob/main/CODE_OF_CONDUCT.md).

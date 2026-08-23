@@ -80,6 +80,12 @@ eras:
       acquire gates, retrieval acquires BM25, and the hardware that will matter
       arrives for entirely unrelated reasons.
     events:
+      - year: "1972"
+        what: Spärck Jones introduces inverse document frequency; text becomes vectors.
+        term: tf-idf
+      - year: "1994"
+        what: BM25 is formalised, and remains a competitive baseline three decades later.
+        term: bm25
       - year: "1997"
         what: LSTM solves vanishing gradients with gating and an additive memory path.
         term: lstm
@@ -100,7 +106,7 @@ eras:
     events:
       - year: "2012"
         what: AlexNet wins ImageNet by a wide margin on two consumer GPUs.
-        term: gpu
+        term: computer-vision
       - year: "2013"
         what: Word2Vec makes meaning geometric and reusable.
         term: word2vec
@@ -151,6 +157,9 @@ eras:
       - year: "2021"
         what: The term "foundation model" is coined at Stanford.
         term: foundation-model
+      - year: "2020"
+        what: GShard distributes experts across devices, making trillion-parameter MoE training possible.
+        term: expert-parallelism
       - year: "2021"
         what: LoRA makes fine-tuning affordable; RoPE becomes the default position encoding.
         term: lora
@@ -181,6 +190,9 @@ eras:
       - year: "2023"
         what: Sparse autoencoders decompose activations into interpretable features.
         term: sparse-autoencoder
+      - year: "2023"
+        what: Video diffusion moves from research demos to usable generated footage.
+        term: video-generation
 
   - id: agentic
     label: "2024–present — agents, protocols and reasoning"
