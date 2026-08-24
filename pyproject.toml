@@ -29,9 +29,9 @@ dev = ["pytest>=8.0.0", "ruff>=0.4.0"]
 enc = "encyclopedia.cli:main"
 
 [project.urls]
-Homepage = "https://Iamhifza.github.io/encyclopedia"
-Source = "https://github.com/Iamhifza/encyclopedia"
-Issues = "https://github.com/Iamhifza/encyclopedia/issues"
+Homepage = "https://OWNER.github.io/ai-computing-encyclopedia"
+Source = "https://github.com/OWNER/ai-computing-encyclopedia"
+Issues = "https://github.com/OWNER/ai-computing-encyclopedia/issues"
 
 [tool.setuptools]
 package-dir = { "" = "tools" }
@@ -46,6 +46,12 @@ target-version = "py310"
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
 ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+# `encyclopedia` lives under tools/, so ruff cannot infer that it is ours.
+# Without this it sorts our imports into the third-party group and the
+# stdlib / third-party / first-party layout in every file looks "unsorted".
+known-first-party = ["encyclopedia"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

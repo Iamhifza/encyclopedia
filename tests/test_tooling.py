@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from encyclopedia.loader import ContentError, parse_front_matter, split_sections
 from encyclopedia.model import Corpus, Entry
 from encyclopedia.validate import _detect_cycle, validate
