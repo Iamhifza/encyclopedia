@@ -349,30 +349,87 @@ def cmd_stats(args) -> int:
 
 
 def cmd_lint_links(args) -> int:
+    """Check that cited URLs resolve.
+
+    Academic publishers routinely reject HEAD requests and default user agents
+    while serving the page perfectly well in a browser. A checker that reports
+    those as failures is a checker nobody runs twice, so results are classified:
+    only 404 and 410 are treated as genuinely dead.
+    """
     import urllib.error
     import urllib.request
 
+    UA = (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"
+    )
+
+    def probe(url: str, method: str) -> int:
+        request = urllib.request.Request(
+            url,
+            method=method,
+            headers={"User-Agent": UA, "Accept": "*/*"},
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=args.timeout) as response:
+                return response.status
+        except urllib.error.HTTPError as exc:
+            return exc.code
+        except Exception:  # noqa: BLE001 - network flakiness is not a content bug
+            return 0
+
     corpus = _load()
-    seen: dict[str, int] = {}
-    bad = 0
+    urls: dict[str, list[str]] = {}
     for entry in corpus.entries.values():
         for src in entry.sources:
-            url = src["url"]
-            if url in seen:
-                continue
-            request = urllib.request.Request(url, method="HEAD", headers={"User-Agent": "enc-linkcheck"})
-            try:
-                with urllib.request.urlopen(request, timeout=15) as response:
-                    seen[url] = response.status
-            except urllib.error.HTTPError as exc:
-                seen[url] = exc.code
-            except Exception:  # noqa: BLE001 - network flakiness is not a content bug
-                seen[url] = 0
-            if seen[url] >= 400 or seen[url] == 0:
-                bad += 1
-                print(f"{YELLOW}{seen[url] or 'unreachable'}{RESET}  {entry.slug}: {url}")
-    print(f"\nchecked {len(seen)} urls · {bad} suspicious")
-    return 1 if bad and args.strict else 0
+            urls.setdefault(src["url"], []).append(entry.slug)
+
+    dead: list[tuple[str, int, list[str]]] = []
+    blocked: list[tuple[str, int, list[str]]] = []
+    unreachable: list[tuple[str, list[str]]] = []
+    ok = 0
+
+    for i, (url, slugs) in enumerate(sorted(urls.items()), start=1):
+        status = probe(url, "HEAD")
+        # Many hosts reject HEAD but answer GET. Retry before judging.
+        if status in (0, 403, 405, 406, 501):
+            status = probe(url, "GET")
+        if status and status < 400:
+            ok += 1
+        elif status in (404, 410):
+            dead.append((url, status, slugs))
+        elif status == 0:
+            unreachable.append((url, slugs))
+        else:
+            blocked.append((url, status, slugs))
+        if not args.quiet:
+            print(f"\r{DIM}checked {i}/{len(urls)}{RESET}", end="", flush=True)
+
+    print("\r" + " " * 40 + "\r", end="")
+
+    if dead:
+        print(f"{RED}DEAD — these need fixing{RESET}")
+        for url, status, slugs in dead:
+            print(f"  {status}  {', '.join(slugs)}\n       {url}")
+    if unreachable:
+        print(f"\n{YELLOW}UNREACHABLE — verify by hand; may be transient{RESET}")
+        for url, slugs in unreachable:
+            print(f"  {', '.join(slugs)}\n       {url}")
+    if blocked and args.verbose:
+        print(f"\n{DIM}BLOCKED — publisher refused an automated request; almost")
+        print(f"          certainly fine in a browser{RESET}")
+        for url, status, slugs in blocked:
+            print(f"  {status}  {', '.join(slugs)}\n       {url}")
+
+    print(
+        f"\n{len(urls)} urls · {GREEN}{ok} ok{RESET} · "
+        f"{RED}{len(dead)} dead{RESET} · "
+        f"{YELLOW}{len(unreachable)} unreachable{RESET} · "
+        f"{DIM}{len(blocked)} blocked by publisher{RESET}"
+    )
+    if blocked and not args.verbose:
+        print(f"{DIM}(pass --verbose to list the blocked ones){RESET}")
+    return 1 if dead and args.strict else 0
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -421,7 +478,10 @@ def main(argv: list[str] | None = None) -> int:
     p.set_defaults(func=cmd_stats)
 
     p = sub.add_parser("lint-links", help="check source URLs resolve")
-    p.add_argument("--strict", action="store_true")
+    p.add_argument("--strict", action="store_true", help="exit non-zero if any link is dead")
+    p.add_argument("--verbose", action="store_true", help="also list publisher-blocked URLs")
+    p.add_argument("--quiet", action="store_true", help="no progress counter")
+    p.add_argument("--timeout", type=int, default=15)
     p.set_defaults(func=cmd_lint_links)
 
     args = parser.parse_args(argv)

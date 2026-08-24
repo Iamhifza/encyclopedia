@@ -19,9 +19,10 @@ sources:
     title: "Time, Clocks, and the Ordering of Events in a Distributed System (Lamport)"
     url: https://lamport.azurewebsites.net/pubs/time-clocks.pdf
     year: 1978
-  - type: paper
-    title: "Fallacies of Distributed Computing Explained"
-    url: https://www.rgoarchitects.com/Files/fallacies.pdf
+  - type: book
+    title: "Site Reliability Engineering — running distributed systems in production"
+    url: https://sre.google/sre-book/table-of-contents/
+    note: The fallacies of distributed computing are attributed to L. Peter Deutsch and colleagues at Sun, c. 1994.
   - type: report
     title: "The Llama 3 Herd of Models — training infrastructure and failures"
     url: https://arxiv.org/abs/2407.21783

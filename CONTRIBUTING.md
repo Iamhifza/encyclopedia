@@ -197,7 +197,19 @@ Status, Difficulty, Further Reading.
 
 ### Sources
 
-Cite at least one, best first, using this order of preference:
+Run `enc lint-links` after changing any citation. It classifies results rather
+than reporting everything that is not a 200:
+
+* **dead** (404, 410) — genuinely gone. Fix these.
+* **unreachable** — timeout or DNS failure. Often transient; check by hand.
+* **blocked** — the publisher refused an automated request. ACM, Wiley,
+  ScienceDirect, MIT Press and Oxford all do this routinely, and the page loads
+  perfectly well in a browser. Not a problem.
+
+Only dead links fail `--strict`. A link checker that cries wolf is a link checker
+nobody runs.
+
+Cite at least one source, best first, using this order of preference:
 
 1. Original research papers
 2. Official specifications and standards

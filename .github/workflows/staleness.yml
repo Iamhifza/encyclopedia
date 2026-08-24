@@ -1,0 +1,84 @@
+name: Review reminder
+
+# Terminology in this field ages quickly. Once a month, open (or update) an
+# issue listing every entry whose review date has passed.
+on:
+  schedule:
+    - cron: "0 9 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  link-rot:
+    name: Check cited sources still resolve
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -e .
+      - name: Check links
+        run: enc lint-links --quiet
+
+  stale-entries:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -e .
+
+      - name: Collect overdue entries
+        id: collect
+        run: |
+          enc validate 2>&1 | grep "review overdue" > overdue.txt || true
+          {
+            echo "count=$(wc -l < overdue.txt)"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Open or update the review issue
+        if: steps.collect.outputs.count != '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = [
+              'These entries are past their `review_by` date. Fast-moving terminology',
+              'goes stale quietly, so please check each against current practice and',
+              'either update the content or bump `updated` and `review_by`.',
+              '',
+              '```',
+              fs.readFileSync('overdue.txt', 'utf8').trim(),
+              '```'
+            ].join('\n');
+            const title = 'Entries due for review';
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: 'review'
+            });
+            const issue = existing.data.find(i => i.title === title);
+            if (issue) {
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, body
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body, labels: ['review', 'good first issue']
+              });
+            }

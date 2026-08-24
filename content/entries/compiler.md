@@ -15,9 +15,11 @@ relations:
 prerequisites: [cpu]
 encountered_in: [research-papers, github, production-systems, interviews]
 sources:
-  - type: book
-    title: "Compilers: Principles, Techniques, and Tools (the Dragon Book)"
-    url: https://suif.stanford.edu/dragonbook/
+  - type: paper
+    title: "MLIR: A Compiler Infrastructure for the End of Moore's Law"
+    url: https://arxiv.org/abs/2002.11054
+    year: 2020
+    note: The compiler infrastructure most ML compilers are now built on.
   - type: docs
     title: "torch.compile — PyTorch compilation"
     url: https://pytorch.org/docs/stable/torch.compiler.html
