@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+title: The AI & Computing Encyclopedia
+message: If you use this encyclopedia, please cite it.
+type: dataset
+authors:
+  - name: The AI & Computing Encyclopedia contributors
+repository-code: https://github.com/Iamhifza/encyclopedia
+url: https://Iamhifza.github.io/encyclopedia
+abstract: >-
+  A structured, continuously reviewed knowledge base of AI and computing
+  concepts. Each concept has one canonical entry with typed relationships,
+  historical lineage, comparisons and primary sources, published as a website
+  and as a JSON API.
+keywords:
+  - artificial intelligence
+  - machine learning
+  - large language models
+  - knowledge graph
+  - encyclopedia
+license: CC-BY-SA-4.0
+version: 1.0.0
+date-released: "2026-08-22"
