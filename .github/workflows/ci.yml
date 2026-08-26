@@ -1,4 +1,4 @@
-﻿name: Validate
+name: Validate
 
 on:
   push:
@@ -37,6 +37,37 @@ jobs:
             enc stats
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+
+  diagrams:
+    name: Diagram geometry
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          pip install -e .
+          npm install --no-save playwright@1.49
+          npx playwright install --with-deps chromium
+      - name: Lint diagram geometry
+        # Renders every figure in a real browser and fails on text that is
+        # clipped, spills out of its box, or overlaps another label. The
+        # renderer estimates text widths, so only a browser can catch this.
+        run: node scripts/lint_diagrams.mjs --json diagram-report.json
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagram-report
+          path: diagram-report.json
 
   test:
     name: Tooling tests

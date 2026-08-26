@@ -24,6 +24,10 @@ install: $(BIN)/python ## Create a virtualenv and install dependencies
 check: ## Validate the corpus (warnings are fatal)
 	$(BIN)/python -m encyclopedia validate --strict
 
+.PHONY: diagrams
+diagrams: ## Lint rendered diagram geometry in a real browser
+	node scripts/lint_diagrams.mjs
+
 .PHONY: build
 build: ## Generate build/docs and build/docs/api
 	$(BIN)/python -m encyclopedia build
