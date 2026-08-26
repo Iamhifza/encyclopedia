@@ -99,8 +99,14 @@ const MEASURE = ({ tolEdge, tolOverlap }) => {
       }
     }
 
-    // 2. anything wider than the box or panel it sits inside
-    const containers = [...svg.querySelectorAll('rect')].map(r => ({ el: r, r: r.getBoundingClientRect() }));
+    // 2. anything wider than the box it sits inside.
+    // Grounds are excluded: a panel, a plot frame, a shaded band or a bar
+    // track is something drawn *behind* the figure, not a box the label is
+    // supposed to fit within. Counting them produces noise, not findings.
+    const GROUND = /dgm-(panel|plotframe|plotband|plane|segtrack|track)\b/;
+    const containers = [...svg.querySelectorAll('rect')]
+      .filter(r => !GROUND.test(r.getAttribute('class') || ''))
+      .map(r => ({ el: r, r: r.getBoundingClientRect() }));
     for (const b of boxes) {
       if (!b.r.width) continue;
       const cx = (b.r.left + b.r.right) / 2, cy = (b.r.top + b.r.bottom) / 2;

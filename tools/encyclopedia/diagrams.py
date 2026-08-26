@@ -82,6 +82,17 @@ def _unpack(cell: Any) -> tuple[str, bool]:
 # visuals — each returns (markup, height)
 # --------------------------------------------------------------------------
 
+CHIP_MIN_W = 74
+CHIP_PAD = 22
+
+
+def _chip_w(item: Any) -> float:
+    """A chip is as wide as its word. Fixed-width chips silently clipped
+    anything past nine characters, which quietly shortened the vocabulary."""
+    text, _ = _unpack(item)
+    return max(CHIP_MIN_W, len(text) * MONO_ADV + CHIP_PAD)
+
+
 def _vis_grid(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
     rows = spec.get("rows", [])
     label_w = max((len(str(r.get("label", ""))) * MONO_ADV for r in rows), default=0)
@@ -141,8 +152,10 @@ def _vis_fan(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
     source = spec.get("source", "")
     targets = spec.get("targets", [])
     n = max(len(targets), 1)
-    src_w, src_h = 68, 38
-    tgt_w, tgt_h = 78, 30
+    src_w = max(68, len(str(source)) * MONO_ADV + CHIP_PAD)
+    src_h = 38
+    tgt_h = 30
+    tgt_w = max((_chip_w(t) for t in targets), default=78)
     gap = 8
     total_h = n * tgt_h + (n - 1) * gap
     src_y = y + total_h / 2 - src_h / 2
@@ -163,17 +176,6 @@ def _vis_fan(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
         out.append(_t(x, y + total_h + 16, spec["caption"], "dgm-caption"))
         total_h += 20
     return "\n".join(out), total_h
-
-
-CHIP_MIN_W = 74
-CHIP_PAD = 22
-
-
-def _chip_w(item: Any) -> float:
-    """A chip is as wide as its word. Fixed-width chips silently clipped
-    anything past nine characters, which quietly shortened the vocabulary."""
-    text, _ = _unpack(item)
-    return max(CHIP_MIN_W, len(text) * MONO_ADV + CHIP_PAD)
 
 
 def _vis_chips(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
@@ -874,8 +876,14 @@ def _vis_matrix(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
         if row.get("label"):
             out.append(_t(grid_x - LABEL_GAP, cy + ch / 2 + 5, row["label"],
                           _cls("dgm-rowlabel", _tone(row)), "end"))
-        peak = max(row.get("values", [0]) or [0])
+        present = [v for v in row.get("values", []) if v is not None]
+        peak = max(present or [0])
         for j, val in enumerate(row.get("values", [])):
+            # `null` means the cell does not exist — a masked position, an
+            # impossible pair. Drawing it as 0.00 says "we measured zero here",
+            # which is a different and wrong claim.
+            if val is None:
+                continue
             v = max(0.0, min(1.0, float(val)))
             cx = grid_x + j * cw
             top_cell = v >= peak - 1e-9
@@ -1269,7 +1277,9 @@ def _visual_width(spec: dict[str, Any] | None) -> float:
     if kind == "bars":
         return VIS_W
     if kind == "fan":
-        return 68 + 110 + 78
+        targets = spec.get("targets", [])
+        src_w = max(68, len(str(spec.get("source", ""))) * MONO_ADV + CHIP_PAD)
+        return src_w + 110 + max((_chip_w(t) for t in targets), default=78)
     if kind == "chips":
         items = spec.get("items", [])
         return sum(_chip_w(i) for i in items) + max(len(items) - 1, 0) * 12
