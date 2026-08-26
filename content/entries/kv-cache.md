@@ -11,6 +11,103 @@ origin:
   circa: true
   attribution: Standard practice in fast Transformer decoding; formalised in Shazeer's multi-query attention work
 historical_period: transformer
+diagram:
+  kind: steps
+  title: Building the cache, one token at a time
+  footer: 'Without this, generating token n would recompute all n-1 earlier keys and values: O(n²) wasted work.'
+  steps:
+  - title: Prefill — the prompt "the cache stores"
+    notes:
+    - label: Computed
+      text: K and V for all three tokens in one pass
+    - label: Stored
+      text: per layer, per attention head
+    visual:
+      kind: grid
+      caption: cache after prefill
+      rows:
+      - label: K
+        cells:
+        - text: K1
+          new: true
+        - text: K2
+          new: true
+        - text: K3
+          new: true
+      - label: V
+        cells:
+        - text: V1
+          new: true
+        - text: V2
+          new: true
+        - text: V3
+          new: true
+  - title: Decode — the model emits "keys"
+    notes:
+    - label: Computed
+      text: K4 and V4 only; the first three are already cached
+    - label: Not cached
+      text: Q4 itself — a query is used once and never again
+    visual:
+      kind: grid
+      caption: one slot appended
+      rows:
+      - label: K
+        cells:
+        - K1
+        - K2
+        - K3
+        - text: K4
+          new: true
+      - label: V
+        cells:
+        - V1
+        - V2
+        - V3
+        - text: V4
+          new: true
+  - title: Decode — the model emits "and"
+    notes:
+    - label: Cost
+      text: one slot per token, per layer, for the life of the request
+    - label: Consequence
+      text: 32k tokens on a 70B model is roughly 10 GB
+    visual:
+      kind: bars
+      caption: GPU memory, 80 GB card
+      bars:
+      - label: weights
+        value: 0.87
+        value_label: 70 GB
+      - label: KV cache
+        value: 0.13
+        value_label: 10 GB
+        accent: true
+diagrams:
+- kind: figure
+  section: Evolution
+  title: Every step here is someone trying to make the cache smaller
+  visual:
+    kind: lineage
+    per_row: 4
+    caption: the cache went from an obvious optimisation to the thing serving architecture is designed
+      around
+    milestones:
+    - text: recompute
+      note: O(n²)
+    - text: KV cache
+      note: '2019'
+      tone: accent
+    - text: MQA / GQA
+      note: fewer heads
+    - text: PagedAttention
+      note: '2023'
+    - text: prefix caching
+      note: share it
+    - text: KV quantisation
+      note: fp8 · int4
+    - text: offload & reuse
+      note: spill to host
 tags: [inference, architecture]
 relations:
   depends_on: [self-attention]
@@ -33,6 +130,11 @@ sources:
   - type: docs
     title: "vLLM — automatic prefix caching and KV cache management"
     url: https://docs.vllm.ai/en/latest/
+videos:
+  - title: "KV cache explained"
+    channel: "Efficient NLP"
+    url: https://www.youtube.com/results?search_query=kv+cache+explained+llm+inference
+    note: "Why context length costs memory"
 updated: 2026-08-21
 review_by: 2027-02-01
 ---
@@ -66,18 +168,6 @@ that traded-for memory then becomes the binding constraint on how many users a
 GPU can serve at once.
 
 ## How Does It Work?
-
-```text
-step 1  prompt "the cache stores"
-        compute k,v for all 3 tokens ──▶ cache: [k1 k2 k3][v1 v2 v3]
-
-step 2  new token "keys"
-        compute k4,v4 only          ──▶ cache: [k1..k4][v1..v4]
-        attention: q4 against k1..k4
-
-step 3  new token "and"
-        compute k5,v5 only          ──▶ cache grows by one slot
-```
 
 Queries are *not* cached — a query is used once, at the step that generates it,
 and never again.
@@ -122,10 +212,13 @@ context windows grew and cache memory started to dominate serving cost.
 
 ## Evolution
 
-```text
-recompute everything → KV cache → multi-query / grouped-query attention
-  → PagedAttention → prefix caching → KV quantisation → cache offload and reuse
-```
+
+Every step in this lineage is someone trying to make the cache smaller. The cache
+began as an obvious engineering optimisation and became, within a few years, the
+constraint that serving architecture is designed around — first by attacking its
+shape (fewer key-value heads), then its allocation (paging instead of contiguous
+blocks), then its redundancy (sharing prefixes between requests), and finally its
+precision and residency.
 
 ## Common Confusions
 

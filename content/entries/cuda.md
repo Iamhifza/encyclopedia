@@ -11,6 +11,51 @@ origin:
   year: 2007
   attribution: NVIDIA; the first release that made general-purpose GPU programming practical
 historical_period: statistical-ml
+diagram:
+  kind: steps
+  title: What sits between your code and the silicon
+  footer: Most people never write CUDA directly. They meet it as the reason a version matrix has to line
+    up, and as the layer a profiler points at.
+  steps:
+  - title: The dispatch chain
+    notes:
+    - label: Consequence
+      text: framework, toolkit and driver versions must all agree, which is most of the pain
+    visual:
+      kind: pipeline
+      width: 660
+      stages:
+      - text: your code
+        note: Python · PyTorch
+      - text: cuBLAS · cuDNN · custom kernels
+        note: the fast paths
+        via: the framework dispatches an op to a kernel
+      - text: CUDA runtime and driver
+        tone: accent
+        via: launch configuration, memory, streams
+      - text: GPU
+        note: actual execution
+        via: hardware queues
+  - title: How the work is divided once it arrives
+    notes:
+    - label: Lockstep
+      text: the 32 threads of a warp share one program counter — a branch that splits them costs both
+        sides
+    visual:
+      kind: lineage
+      width: 660
+      per_row: 4
+      caption: each level exists to hide the latency of the level below
+      milestones:
+      - text: grid
+        note: the whole launch
+      - text: blocks
+        note: share fast memory
+      - text: warps
+        note: 32, in lockstep
+        tone: accent
+      - text: threads
+        note: one data element
 tags: [hardware]
 relations:
   used_by: [gpu-kernel, gpu]
@@ -59,17 +104,6 @@ Programmability. The hardware was already capable; the barrier was that using it
 required thinking like a graphics programmer.
 
 ## How Does It Work?
-
-```text
-your code (Python / PyTorch)
-        │
-   framework dispatches to
-        │
-   cuBLAS · cuDNN · custom kernels ──▶ CUDA runtime ──▶ driver ──▶ GPU
-        │
-   thread hierarchy:
-     grid ──▶ blocks ──▶ warps (32 threads in lockstep) ──▶ threads
-```
 
 Almost nobody in AI writes CUDA C++ directly. You write PyTorch, PyTorch calls
 libraries, and those libraries are CUDA. The stack is invisible until something

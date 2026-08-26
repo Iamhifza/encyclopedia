@@ -12,6 +12,31 @@ origin:
   circa: true
   attribution: MIT's Summer Vision Project famously assigned it to an undergraduate for one summer; it took fifty years
 historical_period: classical-ai
+diagram:
+  kind: figure
+  title: 2012 split the field in half
+  footer: The learned column did not win by being cleverer about vision. It won by replacing the hand-designed
+    half of the pipeline with more data.
+  visual:
+    kind: columns
+    width: 700
+    caption: the same task, before and after the features stopped being designed
+    columns:
+    - title: Classical · before 2012
+      lines:
+      - hand-designed features
+      - SIFT · HOG · edge detectors
+      - feed them to a classifier
+      - brittle, domain-specific
+      - a new domain means new features
+    - title: Learned · after
+      accent: true
+      lines:
+      - features learned from data
+      - 'early layers: edges'
+      - 'middle: textures and parts'
+      - 'late: whole objects'
+      - one pipeline, trained end to end
 tags: [architecture]
 relations:
   used_by: [vision-language-model, computer-use, embodied-ai]
@@ -32,6 +57,10 @@ sources:
     title: "Segment Anything"
     url: https://arxiv.org/abs/2304.02643
     year: 2023
+videos:
+  - title: "How Computer Vision Works"
+    channel: "Computerphile"
+    url: https://www.youtube.com/results?search_query=computerphile+how+computer+vision+works
 updated: 2026-08-21
 ---
 
@@ -64,16 +93,6 @@ Perception. It is the input layer for everything from medical diagnosis to
 autonomous driving to an agent reading a screen.
 
 ## How Does It Work?
-
-```text
-CLASSICAL (before 2012)          LEARNED (after)
-hand-designed features           learn features from data
-  SIFT · HOG · edge detectors      early layers: edges
-        │                          middle: textures, parts
-  feed to a classifier             late: objects
-        │                                │
-  brittle, domain-specific         one pipeline, trained end to end
-```
 
 The shift from designing features to learning them is the whole story, and
 AlexNet in 2012 is where it happened.

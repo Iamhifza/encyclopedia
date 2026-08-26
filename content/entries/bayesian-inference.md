@@ -11,6 +11,38 @@ origin:
   year: 1763
   attribution: Thomas Bayes, published posthumously; developed independently and more generally by Laplace
 historical_period: pre-computing
+diagram:
+  kind: steps
+  title: Belief, updated by evidence, becoming the next belief
+  footer: The framework says how much to move, not what to believe first. A confident wrong prior is the
+    expensive failure mode, and no amount of evidence is free.
+  steps:
+  - title: One update, then the same update again
+    visual:
+      kind: chips
+      items:
+      - prior belief
+      - new evidence
+      - posterior belief
+      loop: the posterior becomes the prior for the next piece of evidence
+  - title: How far the belief actually moves
+    notes:
+    - label: Ratio
+      text: movement depends on the strength of the evidence relative to the prior, not on either alone
+    visual:
+      kind: bars
+      caption: how far the posterior travels from the prior
+      bars:
+      - label: strong prior, weak evidence
+        value: 0.12
+        value_label: barely moves
+      - label: matched
+        value: 0.5
+        value_label: meets in the middle
+      - label: weak prior, strong evidence
+        value: 0.92
+        value_label: moves a long way
+        accent: true
 tags: [training]
 relations:
   related_to: [probability, supervised-learning, autoencoder, hallucination]
@@ -25,6 +57,10 @@ sources:
     title: "Pattern Recognition and Machine Learning (Bishop)"
     url: https://www.microsoft.com/en-us/research/publication/pattern-recognition-machine-learning/
     year: 2006
+videos:
+  - title: "Bayes theorem, the geometry of changing beliefs"
+    channel: "3Blue1Brown"
+    url: https://www.youtube.com/results?search_query=3blue1brown+bayes+theorem
 updated: 2026-08-21
 ---
 
@@ -57,16 +93,6 @@ Principled uncertainty. It says how much to trust a conclusion, and how to
 combine evidence from several sources without double-counting.
 
 ## How Does It Work?
-
-```text
-prior belief ──▶ observe evidence ──▶ posterior belief
-                        │
-              the posterior becomes the prior
-              for the next piece of evidence
-                        │
-              strong prior + weak evidence  → little movement
-              weak prior + strong evidence  → large movement
-```
 
 That last line is the practical content: how much you move depends on the
 relative strength of what you believed and what you saw.

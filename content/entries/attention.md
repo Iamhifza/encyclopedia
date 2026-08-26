@@ -10,6 +10,75 @@ origin:
   year: 2014
   attribution: Bahdanau, Cho and Bengio, for neural machine translation
 historical_period: statistical-ml
+diagram:
+  kind: steps
+  title: One query, resolving "it"
+  footer: High weight says where the model looked. It is not proof of why it answered — a distinction
+    the interpretability literature keeps having to make.
+  steps:
+  - title: Score the query against every key
+    notes:
+    - label: Query
+      text: from "it" — what do I need to resolve?
+    - label: Scale
+      text: divide by √d_k, or the softmax saturates and the gradient goes flat
+    visual:
+      kind: bars
+      caption: q·kᵀ, before softmax
+      bars:
+      - label: the
+        value: 0.12
+        value_label: '0.3'
+      - label: animal
+        value: 1.0
+        value_label: '2.4'
+        accent: true
+      - label: street
+        value: 0.29
+        value_label: '0.7'
+      - label: because
+        value: 0.17
+        value_label: '0.4'
+  - title: Softmax turns the scores into a distribution
+    notes:
+    - label: Property
+      text: the row sums to 1, so attention allocates a fixed budget across positions
+    visual:
+      kind: matrix
+      cols:
+      - the
+      - animal
+      - street
+      - because
+      rows:
+      - label: it →
+        values:
+        - 0.06
+        - 0.62
+        - 0.19
+        - 0.13
+      caption: attention weights for one query
+  - title: The output is those weights spent on the values
+    notes:
+    - label: Result
+      text: a blend dominated by the value at "animal" — which is what resolving the pronoun means
+    visual:
+      kind: segments
+      label: output vector at "it"
+      caption: every output is a mixture; attention only chooses the proportions
+      segments:
+      - text: V(the)
+        value: 0.06
+      - text: V(animal)
+        value: 0.62
+        tone: accent
+        value_label: '0.62'
+      - text: V(street)
+        value: 0.19
+        value_label: '0.19'
+      - text: V(because)
+        value: 0.13
+        value_label: '0.13'
 tags: [architecture]
 relations:
   successor_of: [lstm]
@@ -28,6 +97,10 @@ sources:
     title: "Attention Is All You Need"
     url: https://arxiv.org/abs/1706.03762
     year: 2017
+videos:
+  - title: "Attention in transformers, visually explained"
+    channel: "3Blue1Brown"
+    url: https://www.youtube.com/results?search_query=3blue1brown+attention+in+transformers+visually+explained
 updated: 2026-08-21
 ---
 
@@ -59,16 +132,6 @@ recurrence — a constant number of sequential steps between any two positions,
 which makes training parallelisable.
 
 ## How Does It Work?
-
-```text
-query (what I am looking for)
-   │
-   ├── score against every key ──▶ [0.1  2.4  0.3  1.8]
-   │                                     │ softmax
-   ├── weights ────────────────────▶ [.05 .55 .06 .34]
-   │
-   └── output = Σ weight × value  ──▶ blended information
-```
 
 1. Project each token into query, key and value vectors.
 2. Score every query against every key by dot product.

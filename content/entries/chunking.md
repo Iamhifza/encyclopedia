@@ -8,6 +8,58 @@ status: established
 difficulty: intermediate
 one_liner: "Cutting documents into passages small enough to retrieve precisely and large enough to still make sense on their own."
 historical_period: foundation-model
+diagram:
+  kind: steps
+  title: Chunk size is a retrieval decision, not a formatting one
+  footer: Chunking is the cheapest lever in a RAG system and the one most often left at its default. Measure
+    recall@k against two or three sizes before tuning anything else.
+  steps:
+  - title: Both ends of the range fail, for opposite reasons
+    visual:
+      kind: columns
+      width: 700
+      columns:
+      - title: Too small
+        tone: bad
+        lines:
+        - '"…the rate is 4.5%."'
+        - 4.5% of what?
+        - retrieved, and still useless
+      - title: Too large
+        tone: bad
+        lines:
+        - an entire 40-page policy
+        - one vector averages all of it
+        - matches nothing in particular
+  - title: Split on structure, then overlap the seams
+    notes:
+    - label: Why overlap
+      text: an answer that straddles a boundary survives in at least one chunk
+    visual:
+      kind: segments
+      width: 700
+      label: one section, chunked
+      caption: the overlap is duplicated on purpose — it is cheap, and losing an answer at a seam is not
+      segments:
+      - text: chunk 1
+        value: 500
+        value_label: ~500 tok
+      - text: overlap
+        value: 50
+        tone: accent
+      - text: chunk 2
+        value: 500
+        value_label: ~500 tok
+      - text: overlap
+        value: 50
+        tone: accent
+      - text: chunk 3
+        value: 500
+        value_label: ~500 tok
+      spans:
+      - from: 0
+        to: 2
+        text: what chunk 2's embedding actually sees
 tags: [retrieval]
 relations:
   part_of: [rag]
@@ -56,19 +108,17 @@ sufficiency (the retrieved text must actually contain enough to answer).
 
 ## How Does It Work?
 
-```text
-TOO SMALL                      TOO LARGE
-"...rate is 4.5%."             [entire 40-page policy document]
-   4.5% of what?                 vector averages everything → matches nothing
 
-STRUCTURE-AWARE + OVERLAP
-┌── section heading ──────────────────┐
-│ chunk 1: ~500 tokens                │
-│        ┌─ 50-token overlap ─┐       │
-│        │ chunk 2: ~500 tokens ──────┤
-└────────┴────────────────────────────┘
-overlap stops answers being severed at a boundary
-```
+Split on structure first — headings, sections, paragraph boundaries, function
+definitions — and only fall back to a fixed token count when the document has no
+structure to follow. A chunk should be the smallest span that still carries its
+own context, which is a property of the document, not a number you can set once
+and reuse everywhere.
+
+Then overlap the boundaries by roughly a tenth of the chunk size. Duplicated
+tokens are cheap; an answer severed in half by a boundary is not retrievable at
+any *k*. Attach the document title and section heading to each chunk as a prefix
+too — it costs a few tokens and rescues chunks whose own text is ambiguous.
 
 ## Mental Model
 

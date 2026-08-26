@@ -8,6 +8,28 @@ status: foundational
 difficulty: advanced
 one_liner: "A program that turns code written for humans into instructions a specific machine can execute quickly."
 historical_period: early-computing
+diagram:
+  kind: figure
+  title: From Python down to kernels
+  footer: Every level exists so the level above it can stop caring about the hardware. The cost is that
+    when performance is wrong, the answer is several levels down.
+  visual:
+    kind: pipeline
+    width: 680
+    caption: the optimising middle is where the speed comes from
+    stages:
+    - text: your model
+      note: Python
+    - text: computation graph
+      note: what, not how
+      via: trace or capture the graph
+    - text: lowered IR
+      note: how, not where
+      tone: accent
+      via: fuse ops · eliminate dead nodes · plan memory · choose layouts · tile loops · autotune
+    - text: executable kernels
+      note: GPU · NPU · CPU
+      via: generate device code
 tags: [hardware]
 relations:
   used_by: [flash-attention, gpu-kernel]
@@ -63,17 +85,6 @@ The gap between code written for clarity and code that runs well on a specific
 accelerator, without asking the author to write kernels by hand.
 
 ## How Does It Work?
-
-```text
-your model (Python)
-    │ trace or capture the graph
-computation graph
-    │ optimise:  fuse ops · eliminate dead nodes · plan memory
-    │            choose layouts · tile loops · autotune
-lowered IR
-    │ generate device code
-executable kernels ──▶ GPU / NPU / CPU
-```
 
 Fusion is the biggest single win, and it is the same argument made in the GPU
 kernel entry: fewer trips to memory.

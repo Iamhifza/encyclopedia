@@ -10,6 +10,44 @@ origin:
   year: 2023
   attribution: Agrawal et al., SARATHI; deployed in vLLM and other engines
 historical_period: foundation-model
+diagram:
+  kind: steps
+  title: Stop one long prompt from freezing everyone else
+  footer: Total throughput barely moves. What changes is that no user's decode stalls behind another user's
+    prompt — a tail-latency fix, not a speed-up.
+  steps:
+  - title: Without chunking, a long prefill owns the step
+    visual:
+      kind: segments
+      width: 700
+      label: one scheduler step
+      caption: every other request waits out the whole prompt
+      segments:
+      - text: 100k-token prefill
+        value: 96
+        tone: warn
+      - text: nothing else
+        value: 4
+  - title: With a token budget, every step carries both
+    notes:
+    - label: Budget
+      text: 2048 tokens per step, split between prefill and the decodes waiting behind it
+    visual:
+      kind: segments
+      width: 700
+      label: one scheduler step, budget 2048
+      caption: the prompt now takes three steps, and nobody's decode stops
+      segments:
+      - text: prefill chunk
+        value: 2000
+        value_label: '2000'
+      - text: 48 decodes
+        value: 48
+        tone: accent
+      spans:
+      - from: 0
+        to: 1
+        text: repeated until the prompt is consumed
 tags: [inference]
 relations:
   depends_on: [prefill, continuous-batching]
@@ -56,16 +94,16 @@ Inter-token latency spikes caused by long prompts entering the batch — the
 
 ## How Does It Work?
 
-```text
-without chunking
-step k   : [ 100k-token prefill ..................... ] other users wait
-step k+1 : [ decode decode decode ]
 
-with chunking, budget 2048 tokens/step
-step k   : [ prefill chunk 1 (2000) ][ 48 decodes ]
-step k+1 : [ prefill chunk 2 (2000) ][ 48 decodes ]
-step k+2 : [ prefill chunk 3 (2000) ][ 48 decodes ]
-```
+The scheduler is given a token budget per step rather than a request per step. A
+long prompt is admitted a slice at a time, and whatever budget is left over goes
+to the decode steps of requests already in flight. A 100k-token prefill becomes
+fifty scheduled slices instead of one monopolising batch.
+
+The prompt itself finishes no sooner — slightly later, in fact, since it now
+shares each step. What changes is that every other user keeps generating
+throughout, so the inter-token latency they observe stays flat instead of
+stalling for the length of somebody else's prompt.
 
 ## Mental Model
 

@@ -10,6 +10,26 @@ origin:
   year: 2024
   attribution: Shipped as a model capability by Anthropic in October 2024; research prototypes and browser agents preceded it
 historical_period: agentic
+diagram:
+  kind: flow
+  title: A model driving a screen it can only see
+  loop: a fresh screenshot after every action
+  footer: There is no API here and no undo. The agent works from pixels, so a moved button is a new problem
+    and a destructive click is permanent.
+  nodes:
+  - title: Screenshot
+    note: pixels, nothing more
+    caption: the entire observation
+  - title: Model
+    note: decide the next action
+    accent: true
+    caption: coordinates, not selectors
+  - title: Action
+    note: '{"click", "x": 842, "y": 317}'
+    caption: one step at a time
+  - title: Execute
+    note: in a VM or container
+    caption: sandboxed, because it must be
 tags: [agents]
 relations:
   is_a: [ai-agent]
@@ -56,12 +76,6 @@ Automation of systems that cannot be integrated with, without waiting for anyone
 to build an API.
 
 ## How Does It Work?
-
-```text
-screenshot ──▶ model ──▶ {"action":"click","x":842,"y":317}
-     ▲                          │
-     └──── new screenshot ◀── executed in a VM or container
-```
 
 Every step costs a full image in context, so sessions are token-heavy and slow
 compared with tool calling.

@@ -12,6 +12,46 @@ origin:
   circa: true
   attribution: Catastrophic forgetting identified by McCloskey and Cohen; the modern research programme dates from the 2010s
 historical_period: ai-winter
+diagram:
+  kind: steps
+  title: Learning the second thing costs you the first
+  footer: None of the mitigations fully solves it and all of them cost something — memory, compute, or
+    parameters. In practice most teams retrain from scratch instead.
+  steps:
+  - title: Catastrophic forgetting
+    notes:
+    - label: Cause
+      text: the weights that encoded task A are the same weights gradient descent is free to overwrite
+        for B
+    visual:
+      kind: mapping
+      width: 700
+      head:
+      - train on
+      - what the model can do afterwards
+      rows:
+      - left: task A
+        right: A, well
+        mark: ok
+      - left: then task B
+        right: B well, A forgotten
+        mark: bad
+  - title: Three ways to slow it down
+    visual:
+      kind: stack
+      width: 720
+      caption: EWC is the canonical regularisation method; replay is the one that usually works best in
+        practice
+      layers:
+      - label: regularise
+        text: penalise changing the weights that mattered for A
+        note: a stiffer model
+      - label: replay
+        text: mix old examples back in while learning B
+        note: you must keep the old data
+      - label: grow
+        text: freeze A's parameters, allocate new ones for B
+        note: the model grows forever
 tags: [training]
 relations:
   related_to: [supervised-fine-tuning, agent-memory, transfer-learning, drift, rag]
@@ -62,17 +102,17 @@ problem is largely unsolved at scale, and the field routes around it.
 
 ## How Does It Work?
 
-```text
-train on A ──▶ good at A
-train on B ──▶ good at B, forgot A          ← catastrophic forgetting
 
-mitigations:
-  regularisation   penalise changing weights that mattered for A (EWC)
-  replay           mix old examples back in while learning B
-  architecture     freeze A's parameters, allocate new ones for B
-                        │
-  none of these fully solves it, and all cost something
-```
+Gradient descent has no notion of which weights are already carrying something
+important. Train on task B and the optimiser is free to overwrite exactly the
+parameters that encoded task A, because nothing in the loss for B mentions A.
+The result is not gradual decay but collapse: performance on A can fall to chance
+within a few hundred steps.
+
+Every mitigation buys retention with something else — a stiffer model, a stored
+replay buffer, or a parameter count that grows with every task. None restores the
+clean behaviour of training on everything at once, which is why full retraining
+remains the default whenever the data is still available.
 
 ## Mental Model
 

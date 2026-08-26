@@ -11,6 +11,41 @@ origin:
   circa: true
   attribution: A property of Transformer training configuration; became a headline product specification from 2023
 historical_period: transformer
+diagram:
+  kind: figure
+  title: What is actually in the window
+  footer: The window is a budget, not a memory. Nothing in it persists to the next request unless your
+    code puts it back.
+  visual:
+    kind: segments
+    width: 780
+    label: 200k tokens
+    caption: the split moves constantly; only the leftmost part is worth caching
+    segments:
+    - text: system prompt
+      value: 6
+      value_label: 12k
+    - text: tool schemas
+      value: 9
+      value_label: 18k
+    - text: retrieved docs
+      value: 38
+      value_label: 76k
+    - text: conversation history
+      value: 32
+      value_label: 64k
+    - text: output so far
+      value: 15
+      value_label: 30k
+      tone: warn
+    spans:
+    - from: 0
+      to: 1
+      text: stable across turns — cacheable prefix
+    - from: 2
+      to: 4
+      text: rewritten every turn
+      tone: warn
 tags: [architecture, inference]
 relations:
   depends_on: [self-attention, rope]
@@ -57,13 +92,6 @@ It bounds the resources one request may consume, and defines the working set the
 model can reason over in a single pass.
 
 ## How Does It Work?
-
-```text
-┌─────────────────── context window (e.g. 200k tokens) ───────────────────┐
-│ system prompt │ tool schemas │ retrieved docs │ history │ output so far  │
-└─────────────────────────────────────────────────────────────────────────┘
-   stable, cacheable ──────────────▶            ◀── volatile, changes often
-```
 
 Ordering matters for cost: stable content first maximises prefix cache hits.
 

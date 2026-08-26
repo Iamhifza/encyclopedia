@@ -8,6 +8,31 @@ status: foundational
 difficulty: beginner
 one_liner: "The general-purpose processor that runs the operating system and everything a GPU is not doing."
 historical_period: early-computing
+diagram:
+  kind: figure
+  title: Two answers to 'what should a core be good at'
+  footer: Neither is better. A CPU finishes one thing quickly; a GPU finishes an enormous number of things
+    eventually. Model inference is the second problem.
+  visual:
+    kind: columns
+    width: 700
+    caption: the split is latency versus throughput, and everything else follows from it
+    columns:
+    - title: CPU
+      accent: true
+      lines:
+      - 8–64 complex cores
+      - independent control flow
+      - 'deep cache: L1 / L2 / L3'
+      - predicts, reorders, prefetches
+      - 'optimised for: one task fast'
+    - title: GPU
+      lines:
+      - 10,000+ simple cores
+      - lockstep within a warp
+      - small cache, huge bandwidth
+      - thousands of threads resident
+      - 'optimised for: total work done'
 tags: [hardware]
 relations:
   alternative_to: [gpu]
@@ -53,15 +78,19 @@ Latency on irregular, branch-heavy work — which is nearly all software.
 
 ## How Does It Work?
 
-```text
-CPU                              GPU
-8-64 complex cores               10,000+ simple cores
-independent control flow         lockstep within a warp
-deep cache: L1/L2/L3             small cache, huge bandwidth
-optimised for: one task fast     optimised for: total work done
-predicts branches, reorders      hides latency by having
-instructions, prefetches         thousands of threads resident
-```
+
+A CPU spends its transistor budget making a single instruction stream finish as
+fast as possible: deep caches so memory rarely stalls it, branch prediction and
+out-of-order execution so it keeps working through dependencies, and a handful of
+very capable cores. It is optimised for latency, and for code whose next step
+depends on the last one.
+
+A GPU spends the same budget on parallelism instead — thousands of simple cores,
+a wide memory bus, and enough resident threads that a stalled warp can always be
+swapped for a ready one. It is optimised for throughput on work that is identical
+across many data elements. Matrix multiplication is precisely that shape, which is
+why model inference runs on the second design and orchestration around it runs on
+the first.
 
 ## Mental Model
 

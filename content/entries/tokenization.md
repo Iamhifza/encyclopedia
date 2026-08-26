@@ -10,6 +10,25 @@ origin:
   year: 2015
   attribution: Sennrich et al. adapted byte-pair encoding from data compression to neural machine translation
 historical_period: statistical-ml
+diagram:
+  kind: figure
+  title: Text to integers, in two lookups
+  footer: Every downstream count — context length, price, rate limit — is measured in the units on the
+    bottom row, not the ones you typed.
+  visual:
+    kind: pipeline
+    width: 700
+    caption: the merge table is learned once, at tokeniser training time, and then frozen
+    stages:
+    - text: '"tokenization is lossy"'
+      note: 22 characters
+    - text: '["token", "ization", " is", " lossy"]'
+      note: 4 tokens
+      via: split to bytes, then apply the learned merge table in order
+    - text: '[3928, 2065, 374, 69990]'
+      note: what the model sees
+      tone: accent
+      via: look each piece up in the vocabulary
 tags: [architecture]
 relations:
   part_of: [large-language-model]
@@ -29,6 +48,11 @@ sources:
     title: "Let's build the GPT Tokenizer"
     url: https://www.youtube.com/watch?v=zduSFxRajkE
     year: 2024
+videos:
+  - title: "Let's build the GPT Tokenizer"
+    channel: "Andrej Karpathy"
+    url: https://www.youtube.com/watch?v=zduSFxRajkE
+    note: "Why models cannot count letters"
 updated: 2026-08-21
 ---
 
@@ -58,16 +82,6 @@ A bounded vocabulary with unbounded coverage, and a sequence length short enough
 to be affordable.
 
 ## How Does It Work?
-
-```text
-"tokenization is lossy"
-   │ byte-level split, then apply learned merges
-   ▼
-["token", "ization", " is", " lossy"]
-   │ vocabulary lookup
-   ▼
-[3928, 2065, 374, 69990]
-```
 
 Note that leading spaces are usually part of the token — `" is"` and `"is"` are
 different tokens, a frequent source of subtle prompt bugs.

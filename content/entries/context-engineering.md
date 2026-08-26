@@ -11,6 +11,48 @@ origin:
   circa: true
   attribution: Named in practitioner writing during 2024-2025 as agent context budgets became the binding constraint; no single originator
 historical_period: agentic
+diagram:
+  kind: steps
+  title: The window has three tenants, and they change at different rates
+  footer: Ordering by volatility is not tidiness — it is what makes the prefix cacheable. One rewritten
+    token near the top invalidates everything after it.
+  steps:
+  - title: Order by how often it changes
+    notes:
+    - label: Rule
+      text: stable first, volatile last, always
+    visual:
+      kind: stack
+      width: 700
+      caption: cache hit rate is decided by this ordering alone
+      layers:
+      - label: stable
+        text: system prompt · tool schemas · project conventions
+        note: rarely changes
+      - label: selected
+        text: retrieved passages · memory · file excerpts
+        note: chosen per step
+      - label: volatile
+        text: recent turns · latest tool results · the instruction
+        note: changes always
+        accent: true
+  - title: What to do when it will not fit
+    visual:
+      kind: mapping
+      width: 700
+      head:
+      - what is taking up room
+      - what to do with it
+      rows:
+      - left: older conversation turns
+        right: summarise them in place
+      - left: large intermediate state
+        right: write it to a file, keep the path
+      - left: superseded tool output
+        right: drop it — it is already wrong
+      - left: the plan
+        right: keep it, always
+        tone: accent
 tags: [agents, culture, retrieval]
 relations:
   successor_of: [prompt-engineering]
@@ -63,19 +105,6 @@ Context exhaustion in long-running agents, quality loss from diluted or badly
 ordered context, and the token cost of resending everything each turn.
 
 ## How Does It Work?
-
-```text
-┌─ stable, cacheable ────────────────────────────────────────┐
-│ system prompt · tool schemas · project conventions         │  ← rarely changes
-├─ selected ────────────────────────────────────────────────┤
-│ retrieved passages · relevant memory · file excerpts       │  ← chosen per step
-├─ volatile ────────────────────────────────────────────────┤
-│ recent turns · latest tool results · current instruction   │  ← changes always
-└────────────────────────────────────────────────────────────┘
-
-when full:  summarise older turns · write state to a file ·
-            drop superseded tool output · keep the plan
-```
 
 Stable content first is not stylistic: it is what makes prefix caching hit.
 

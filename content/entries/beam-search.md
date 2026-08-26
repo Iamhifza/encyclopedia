@@ -8,6 +8,44 @@ status: historical
 difficulty: intermediate
 one_liner: "Keeping several candidate continuations alive at once and returning the best-scoring whole sequence, which helps in translation and hurts in chat."
 historical_period: statistical-ml
+diagram:
+  kind: figure
+  title: Keep k paths, not one
+  footer: Larger k finds higher-probability sequences, and higher probability is not the same as better
+    text — which is why open-ended generation sampled instead.
+  visual:
+    kind: tree
+    width: 880
+    caption: 'k = 3: every beam is extended by every candidate, all of them are scored, and only the best
+      three survive the cut'
+    levels:
+    - prompt
+    - step 1
+    - step 2
+    root:
+      text: ▶
+      children:
+      - text: '"The"'
+        children:
+        - text: '"The cat"'
+          tone: accent
+          note: −0.9
+        - text: '"The dog"'
+          note: −1.4
+      - text: '"A"'
+        children:
+        - text: '"A dog"'
+          note: −1.6
+        - text: '"A cat"'
+          tone: muted
+          note: −2.7  cut
+      - text: '"In"'
+        children:
+        - text: '"In the"'
+          note: −1.8
+        - text: '"In a"'
+          tone: muted
+          note: −3.1  cut
 tags: [inference]
 relations:
   is_a: [sampling]
@@ -55,19 +93,16 @@ decoding cannot.
 
 ## How Does It Work?
 
-```text
-k = 3
-step 1   "The"          "A"            "In"
-           │              │              │
-step 2   The cat       A dog         In the
-         The dog       A cat         In a
-         The man       A man         In this
-           │ score all 9, keep the best 3
-step 3   The cat sat · A dog ran · The man walked
-           │
-        continue until every beam emits end-of-sequence
-        return the best complete sequence by length-normalised score
-```
+
+Keep the *k* most probable partial sequences rather than the single best one. At
+each step every surviving beam is extended by every plausible next token, all the
+resulting candidates are scored by cumulative log-probability, and only the best
+*k* survive into the next step. Beams finish when they emit an end-of-sequence
+token; the winner is the completed sequence with the best length-normalised score.
+
+Length normalisation is not optional. Raw log-probability falls monotonically as
+a sequence grows, so an unnormalised beam search systematically prefers short
+output — which is why early neural translation systems truncated their sentences.
 
 ## Mental Model
 

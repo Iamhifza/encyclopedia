@@ -11,6 +11,27 @@ origin:
   year: 2022
   attribution: Wei et al. at Google; the zero-shot variant by Kojima et al. the same year
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: Give the answer somewhere to come from
+  footer: The tokens are the computation, not a report of it. This is also why a plausible chain can end
+    in a wrong answer — the words are a medium, not a proof.
+  visual:
+    kind: mapping
+    width: 780
+    head:
+    - the prompt
+    - what comes out
+    rows:
+    - left: 23 apples, used 8, bought 12 more. How many?
+      right: '27'
+      mark: bad
+      note: one forward pass has to produce the answer with no room to work
+    - left: …think step by step.
+      right: Started with 23. Used 8, leaving 15. Bought 12, so 15 + 12 = 27.
+      mark: ok
+      tone: accent
+      note: each step conditions the next, so the model computes across tokens instead of inside one
 tags: [architecture]
 relations:
   evolved_into: [reasoning-model]
@@ -66,17 +87,17 @@ answer is unreliable but a sequence of small steps is not.
 
 ## How Does It Work?
 
-```text
-DIRECT
-  Q: 23 apples, used 8, bought 12 more. How many?
-  A: 27                                   ← one pass, often wrong
 
-CHAIN-OF-THOUGHT
-  Q: ...
-  A: Started with 23. Used 8, leaving 15.
-     Bought 12 more, so 15 + 12 = 27.
-     The answer is 27.                    ← each step conditions the next
-```
+Ask for the reasoning before the answer, and the model has somewhere to put the
+intermediate work. Each generated token conditions the next, so a model that
+writes out "leaving 15" has that quantity in its context when it computes the
+final sum; a model that answers immediately has to arrive at 27 inside a single
+forward pass.
+
+The elicitation can be as small as appending *think step by step*, or as
+structured as a few worked examples in the prompt. Reasoning models go further
+and are trained to produce this scratchpad by default, which is why they cost
+more tokens per answer and are better at multi-step arithmetic and code.
 
 ## Mental Model
 

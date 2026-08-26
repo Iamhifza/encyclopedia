@@ -8,6 +8,29 @@ status: established
 difficulty: beginner
 one_liner: "The raw model straight out of pretraining, which continues text rather than following instructions."
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: It continues text; it does not take instructions
+  footer: Instruction-following is a later training stage, not a property of pretraining. A base model
+    is not broken when it ignores you — it is doing the only thing it was trained to do.
+  visual:
+    kind: mapping
+    width: 820
+    head:
+    - what you write
+    - what a base model produces
+    rows:
+    - left: '"The capital of France is"'
+      right: '" Paris, and its population…"'
+      mark: ok
+    - left: '"Write a poem about rain"'
+      right: '" Write a poem about snow."'
+      mark: bad
+      note: it continued your instruction instead of following it
+    - left: '"Q: Capital of France?  A: Paris   Q: Capital of Japan?  A:"'
+      right: '" Tokyo"'
+      mark: ok
+      note: the format is the instruction — this is what few-shot prompting is
 tags: [architecture]
 relations:
   part_of: [pretraining]
@@ -60,18 +83,6 @@ model can become a chat assistant, a code assistant, a domain specialist and a
 research artefact, without repeating the pretraining run.
 
 ## How Does It Work?
-
-```text
-base model behaviour: continue the text
-  "The capital of France is"        →  " Paris, and its population..."   ✓
-  "Write a poem about rain"          →  " Write a poem about snow..."     ✗
-
-steer it with the format instead of an instruction:
-  "Q: What is the capital of France?
-   A: Paris
-   Q: What is the capital of Japan?
-   A:"                               →  " Tokyo"                          ✓
-```
 
 That second pattern is few-shot prompting, and it is how base models were
 actually used before instruction tuning existed.

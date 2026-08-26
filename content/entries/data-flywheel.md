@@ -12,6 +12,45 @@ origin:
   circa: true
   attribution: Adapted from Jim Collins' flywheel metaphor into technology strategy writing; applied to AI products from the late 2010s
 historical_period: statistical-ml
+diagram:
+  kind: steps
+  title: The loop everyone claims, and the conditions almost nobody meets
+  footer: A flywheel that fails any one of the four conditions is a diagram on a slide, not a mechanism.
+    The first condition is where most of them fail.
+  steps:
+  - title: The loop
+    visual:
+      kind: chips
+      items:
+      - usage
+      - data
+      - a better model
+      - a better product
+      loop: and round again — if, and only if, all four conditions below hold
+  - title: What has to be true for it to turn
+    visual:
+      kind: table
+      width: 720
+      head:
+      - condition
+      - what it means
+      - how it fails
+      rows:
+      - - text: a label, not text
+          new: true
+        - text: usage must produce a signal of correctness
+          new: true
+        - text: most flywheels die here
+          new: true
+      - - volume
+        - enough of it to move a model
+        - a niche product never gets there
+      - - measurable
+        - the improvement is observed, not assumed
+        - no eval, no evidence
+      - - visible
+        - users can feel the improvement
+        - the loop never closes back to usage
 tags: [culture]
 relations:
   related_to: [synthetic-data, model-collapse, evaluation-harness, data-curation]
@@ -61,17 +100,17 @@ honestly, it is a design goal: build a product that learns from being used.
 
 ## How Does It Work?
 
-```text
-        usage ──▶ data ──▶ improvement ──▶ better product ──▶ more usage
-                    ▲                                             │
-                    └─────────────────────────────────────────────┘
 
-for the loop to close, all four must hold:
-  1. usage produces a LABEL, not just text        ← most fail here
-  2. volume is enough to matter
-  3. improvement is MEASURABLE, not assumed
-  4. the improvement is visible to users
-```
+The loop is only a mechanism if every arrow in it actually carries a signal.
+Usage has to produce something that says whether the output was *right*, not
+merely that output happened — a correction, an accepted suggestion, a completed
+transaction. Text alone is not a label, and this is where most claimed flywheels
+turn out to be diagrams rather than systems.
+
+Given a real label, the remaining conditions are quantitative: enough volume to
+move a model, an evaluation that can detect the improvement rather than assume
+it, and a change large enough that users notice and keep using the product. Break
+any one and the wheel does not turn, however good the story sounds.
 
 ## Mental Model
 

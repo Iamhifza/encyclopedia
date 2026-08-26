@@ -8,6 +8,58 @@ status: established
 difficulty: advanced
 one_liner: "Deciding what goes into a training corpus and in what proportion, which decides more about model quality than architecture does."
 historical_period: foundation-model
+diagram:
+  kind: steps
+  title: Petabytes in, a training stream out
+  footer: Curation is where most of the quality difference between models is made, and it is almost never
+    published. The filters are the recipe.
+  steps:
+  - title: Filter the crawl down
+    notes:
+    - label: Order matters
+      text: deduplicate before quality-filtering and you spend the classifier on copies
+    visual:
+      kind: pipeline
+      width: 660
+      stages:
+      - text: raw crawl
+        note: petabytes
+      - text: text, in one language
+        note: ''
+        via: extract text · drop boilerplate · language ID
+      - text: plausibly useful text
+        via: quality filter — heuristics, or a classifier trained on "good" text
+      - text: each document once
+        via: deduplicate — exact hashes, then MinHash for near-duplicates
+      - text: clean pool
+        tone: accent
+        via: decontaminate against benchmark test sets · safety filtering
+  - title: Weight what survived
+    notes:
+    - label: Lever
+      text: the mixture is retuned far more often than the architecture is
+    visual:
+      kind: segments
+      width: 660
+      label: training stream
+      caption: the same clean pool, sampled at different rates
+      segments:
+      - text: web
+        value: 40
+        value_label: 40%
+      - text: code
+        value: 20
+        value_label: 20%
+      - text: books
+        value: 15
+        value_label: 15%
+      - text: papers
+        value: 10
+        value_label: 10%
+      - text: curated
+        value: 15
+        value_label: 15%
+        tone: accent
 tags: [training]
 relations:
   part_of: [pretraining]
@@ -60,19 +112,6 @@ reputational exposure, since what a model can be induced to reproduce is
 determined here.
 
 ## How Does It Work?
-
-```text
-raw crawl (petabytes)
-   │ extract text, drop boilerplate
-   │ language ID
-   │ quality filter        ← heuristics, or a classifier trained on "good" text
-   │ deduplicate           ← exact hashes, then MinHash for near-duplicates
-   │ decontaminate         ← remove anything matching benchmark test sets
-   │ safety filtering
-   ▼
-clean pool ──▶ MIXTURE WEIGHTS ──▶ training stream
-                  40% web · 20% code · 15% books · ...
-```
 
 Mixture weights are a hyperparameter as consequential as learning rate. Raising
 the code fraction improves reasoning benchmarks, not only coding ones — a

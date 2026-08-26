@@ -12,6 +12,26 @@ origin:
   circa: true
   attribution: SWE-agent and Devin popularised the category; command-line and IDE agents followed
 historical_period: agentic
+diagram:
+  kind: flow
+  title: The loop, and the part that actually decides whether it works
+  loop: read the failure, revise — until green or the budget is spent
+  footer: The model is roughly the same across agents. What differs is how files and diffs are presented,
+    how test output is truncated on the way back, what the agent may run, and when it is made to stop.
+  nodes:
+  - title: Task
+    note: an issue, a diff, a request
+    caption: usually underspecified
+  - title: Explore
+    note: grep · read · trace
+    caption: most of the token spend
+  - title: Edit
+    note: a hypothesis, applied
+    caption: small and reversible
+  - title: Run tests
+    note: the only real feedback
+    accent: true
+    caption: truncation decides what it learns
 tags: [agents, culture]
 relations:
   is_a: [ai-agent]
@@ -72,19 +92,6 @@ reproduction, refactors, dependency upgrades — where the intent is clear and t
 execution is tedious.
 
 ## How Does It Work?
-
-```text
-task ──▶ explore (grep, read) ──▶ hypothesis ──▶ edit ──▶ run tests
-             ▲                                                │
-             └────────── read the failure, revise ◀───────────┘
-                     until green, or the budget is exhausted
-
-what actually determines success:
-   how files and diffs are presented to the model
-   how test output is truncated and fed back
-   what the agent is allowed to run, and where
-   when it is made to stop
-```
 
 The SWE-agent finding is the important one: holding the model constant and
 redesigning only the *interface* — how the agent sees files, how errors are

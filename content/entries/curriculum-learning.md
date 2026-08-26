@@ -11,6 +11,22 @@ origin:
   year: 2009
   attribution: Bengio et al. formalised the idea for neural networks; the intuition is borrowed from education
 historical_period: statistical-ml
+diagram:
+  kind: flow
+  title: Not all training tokens are worth the same
+  footer: The final anneal is a few per cent of the tokens and a disproportionate share of the measured
+    capability, which is why data mixtures are guarded so closely.
+  nodes:
+  - title: Early
+    note: broad web text
+    caption: high LR · learn language
+  - title: Middle
+    note: balanced mixture
+    caption: decaying LR · learn breadth
+  - title: Anneal
+    note: high-quality curated
+    accent: true
+    caption: low LR · sharpen capability
 tags: [training]
 relations:
   part_of: [pretraining]
@@ -61,16 +77,17 @@ learning rate, shapes the final weights more than material seen at the start.
 
 ## How Does It Work?
 
-```text
-training progress ──────────────────────────────────▶
 
-  early                  middle                  late (annealing)
-  broad web text         balanced mixture        high-quality curated
-  high learning rate     decaying                low learning rate
-  learn language         learn breadth           sharpen capability
-                                                 ▲
-                                       this phase punches above its weight
-```
+Order the training data so the distribution shifts as the run proceeds. Early
+tokens are broad and cheap — general web text at a high learning rate, where the
+model is learning the shape of language at all. The middle is a balanced mixture
+across domains. The final phase, the anneal, is a small quantity of carefully
+curated high-quality data at a decayed learning rate.
+
+The anneal is where the ordering earns its keep. Late training at a low learning
+rate makes small, targeted adjustments, so the data seen there has an outsized
+effect on measured capability relative to its token count. This is also why lab
+data mixtures are among the least published details of any model.
 
 ## Mental Model
 

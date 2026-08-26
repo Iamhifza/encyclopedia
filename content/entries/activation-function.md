@@ -8,6 +8,46 @@ status: foundational
 difficulty: beginner
 one_liner: "The small non-linear bend applied between layers, without which any stack of layers collapses into a single one."
 historical_period: statistical-ml
+diagram:
+  kind: figure
+  title: The bend is the whole point
+  footer: Without any activation at all, a stack of layers collapses algebraically into a single matrix — depth
+    buys nothing. Which non-linearity you pick is an empirical detail; that there is one is not.
+  visual:
+    kind: plot
+    width: 700
+    height: 230
+    x_range: [-3, 1.6]
+    y_range: [-0.45, 1.75]
+    x_label: input
+    y_label: output
+    caption: 'the family splits on one question: what to do with negative input — the dip is what
+      lets a layer suppress its own features'
+    bands:
+    - from: -3
+      to: 0
+      text: negative input
+    curves:
+    - label: ReLU
+      points: [[-3, 0], [0, 0], [1.6, 1.6]]
+    - label: GELU
+      tone: accent
+      points: [[-3.0, -0.004], [-2.81, -0.007], [-2.62, -0.012], [-2.42, -0.019], [-2.23, -0.029], [-2.04, -0.042],
+        [-1.85, -0.059], [-1.66, -0.081], [-1.47, -0.104], [-1.28, -0.129], [-1.08, -0.151], [-0.89, -0.166], [
+          -0.7, -0.169], [-0.51, -0.155], [-0.32, -0.119], [-0.12, -0.056], [0.07, 0.035], [0.26, 0.155], [0.45,
+          0.303], [0.64, 0.474], [0.83, 0.665], [1.02, 0.869], [1.22, 1.081], [1.41, 1.296], [1.6, 1.512]]
+    - label: SiLU
+      tone: muted
+      points: [[-3.0, -0.142], [-2.81, -0.16], [-2.62, -0.178], [-2.42, -0.197], [-2.23, -0.216], [-2.04, -0.235],
+        [-1.85, -0.251], [-1.66, -0.265], [-1.47, -0.275], [-1.28, -0.278], [-1.08, -0.274], [-0.89, -0.259], [
+          -0.7, -0.232], [-0.51, -0.191], [-0.32, -0.133], [-0.12, -0.059], [0.07, 0.034], [0.26, 0.146], [0.45,
+          0.275], [0.64, 0.42], [0.83, 0.581], [1.02, 0.754], [1.22, 0.939], [1.41, 1.132], [1.6, 1.331]]
+    marks:
+    - at: [-0.9, -0.166]
+      dy: -40
+      anchor: middle
+      text: a small dip below zero
+      tone: accent
 tags: [architecture]
 relations:
   part_of: [neural-network, feed-forward-network]
@@ -59,17 +99,6 @@ It makes depth meaningful, and it decides how well gradients survive
 backpropagation through many layers.
 
 ## How Does It Work?
-
-```text
-ReLU        GELU              SwiGLU
-    │  ╱        │  ╱              gate branch × activated branch
-    │ ╱         │ ╱               (learned suppression)
-────┼─────   ──╱┼─────
-    │         ╱ │
-zero below   smooth near      the layer can turn its own
-zero         zero, small      features down
-             negative values
-```
 
 Sigmoid and tanh were standard until roughly 2011 and are now rare in hidden
 layers: both saturate, meaning their derivative approaches zero for large inputs,

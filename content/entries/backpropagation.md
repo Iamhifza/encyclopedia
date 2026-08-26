@@ -10,6 +10,34 @@ origin:
   year: 1986
   attribution: Popularised by Rumelhart, Hinton and Williams; equivalent methods appear in control theory from the 1960s and in Linnainmaa's 1970 work
 historical_period: ai-winter
+diagram:
+  kind: figure
+  title: One path, travelled twice
+  footer: 'Memory is the price: every saved activation stays resident until the backward pass consumes
+    it, which is why activation checkpointing trades recomputation for room.'
+  visual:
+    kind: passes
+    width: 760
+    nodes:
+    - text: x
+    - text: layer 1
+      note: save
+    - text: layer 2
+      note: save
+    - text: layer 3
+      note: save
+    - text: loss
+      tone: accent
+    forward:
+      label: forward — compute and remember
+    backward:
+      label: backward — apply the chain rule, right to left
+      marks:
+      - ∂L/∂W₁
+      - ∂L/∂W₂
+      - ∂L/∂W₃
+      - ∂L/∂out
+    caption: each backward step reuses the activation the forward step saved
 tags: [training]
 relations:
   used_by: [neural-network, pretraining]
@@ -23,6 +51,14 @@ sources:
   - type: docs
     title: "PyTorch autograd mechanics"
     url: https://pytorch.org/docs/stable/notes/autograd.html
+videos:
+  - title: "Backpropagation, intuitively"
+    channel: "3Blue1Brown"
+    url: https://www.youtube.com/results?search_query=3blue1brown+backpropagation+intuitively
+  - title: "Backpropagation calculus"
+    channel: "3Blue1Brown"
+    url: https://www.youtube.com/results?search_query=3blue1brown+backpropagation+calculus
+    note: "The chain rule made visual"
 updated: 2026-08-21
 ---
 
@@ -53,12 +89,6 @@ Credit assignment: which of the millions of interacting parameters is
 responsible for this particular mistake.
 
 ## How Does It Work?
-
-```text
-FORWARD    x ──▶ layer1 ──▶ layer2 ──▶ layer3 ──▶ loss
-                  (save)     (save)     (save)
-BACKWARD         ∂L/∂W1 ◀── ∂L/∂W2 ◀── ∂L/∂W3 ◀── ∂L/∂out
-```
 
 Each layer receives the gradient of the loss with respect to its output,
 multiplies by its local derivative, and passes the result down. Activations from

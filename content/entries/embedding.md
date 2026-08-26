@@ -12,6 +12,93 @@ origin:
   circa: true
   attribution: Popularised by Word2Vec; the idea of distributional representation is far older
 historical_period: statistical-ml
+diagram:
+  kind: steps
+  title: Text in, position out
+  footer: A vector is only as good as the training objective that placed it. Swap the encoder and every
+    stored vector becomes meaningless — embeddings are not portable between models.
+  steps:
+  - title: The encoder maps text to a fixed-length vector
+    notes:
+    - label: Fixed
+      text: same width whatever the input length — here d ≈ 1024
+    visual:
+      kind: mapping
+      head:
+      - text
+      - vector
+      rows:
+      - left: '"how do I cancel my plan"'
+        right: '[ 0.02, -0.41, …, 0.17 ]'
+      - left: '"ending your subscription"'
+        right: '[ 0.04, -0.38, …, 0.15 ]'
+      caption: different words, neighbouring coordinates
+  - title: Meaning becomes distance
+    notes:
+    - label: Measure
+      text: cosine similarity — the angle between vectors, not their length
+    visual:
+      kind: scatter
+      height: 200
+      caption: two of roughly a thousand dimensions
+      groups:
+      - label: billing
+        tone: accent
+        points:
+        - - 0.22
+          - 0.72
+        - - 0.28
+          - 0.66
+        - - 0.19
+          - 0.61
+        - - 0.31
+          - 0.75
+      - label: shipping
+        points:
+        - - 0.72
+          - 0.68
+        - - 0.79
+          - 0.74
+        - - 0.75
+          - 0.6
+      - label: password reset
+        points:
+        - - 0.52
+          - 0.18
+        - - 0.58
+          - 0.24
+        - - 0.46
+          - 0.22
+      links:
+      - from:
+        - 0.22
+        - 0.72
+        to:
+        - 0.28
+        - 0.66
+        text: cos 0.91
+        dx: 34
+        dy: 4
+        anchor: start
+  - title: Contrastive training is what stops the collapse
+    notes:
+    - label: Without the push
+      text: every vector converges to one point and similarity becomes 1.0 everywhere
+    visual:
+      kind: columns
+      columns:
+      - title: pull together
+        accent: true
+        lines:
+        - a question
+        - and its correct answer
+        - → minimise the angle
+      - title: push apart
+        lines:
+        - that same question
+        - and a random passage
+        - → maximise the angle
+      caption: the second column is the half that does the real work
 tags: [architecture, retrieval]
 relations:
   successor_of: [word2vec, tf-idf]
@@ -38,6 +125,10 @@ sources:
     url: https://arxiv.org/abs/2205.13147
     year: 2022
     note: Embeddings that can be truncated to smaller dimensions without retraining.
+videos:
+  - title: "Word Embedding and Word2Vec, clearly explained"
+    channel: "StatQuest"
+    url: https://www.youtube.com/results?search_query=statquest+word+embedding+and+word2vec+clearly+explained
 updated: 2026-08-22
 ---
 
@@ -74,17 +165,21 @@ every downstream system a reusable notion of similarity.
 
 ## How Does It Work?
 
-```text
-"how do I cancel my plan"  ──▶ encoder ──▶ [0.02, -0.41, ..., 0.17]   (d≈1024)
-"ending your subscription" ──▶ encoder ──▶ [0.04, -0.38, ..., 0.15]
-                                                    │
-                                   cosine similarity ≈ 0.91  ──▶ related
 
-training: contrastive
-   pull  (question, its correct answer) together
-   push  (question, a random passage) apart
-   the second half is what stops every vector collapsing to one point
-```
+An encoder maps a piece of text to a fixed-length vector, the same width whatever
+the input length. Similarity of meaning becomes proximity in that space, measured
+by the cosine of the angle between two vectors, so retrieval reduces to a nearest
+-neighbour search rather than a keyword match.
+
+The geometry is produced by contrastive training: pull a question and its correct
+answer together, push that same question and an unrelated passage apart. The
+second half is what does the real work — without it, the cheapest way to satisfy
+the objective is to collapse every vector onto one point, where all similarities
+are 1.0 and nothing is retrievable.
+
+Vectors are meaningful only relative to the encoder that produced them. Change
+the model and every stored vector becomes noise, which makes re-embedding the
+whole corpus the real cost of upgrading a retrieval system.
 
 ## Mental Model
 
