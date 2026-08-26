@@ -13,7 +13,7 @@ historical_period: statistical-ml
 diagram:
   kind: steps
   title: A word is defined by the company it keeps
-  footer: 'Superseded by contextual embeddings, because a single vector per word cannot represent *bank*
+  footer: 'Superseded by contextual embeddings, because a single vector per word cannot represent bank
     twice. Historically decisive nonetheless: it established that meaning could be a position rather than
     a symbol.'
   steps:

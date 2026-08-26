@@ -10,6 +10,71 @@ origin:
   year: 2021
   attribution: Su et al., RoFormer
 historical_period: foundation-model
+diagram:
+  kind: steps
+  title: Encode position by rotating, not by adding
+  footer: Because the dot product depends only on the offset, a model can be stretched to longer contexts
+    by rescaling the frequencies — which is what every context-extension method does.
+  steps:
+  - title: Each dimension pair turns at its own rate
+    notes:
+    - label: Range
+      text: fast pairs resolve nearby positions, slow pairs distinguish distant ones
+    visual:
+      kind: plot
+      width: 700
+      height: 200
+      x_range: [0, 16]
+      y_range: [-1.2, 1.2]
+      x_label: token position
+      caption: one curve per dimension pair; a position is the whole set of angles at once
+      curves:
+      - label: fast pair
+        tone: accent
+        points: [[0.0, 0.0], [0.33, 0.296], [0.67, 0.565], [1.0, 0.783], [1.33, 0.932], [1.67, 0.997],
+          [2.0, 0.974], [2.33, 0.863], [2.67, 0.675], [3.0, 0.427], [3.33, 0.141], [3.67, -0.158], [4.0,
+            -0.443], [4.33, -0.688], [4.67, -0.872], [5.0, -0.978], [5.33, -0.996], [5.67, -0.926], [
+            6.0, -0.773], [6.33, -0.551], [6.67, -0.279], [7.0, 0.017], [7.33, 0.312], [7.67, 0.578],
+          [8.0, 0.794], [8.33, 0.938], [8.67, 0.999], [9.0, 0.97], [9.33, 0.855], [9.67, 0.663], [10.0,
+            0.412], [10.33, 0.124], [10.67, -0.174], [11.0, -0.458], [11.33, -0.7], [11.67, -0.88], [
+            12.0, -0.981], [12.33, -0.995], [12.67, -0.919], [13.0, -0.762], [13.33, -0.537], [13.67,
+            -0.263], [14.0, 0.034], [14.33, 0.327], [14.67, 0.592], [15.0, 0.804], [15.33, 0.944], [15.67,
+            0.999], [16.0, 0.966]]
+      - label: slower
+        points: [[0.0, 0.0], [0.33, 0.116], [0.67, 0.231], [1.0, 0.343], [1.33, 0.45], [1.67, 0.551],
+          [2.0, 0.644], [2.33, 0.729], [2.67, 0.804], [3.0, 0.867], [3.33, 0.919], [3.67, 0.959], [4.0,
+            0.985], [4.33, 0.999], [4.67, 0.998], [5.0, 0.984], [5.33, 0.957], [5.67, 0.916], [6.0, 0.863],
+          [6.33, 0.799], [6.67, 0.723], [7.0, 0.638], [7.33, 0.544], [7.67, 0.442], [8.0, 0.335], [8.33,
+            0.223], [8.67, 0.108], [9.0, -0.008], [9.33, -0.125], [9.67, -0.239], [10.0, -0.351], [10.33,
+            -0.457], [10.67, -0.558], [11.0, -0.651], [11.33, -0.735], [11.67, -0.809], [12.0, -0.872],
+          [12.33, -0.923], [12.67, -0.961], [13.0, -0.987], [13.33, -0.999], [13.67, -0.997], [14.0, -0.982],
+          [14.33, -0.954], [14.67, -0.913], [15.0, -0.859], [15.33, -0.793], [15.67, -0.717], [16.0, -0.631]]
+      - label: slowest
+        tone: muted
+        points: [[0.0, 0.0], [0.33, 0.04], [0.67, 0.08], [1.0, 0.12], [1.33, 0.159], [1.67, 0.199], [
+            2.0, 0.238], [2.33, 0.276], [2.67, 0.315], [3.0, 0.352], [3.33, 0.389], [3.67, 0.426], [4.0,
+            0.462], [4.33, 0.497], [4.67, 0.531], [5.0, 0.565], [5.33, 0.597], [5.67, 0.629], [6.0, 0.659],
+          [6.33, 0.689], [6.67, 0.717], [7.0, 0.745], [7.33, 0.771], [7.67, 0.796], [8.0, 0.819], [8.33,
+            0.841], [8.67, 0.862], [9.0, 0.882], [9.33, 0.9], [9.67, 0.917], [10.0, 0.932], [10.33, 0.946],
+          [10.67, 0.958], [11.0, 0.969], [11.33, 0.978], [11.67, 0.985], [12.0, 0.991], [12.33, 0.996],
+          [12.67, 0.999], [13.0, 1.0], [13.33, 1.0], [13.67, 0.998], [14.0, 0.994], [14.33, 0.989], [
+            14.67, 0.982], [15.0, 0.974], [15.33, 0.964], [15.67, 0.953], [16.0, 0.94]]
+  - title: The score then depends only on the distance
+    notes:
+    - label: Consequence
+      text: no learned position table, and nothing that has to be resized to extend the context
+    visual:
+      kind: mapping
+      width: 720
+      head:
+      - query at position
+      - what its score against key n depends on
+      rows:
+      - left: m = 5,  key n = 9
+        right: n − m = 4
+      - left: m = 105, key n = 109
+        right: n − m = 4  — identical
+        tone: accent
 tags: [architecture]
 relations:
   used_by: [transformer, context-window]
@@ -59,16 +124,6 @@ YaRN — allows a model trained at 8k tokens to be extended to far longer contex
 with modest additional training.
 
 ## How Does It Work?
-
-```text
-dimension pairs:  (0,1)   (2,3)   (4,5)  ...
-frequency:        fast    slower  slower still
-
-position m ──▶ rotate each pair by m·θ_i
-position n ──▶ rotate each pair by n·θ_i
-
-q_m · k_n  depends only on (n − m)
-```
 
 Low-frequency pairs rotate slowly and carry long-range position; high-frequency
 pairs carry fine local order.

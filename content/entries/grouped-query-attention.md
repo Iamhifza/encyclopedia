@@ -10,6 +10,54 @@ origin:
   year: 2023
   attribution: Ainslie et al. (Google); generalises Shazeer's 2019 multi-query attention
 historical_period: foundation-model
+diagram:
+  kind: steps
+  title: Share the keys and values, keep the queries
+  footer: Almost every open-weight model of the last two years ships GQA. It is the rare change that shrinks
+    the dominant memory cost with no measurable quality loss, which is why adoption was close to universal.
+  steps:
+  - title: Three points on one dial
+    visual:
+      kind: columns
+      width: 720
+      columns:
+      - title: MHA
+        lines:
+        - 32 query heads
+        - 32 KV heads
+        - one KV pair per query
+        - best quality
+      - title: GQA
+        accent: true
+        lines:
+        - 32 query heads
+        - 8 KV heads
+        - four queries share a KV pair
+        - quality holds
+      - title: MQA
+        lines:
+        - 32 query heads
+        - 1 KV head
+        - all queries share one
+        - quality cost
+  - title: What that does to the cache
+    notes:
+    - label: Why it matters
+      text: the KV cache, not the weights, decides how many users fit on a card
+    visual:
+      kind: bars
+      caption: KV cache per token, relative to MHA
+      bars:
+      - label: MHA
+        value: 1.0
+        value_label: 32 units
+      - label: GQA
+        value: 0.25
+        value_label: 8 units — 4× less
+        accent: true
+      - label: MQA
+        value: 0.03
+        value_label: 1 unit — 32× less
 tags: [architecture, inference]
 relations:
   successor_of: [self-attention]
@@ -58,14 +106,23 @@ and, because decode must read the whole cache each step, decode speed as well.
 
 ## How Does It Work?
 
-```text
-MHA  (H_kv = 32)      GQA  (H_kv = 8)         MQA  (H_kv = 1)
-q1..q32               q1..q32                 q1..q32
-k1..k32               k1..k8                  k1
-v1..v32               v1..v8                  v1
-cache: 32 units       cache: 8 units (4×)     cache: 1 unit (32×)
-best quality          near-MHA quality        largest saving, quality cost
-```
+
+Multi-head attention gives every query head its own key and value heads. Since
+the KV cache stores one entry per key-value head per token, its size scales
+directly with that count — and on a long-context request the cache, not the
+weights, is what fills the card.
+
+GQA keeps all the query heads and shares each key-value pair across a group of
+them. Thirty-two query heads backed by eight KV heads means four queries read
+the same keys and values, and the cache shrinks fourfold for it. Multi-query
+attention is the same idea taken to one shared pair, which saves the most and
+costs the most quality.
+
+The reason this works at all is that the query heads carry most of the
+specialisation; the keys and values are closer to a shared representation of the
+sequence than the head count implies. Eight groups turned out to sit at the point
+where quality is indistinguishable from full multi-head attention, and that is
+why essentially every open-weight model now ships with it.
 
 ## Mental Model
 

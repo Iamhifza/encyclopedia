@@ -10,6 +10,25 @@ origin:
   year: 2015
   attribution: Hinton, Vinyals and Dean; related compression ideas from Buciluă et al. in 2006
 historical_period: deep-learning
+diagram:
+  kind: flow
+  title: A big model teaches a small one
+  footer: The student learns the teacher's whole output distribution, not just its top answer — the relative
+    probabilities of the wrong answers carry information that a hard label throws away.
+  nodes:
+  - title: Teacher
+    note: large, slow, expensive
+    caption: already trained
+  - title: Targets
+    note: soft probabilities, or generated responses
+    caption: richer than a hard label
+  - title: Student
+    note: trained to match them
+    accent: true
+    caption: a fraction of the size
+  - title: Deployed
+    note: what actually serves traffic
+    caption: the teacher never ships
 tags: [training]
 relations:
   alternative_to: [quantization, lora]
@@ -56,12 +75,6 @@ Inference cost and latency, by shifting capability into a model that is cheaper
 to run.
 
 ## How Does It Work?
-
-```text
-teacher (large) ──▶ soft targets / generated responses
-                              │
-student (small) ──▶ trained to match them ──▶ deployed
-```
 
 The "dark knowledge" is the relative probabilities of the wrong answers, which
 carry information about similarity that a one-hot label destroys.

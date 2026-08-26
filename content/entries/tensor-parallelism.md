@@ -10,6 +10,32 @@ origin:
   year: 2019
   attribution: Shoeybi et al., Megatron-LM
 historical_period: transformer
+diagram:
+  kind: figure
+  title: One layer, split across four cards
+  footer: Two all-reduces per layer, so this needs an interconnect like NVLink and stops paying off across
+    ordinary network links. It is the parallelism you use inside a node, not between nodes.
+  visual:
+    kind: columns
+    width: 760
+    caption: every card holds a slice of the same matrices and must synchronise twice per layer
+    columns:
+    - title: GPU 0
+      lines:
+      - heads 0–7
+      - ¼ of the FFN
+    - title: GPU 1
+      lines:
+      - heads 8–15
+      - ¼ of the FFN
+    - title: GPU 2
+      lines:
+      - heads 16–23
+      - ¼ of the FFN
+    - title: GPU 3
+      lines:
+      - heads 24–31
+      - ¼ of the FFN
 tags: [hardware, inference]
 relations:
   alternative_to: [pipeline-parallelism]
@@ -56,14 +82,21 @@ aggregate memory bandwidth behind each forward pass.
 
 ## How Does It Work?
 
-```text
-      GPU 0            GPU 1            GPU 2            GPU 3
-  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
-  │ heads 0-7│    │heads 8-15│    │heads16-23│    │heads24-31│
-  └────┬─────┘    └────┬─────┘    └────┬─────┘    └────┬─────┘
-       └───────── all-reduce across the interconnect ──┘
-                    (twice per layer)
-```
+
+Split each weight matrix across devices and have every device compute its slice
+of the same operation. Attention divides cleanly by head — give each card a
+contiguous range — and the feed-forward network divides by column in the first
+matrix and by row in the second, so the partial results can simply be summed.
+
+The cost is synchronisation. Each device holds a partial result that is
+meaningless alone, so every layer needs an all-reduce after attention and
+another after the feed-forward block. That is two collective operations per
+layer, on the critical path, at every token.
+
+Which is why this is intra-node parallelism. Over NVLink the all-reduces are
+fast enough to disappear into the compute; over ordinary Ethernet they dominate
+it. The rule of thumb is tensor parallelism inside a machine, pipeline
+parallelism between machines.
 
 ## Mental Model
 

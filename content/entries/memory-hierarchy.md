@@ -11,6 +11,32 @@ origin:
   circa: true
   attribution: Formalised alongside cache design in early mainframes; the 'memory wall' named by Wulf and McKee in 1995
 historical_period: early-computing
+diagram:
+  kind: figure
+  title: Five tiers, each roughly ten times slower than the one above
+  footer: 'Almost every optimisation in this encyclopedia is a move up this table: FlashAttention keeps
+    work in SRAM, the KV cache keeps it out of recomputation, quantisation makes more of it fit in HBM.'
+  visual:
+    kind: stack
+    width: 760
+    caption: the numbers move with each hardware generation; the ratios barely do
+    layers:
+    - label: registers
+      text: kilobytes · effectively infinite bandwidth
+      note: ~1 cycle
+    - label: SRAM
+      text: ~50 MB on chip · ~10 TB/s
+      note: tens of cycles
+      accent: true
+    - label: HBM
+      text: 80–192 GB · 3–8 TB/s
+      note: hundreds of cycles
+    - label: host RAM
+      text: terabytes · ~100 GB/s
+      note: far worse
+    - label: network
+      text: unbounded · tens of GB/s
+      note: worse still
 tags: [hardware]
 relations:
   used_by: [kv-cache, flash-attention]
@@ -54,15 +80,6 @@ It gives a program the illusion of a large fast memory, as long as its access
 pattern has locality.
 
 ## How Does It Work?
-
-```text
-        capacity        bandwidth      latency
-registers   KB         enormous        ~1 cycle
-SRAM/SMEM   ~50 MB     ~10 TB/s        ~10s of cycles
-HBM         80-192 GB  3-8 TB/s        ~100s of cycles
-host RAM    TB         ~100 GB/s       far worse
-network     ∞          10s of GB/s     worse still
-```
 
 An operation is *compute-bound* if it does many FLOPs per byte loaded, and
 *memory-bound* if it does few.

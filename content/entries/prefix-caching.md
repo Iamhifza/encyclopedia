@@ -10,6 +10,58 @@ origin:
   year: 2023
   attribution: Generalised from PagedAttention block sharing in vLLM; RadixAttention in SGLang; exposed commercially as prompt caching
 historical_period: foundation-model
+diagram:
+  kind: steps
+  title: The unchanged head of the prompt is computed once
+  footer: 'This is why the ordering rule in context engineering matters so much: one rewritten token near
+    the front invalidates every block after it, and the saving disappears.'
+  steps:
+  - title: Turn one computes everything
+    visual:
+      kind: segments
+      width: 700
+      label: turn 1
+      caption: all of it prefilled, and its keys and values retained
+      segments:
+      - text: system prompt
+        value: 20
+      - text: tool schemas
+        value: 30
+      - text: user message
+        value: 12
+  - title: Turn two only pays for what is new
+    notes:
+    - label: Effect
+      text: time to first token falls with the length of the shared prefix, often by most of it
+    visual:
+      kind: segments
+      width: 700
+      label: turn 2
+      caption: the matching prefix is a cache hit; prefill starts after it
+      segments:
+      - text: system prompt
+        value: 20
+        tone: muted
+      - text: tool schemas
+        value: 30
+        tone: muted
+      - text: user message
+        value: 12
+        tone: muted
+      - text: assistant
+        value: 18
+        tone: accent
+      - text: user 2
+        value: 10
+        tone: accent
+      spans:
+      - from: 0
+        to: 2
+        text: skipped — already in the cache
+      - from: 3
+        to: 4
+        text: computed
+        tone: accent
 tags: [inference]
 relations:
   depends_on: [kv-cache, paged-attention]
@@ -57,14 +109,6 @@ Repeated prefill work, which shows up as high time to first token and inflated
 input-token cost in exactly the workloads that iterate most.
 
 ## How Does It Work?
-
-```text
-turn 1: [system prompt][tools][user msg 1]
-        └───── computed and cached ─────┘
-
-turn 2: [system prompt][tools][user msg 1][assistant 1][user msg 2]
-        └──── cache hit, skipped ───────┘└─── computed ──────────┘
-```
 
 Cache blocks are evicted under memory pressure, usually LRU, so a hit is never
 guaranteed. Any change to the prefix — including a timestamp injected at the top

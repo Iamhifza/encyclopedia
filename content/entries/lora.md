@@ -10,6 +10,49 @@ origin:
   year: 2021
   attribution: Hu et al., Microsoft
 historical_period: foundation-model
+diagram:
+  kind: steps
+  title: Freeze the matrix, learn a thin correction beside it
+  footer: The adapter can be merged into the base weights after training, so inference costs nothing extra
+    — or kept separate, so one served base model can carry hundreds of adapters swapped per request.
+  steps:
+  - title: Two paths, only one of them trainable
+    visual:
+      kind: columns
+      width: 700
+      columns:
+      - title: frozen
+        lines:
+        - W₀, shape d × k
+        - never updated
+        - no optimiser state
+      - title: trainable
+        accent: true
+        lines:
+        - B·A, rank r
+        - r typically 8 – 64
+        - added to W₀'s output
+      caption: the update is constrained to a low-rank subspace, which is empirically where most of fine-tuning's
+        change lives anyway
+  - title: What that saves on one 4096 × 4096 layer
+    visual:
+      kind: table
+      width: 700
+      head:
+      - approach
+      - trainable parameters
+      - optimiser state
+      rows:
+      - - full fine-tune
+        - 16.8 M
+        - ~200 MB
+      - - text: LoRA, r = 16
+          new: true
+        - text: 0.13 M  —  0.8%
+          new: true
+        - text: ~1.6 MB
+          new: true
+      caption: which is the difference between a cluster and one consumer card
 tags: [training]
 relations:
   is_a: [supervised-fine-tuning]
@@ -61,13 +104,6 @@ operational problem of serving them: adapters are megabytes, not gigabytes, and
 can be swapped or merged at will.
 
 ## How Does It Work?
-
-```text
-        ┌── frozen W0 (d×k) ──┐
- x ─────┤                      ├──▶ + ──▶ output
-        └── A (r×k) ─ B (d×r) ┘
-             trainable, r typically 8-64
-```
 
 At inference $BA$ can be merged into $W_0$, so a merged LoRA adds no latency;
 kept separate, many adapters can share one base model in memory.

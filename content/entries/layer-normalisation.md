@@ -11,6 +11,32 @@ origin:
   year: 2016
   attribution: Ba, Kiros and Hinton; adapted from batch normalisation for sequence models
 historical_period: deep-learning
+diagram:
+  kind: figure
+  title: Where the normalisation sits decides whether deep training is stable
+  footer: 'Pre-norm won on engineering grounds rather than quality: it trains without a warmup schedule
+    and survives depth. Almost every model since about 2020 places it before the sublayer.'
+  visual:
+    kind: columns
+    width: 720
+    caption: the same two operations, in the other order
+    columns:
+    - title: Post-norm · 2017
+      tone: warn
+      lines:
+      - x → sublayer → add → norm
+      - gradient crosses a norm
+      - at every layer
+      - needs careful warmup
+      - unstable when deep
+    - title: Pre-norm · modern
+      accent: true
+      lines:
+      - x → norm → sublayer → add
+      - an unobstructed identity path
+      - all the way to the input
+      - stable without warmup
+      - scales to hundreds of layers
 tags: [architecture]
 relations:
   part_of: [transformer]
@@ -64,15 +90,6 @@ Training stability at depth, and tolerance of larger learning rates — which
 translates directly into faster convergence.
 
 ## How Does It Work?
-
-```text
-PRE-NORM (modern)                POST-NORM (original 2017)
-x ──┬── norm ── attn ──┐         x ──── attn ──┬── + ── norm ──▶
-    └───────────── + ──┴──▶          └─────────┘
-gradient reaches x through       gradient passes through norm
-an unobstructed identity path    at every layer
-stable without warmup            needs careful warmup, unstable deep
-```
 
 The pre-norm versus post-norm choice looks like a detail and is not: it is much of
 why very deep Transformers became trainable without elaborate learning rate

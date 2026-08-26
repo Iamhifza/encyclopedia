@@ -12,6 +12,40 @@ origin:
   circa: true
   attribution: Standardised in MPI for high-performance computing; NCCL brought GPU-optimised implementations in 2016
 historical_period: statistical-ml
+diagram:
+  kind: steps
+  title: Every device ends up with the same sum, with no coordinator
+  footer: 'Bandwidth-optimal: each device sends and receives roughly twice the data regardless of how
+    many devices there are. This is the operation that makes data-parallel training possible at all.'
+  steps:
+  - title: The devices form a ring
+    visual:
+      kind: chips
+      items:
+      - GPU 0
+      - GPU 1
+      - GPU 2
+      - GPU 3
+      loop: and back to the start — every link carries traffic in both phases
+  - title: Two passes around it
+    visual:
+      kind: columns
+      width: 700
+      columns:
+      - title: 1 · reduce-scatter
+        lines:
+        - each step, pass a chunk on
+        - and add what you receive
+        - after N−1 steps each device
+        - owns one finished quarter
+      - title: 2 · all-gather
+        accent: true
+        lines:
+        - pass the finished chunk on
+        - no arithmetic, only copying
+        - after N−1 more steps
+        - everyone has all four
+      caption: no central node, and every link is busy the whole time
 tags: [hardware]
 relations:
   used_by: [data-parallelism, tensor-parallelism]
@@ -70,20 +104,22 @@ of devices.
 
 ## How Does It Work?
 
-```text
-RING ALL-REDUCE, 4 GPUs
 
-phase 1 — reduce-scatter        phase 2 — all-gather
-each GPU ends up owning the     each GPU passes its finished
-fully-reduced value for one     chunk around the ring until
-quarter of the data             everyone has all four
+Every device starts with its own gradient tensor and must end with the sum of
+all of them. The naive approach sends everything to one coordinator, which makes
+that node's bandwidth the ceiling. Ring all-reduce avoids a coordinator
+entirely.
 
-  GPU0 ──▶ GPU1 ──▶ GPU2 ──▶ GPU3 ──┐
-    ▲                                │
-    └────────────────────────────────┘
+Arrange the devices in a logical ring and split the tensor into as many chunks
+as there are devices. In the reduce-scatter phase, each device passes one chunk
+to its neighbour and adds what it receives; after N−1 steps every device holds
+the fully summed value for exactly one chunk. The all-gather phase passes those
+finished chunks around the same ring until everyone has all of them.
 
-no central node · each device sends and receives simultaneously
-```
+The result is bandwidth-optimal: each device sends and receives about twice the
+tensor size regardless of how many devices there are, and every link is busy
+throughout. This is the operation data-parallel training is built on, and the
+reason interconnect bandwidth is a headline specification on training hardware.
 
 ## Mental Model
 

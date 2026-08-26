@@ -10,6 +10,53 @@ origin:
   year: 2018
   attribution: Huang et al., GPipe; refined by PipeDream and Megatron interleaved schedules
 historical_period: transformer
+diagram:
+  kind: steps
+  title: Different layers on different cards, and the bubble that creates
+  footer: The bubble is fixed by the number of stages but shrinks relative to the work as micro-batches
+    increase. Pipeline parallelism tolerates slow links, which is why it is what you use between nodes.
+  steps:
+  - title: Each card waits for the one before it
+    notes:
+    - label: Bubble
+      text: idle time at the start and end of every batch — unavoidable, only dilutable
+    visual:
+      kind: matrix
+      cell_width: 58
+      show_values: false
+      cols:
+      - t1
+      - t2
+      - t3
+      - t4
+      - t5
+      - t6
+      - t7
+      rows:
+      - label: GPU 0
+        values: [1, 1, 1, 1, null, null, null]
+      - label: GPU 1
+        values: [null, 1, 1, 1, 1, null, null]
+      - label: GPU 2
+        values: [null, null, 1, 1, 1, 1, null]
+      - label: GPU 3
+        values: [null, null, null, 1, 1, 1, 1]
+      caption: four micro-batches through four stages; the gaps are the bubble
+  - title: More micro-batches dilute it
+    visual:
+      kind: bars
+      caption: share of wall-clock spent idle, four stages
+      bars:
+      - label: 4 micro-batches
+        value: 0.43
+        value_label: 43% idle
+        accent: true
+      - label: '16'
+        value: 0.16
+        value_label: 16%
+      - label: '64'
+        value: 0.05
+        value_label: 5%
 tags: [hardware]
 relations:
   alternative_to: [tensor-parallelism]
@@ -55,14 +102,21 @@ Scaling a model across multiple *nodes* without saturating the network.
 
 ## How Does It Work?
 
-```text
-time ──▶
-GPU0  m1 m2 m3 m4 ░░░░░░
-GPU1  ░░ m1 m2 m3 m4 ░░░
-GPU2  ░░░░ m1 m2 m3 m4 ░
-GPU3  ░░░░░░ m1 m2 m3 m4
-      ░ = bubble; more micro-batches shrink it proportionally
-```
+
+Assign contiguous groups of layers to different devices, so a batch flows
+through card 0, then card 1, and so on. Only activations cross between stages —
+a fraction of what tensor parallelism moves — which is why this tolerates slow
+interconnects and works across nodes.
+
+The problem is that stage *k* has nothing to do until stage *k−1* has produced
+something. Run a single batch and most devices idle most of the time. The fix is
+to split the batch into micro-batches and keep them in flight simultaneously, so
+that once the pipeline is full every stage is busy.
+
+The idle time at fill and drain — the bubble — is set by the number of stages
+and cannot be removed, only diluted: with *m* micro-batches and *p* stages the
+bubble is roughly (p−1)/(m+p−1) of the total. More micro-batches shrink it,
+until memory for their activations runs out.
 
 ## Mental Model
 

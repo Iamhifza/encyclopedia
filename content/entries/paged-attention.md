@@ -10,6 +10,46 @@ origin:
   year: 2023
   attribution: Kwon et al., UC Berkeley; introduced with vLLM
 historical_period: foundation-model
+diagram:
+  kind: steps
+  title: Stop reserving for the worst case
+  footer: 'Borrowed wholesale from virtual memory: a page table, fixed-size blocks and reference counting.
+    The gain is not a faster kernel — it is fitting two to four times as many requests on the same card.'
+  steps:
+  - title: Contiguous reservation wastes most of what it holds
+    notes:
+    - label: Cause
+      text: nobody knows how long a response will be, so the allocator books the maximum
+    visual:
+      kind: segments
+      width: 700
+      label: one request's reservation, 2048 tokens
+      caption: internal fragmentation, and the reserved tail cannot be lent to anyone else
+      segments:
+      - text: actually used
+        value: 120
+        value_label: '120'
+      - text: reserved, idle
+        value: 1928
+        value_label: '1928'
+        tone: warn
+  - title: A block table breaks the link between logical and physical
+    notes:
+    - label: Bonus
+      text: identical prefixes can point at the same physical blocks, reference-counted, which is what
+        makes prefix caching possible
+    visual:
+      kind: mapping
+      width: 760
+      head:
+      - logical blocks, per request
+      - physical blocks, from one pool
+      rows:
+      - left: req A  →  0 1 2 3
+        right: 17  04  39  12
+      - left: req B  →  0 1
+        right: 17  04   ← shared, refcount 2
+        tone: accent
 tags: [inference]
 relations:
   successor_of: [kv-cache]
@@ -59,20 +99,6 @@ Memory fragmentation and over-allocation in KV cache management, and — as a
 consequence of block sharing — duplication of identical prefixes across requests.
 
 ## How Does It Work?
-
-```text
-BEFORE: contiguous reservation per request
-[req A: used 120 ────── reserved to 2048 ░░░░░░░░░░░░░░░░░░░░]
-[req B: used  80 ────── reserved to 2048 ░░░░░░░░░░░░░░░░░░░░]
-                                          ░ = wasted
-
-AFTER: block table indirection
-req A logical: [0][1][2][3]        block pool
-                │  │  │  │        ┌──┬──┬──┬──┬──┬──┬──┐
-                ▼  ▼  ▼  ▼        │17│04│39│12│88│05│..│
-              17 04 39 12         └──┴──┴──┴──┴──┴──┴──┘
-req B logical: [0][1] ──▶ 17,04   shared blocks, refcounted
-```
 
 Two requests with the same system prompt point at the same physical blocks until
 one of them diverges, at which point that block is copied.

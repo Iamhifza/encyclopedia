@@ -8,6 +8,21 @@ status: foundational
 difficulty: intermediate
 one_liner: "Adding a layer's input to its output, giving gradients a clear path backwards and making very deep networks trainable."
 historical_period: deep-learning
+diagram:
+  kind: figure
+  title: Every layer adds to a running total
+  footer: 'The modern reading is the residual stream: a shared channel that each layer reads from and
+    writes back into. Most of mechanistic interpretability is an attempt to work out what is written where.'
+  visual:
+    kind: chips
+    items:
+    - x₀
+    - x₀+F₁
+    - +F₂
+    - +F₃
+    - +F₄
+    caption: the identity path is uninterrupted, so the gradient reaches x₀ without passing through any
+      layer — which is what made depth trainable
 tags: [architecture]
 relations:
   part_of: [transformer]
@@ -61,15 +76,22 @@ mystery worth solving.
 
 ## How Does It Work?
 
-```text
-        x ──────────────────┐  identity path: gradient passes through unchanged
-        │                   │
-        ▼                   ▼
-     [ layer ] ──▶ F(x) ──▶ (+) ──▶ x + F(x)
 
-deep stack:  x₀ ──▶ x₀+F₁ ──▶ x₀+F₁+F₂ ──▶ x₀+F₁+F₂+F₃ ...
-             every layer reads the running sum and adds to it
-```
+Instead of passing a layer's output straight on, add it to that layer's input:
+the block computes F(x) and what continues is x + F(x). The unmodified input
+travels alongside the transformation rather than through it.
+
+That identity path is what makes depth trainable. During backpropagation the
+gradient reaches earlier layers through the addition without being multiplied by
+anything, so it cannot shrink away over dozens of layers. Before residuals,
+networks past about twenty layers trained worse than shallower ones; after them,
+hundreds of layers became routine.
+
+The modern framing is the residual stream: a running total that every block reads
+from and writes back into, rather than a chain each block transforms in turn.
+That reading is what makes interpretability work tractable — the question
+becomes what each block contributes to a shared channel, and features can be
+traced through it.
 
 ## Mental Model
 

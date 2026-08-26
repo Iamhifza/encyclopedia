@@ -11,6 +11,28 @@ origin:
   circa: true
   attribution: Nucleus sampling formalised by Holtzman et al. in 2019; temperature comes from statistical physics via simulated annealing
 historical_period: transformer
+diagram:
+  kind: figure
+  title: From a distribution over the vocabulary to one token
+  footer: Greedy decoding is this pipeline with every knob off. It is not obviously worse — it is more
+    repetitive, which matters for prose and matters much less for code.
+  visual:
+    kind: pipeline
+    width: 700
+    caption: 'order matters: truncating before rescaling by temperature gives a different distribution
+      from doing it after'
+    stages:
+    - text: logits over the whole vocabulary
+      note: one score per token
+    - text: sharpened or flattened
+      via: ÷ temperature — below 1 sharpens, above 1 flattens
+    - text: repetition discouraged
+      via: frequency and presence penalties
+    - text: the unlikely tail removed
+      via: top-k, a fixed count · or top-p, the smallest set summing to p
+    - text: one token, drawn
+      tone: accent
+      via: renormalise, then sample
 tags: [inference]
 relations:
   part_of: [decode]
@@ -56,15 +78,6 @@ The gap between the most probable continuation and a good continuation. It also
 gives users one dial for the creativity-versus-reliability tradeoff.
 
 ## How Does It Work?
-
-```text
-logits over vocabulary
-   │ ÷ temperature      (T<1 sharpens, T>1 flattens)
-   │ apply penalties
-   │ truncate: top-k (fixed count) or top-p (adaptive)
-   │ renormalise
-   ▼ draw one token
-```
 
 Top-$p$ is adaptive: where the model is confident the nucleus contains two or
 three tokens, where it is uncertain it may contain hundreds.
