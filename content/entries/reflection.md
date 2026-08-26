@@ -11,6 +11,45 @@ origin:
   year: 2023
   attribution: Formalised in Reflexion and Self-Refine; the pattern appeared informally in agent projects before that
 historical_period: agentic
+diagram:
+  kind: steps
+  title: A second pass only helps if it knows something the first did not
+  footer: Asking a model to check its own work with no new information mostly produces a confident restatement.
+    The gains reported for self-critique almost always come from a signal that entered at the critique
+    step.
+  steps:
+  - title: The loop
+    visual:
+      kind: chips
+      items:
+      - generate
+      - critique
+      - revise
+      - accept?
+      loop: back to critique until it passes, or the budget runs out
+  - title: What the critique step has to be given
+    visual:
+      kind: stack
+      width: 760
+      caption: in rough order of how much they help
+      layers:
+      - label: strongest
+        text: test results, compiler errors, a failing assertion
+        note: ground truth
+        accent: true
+      - label: ''
+        text: retrieved evidence the generator did not have
+        note: new facts
+      - label: ''
+        text: an explicit rubric, written in advance
+        note: a fixed standard
+      - label: ''
+        text: a different model, or a different prompt
+        note: different blind spots
+      - label: weakest
+        text: the same model, asked to look again
+        note: often just agrees
+        tone: warn
 tags: [agents]
 relations:
   part_of: [agent-loop]
@@ -60,16 +99,24 @@ Error detection and recovery, provided the errors are detectable.
 
 ## How Does It Work?
 
-```text
-generate ──▶ critique ──▶ revise ──▶ accept?
-                ▲                        │ no
-                └────────────────────────┘
 
-the critique step is only useful if it has
-something the generation step did not:
-   test results · compiler errors · retrieved evidence ·
-   a rubric · a different model · the user
-```
+Generate, critique, revise, repeat until the critique passes or the budget runs
+out. The loop is trivial to implement, which is part of why it is so widely
+reported and so unevenly effective.
+
+The question that decides whether it works is what the critique step has that
+the generation step did not. If the answer is nothing — same model, same context,
+merely asked to look again — then the critique is drawn from the same
+distribution that produced the error, and it will usually agree with itself.
+Confidently.
+
+So the useful versions all inject something. Test results and compiler errors are
+the strongest, because they are ground truth and the model cannot argue with
+them. Retrieved evidence the generator lacked is next. An explicit rubric written
+in advance gives a fixed standard rather than a mood. A different model, or the
+same model under a genuinely different prompt, at least brings different blind
+spots. Reported gains from self-critique nearly always trace back to one of
+these, rather than to the reflection itself.
 
 ## Mental Model
 

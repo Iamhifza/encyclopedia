@@ -11,6 +11,26 @@ origin:
   circa: true
   attribution: Self-Instruct and Alpaca popularised the LLM form; synthetic data is much older in vision and speech
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: Generation is cheap; the filter is the product
+  footer: Unfiltered synthetic data degrades a model, sometimes sharply — the failure mode called model
+    collapse. Every method that works is a method for throwing most of it away.
+  visual:
+    kind: pipeline
+    width: 740
+    caption: the survivors are worth having precisely because most candidates were not
+    stages:
+    - text: a few hundred seed prompts
+      note: human-written
+    - text: hundreds of thousands of candidates
+      via: generate at temperature, many per seed
+    - text: what survives the filters
+      tone: accent
+      via: verifier or tests · a judge · deduplication · difficulty threshold
+    - text: a training set
+      note: small, and much better
+      via: balance across topics and difficulty
 tags: [training]
 relations:
   used_by: [pretraining, supervised-fine-tuning, distillation]
@@ -55,13 +75,6 @@ manufacture training data at scale.
 Data scarcity in narrow domains, coverage of rare cases, and cost of annotation.
 
 ## How Does It Work?
-
-```text
-seed prompts ──▶ generate many candidates ──▶ FILTER (verifier, tests,
-                                              judge, dedupe, difficulty)
-                                                       │
-                                      keep the survivors ──▶ training set
-```
 
 The filter is the whole method. Unfiltered generation reproduces the generator's
 existing distribution, including its errors.

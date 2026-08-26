@@ -11,6 +11,22 @@ origin:
   circa: true
   attribution: A classical distributed-AI field; the LLM sense dates from 2023 projects such as AutoGen and CAMEL
 historical_period: agentic
+diagram:
+  kind: figure
+  title: One lead, several workers, separate contexts
+  footer: Worth it when subtasks are genuinely independent and each needs its own long context. Not worth
+    it when they are not — you have then bought coordination overhead, duplicated cost and a harder failure
+    to debug.
+  visual:
+    kind: fan
+    source: lead
+    caption: each worker has its own window and its own tools; only results come back
+    targets:
+    - text: search docs
+      new: true
+    - search code
+    - check facts
+    - draft output
 tags: [agents]
 relations:
   depends_on: [ai-agent]
@@ -58,13 +74,24 @@ specialised tool sets per role.
 
 ## How Does It Work?
 
-```text
-              ┌── orchestrator: decompose, delegate, synthesise ──┐
-              │        │              │              │            │
-          sub-agent A  sub-agent B  sub-agent C   (own context,   │
-          search docs  search code  check facts    own tools)     │
-              └────────┴──────────────┴───── results ─────────────┘
-```
+
+A lead agent decomposes a task, hands the pieces to workers, and combines what
+comes back. Each worker runs with its own context window and its own tools, and
+returns only a result — its intermediate reasoning never enters the lead's
+context, which is the entire point.
+
+That isolation is what the pattern buys. Three research questions can each burn a
+hundred thousand tokens of searching without any of them crowding out the others,
+because they are not sharing a window. Genuinely independent subtasks also run
+concurrently rather than sequentially.
+
+It costs more than it looks. Every worker re-reads the shared background, so
+token spend multiplies rather than divides. Errors compound across handoffs, and
+a wrong decomposition cannot be recovered by workers that only see their own
+slice. Debugging means reconstructing several conversations at once. The
+honest test is whether the subtasks are genuinely independent and genuinely need
+their own long contexts — and when they are not, one agent with a good harness
+usually wins.
 
 ## Mental Model
 

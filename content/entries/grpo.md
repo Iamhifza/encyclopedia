@@ -11,6 +11,72 @@ origin:
   year: 2024
   attribution: Introduced by DeepSeek in the DeepSeekMath work and central to DeepSeek-R1
 historical_period: agentic
+diagram:
+  kind: steps
+  title: The group is the baseline
+  footer: Dropping the value network is what makes this cheap enough to run on reasoning traces at scale.
+    It needs a reward you can compute many times per prompt, which is why it pairs with verifiers rather
+    than with human labels.
+  steps:
+  - title: Sample several answers to the same prompt, and score them
+    notes:
+    - label: Scorer
+      text: a verifier where one exists, a reward model where one does not
+    visual:
+      kind: bars
+      caption: five completions from one prompt; the group mean is 0.54
+      bars:
+      - label: completion 1
+        value: 0.9
+        value_label: '0.9'
+        accent: true
+      - label: '2'
+        value: 0.2
+        value_label: '0.2'
+      - label: '3'
+        value: 0.7
+        value_label: '0.7'
+      - label: '4'
+        value: 0.1
+        value_label: '0.1'
+      - label: '5'
+        value: 0.8
+        value_label: '0.8'
+  - title: Each answer is judged against its own group, not against a critic
+    notes:
+    - label: Saving
+      text: no value network to train or hold in memory — the group mean does its job
+    visual:
+      kind: table
+      width: 720
+      head:
+      - completion
+      - reward
+      - advantage
+      rows:
+      - - text: '1'
+          new: true
+        - text: '0.9'
+          new: true
+        - text: +1.2  pushed up
+          new: true
+      - - '2'
+        - '0.2'
+        - −1.1  pushed down
+      - - '3'
+        - '0.7'
+        - '+0.5'
+      - - '4'
+        - '0.1'
+        - −1.4  pushed down
+      - - text: '5'
+          new: true
+        - text: '0.8'
+          new: true
+        - text: +0.9  pushed up
+          new: true
+      caption: advantage = (reward − group mean) ÷ group standard deviation, with a KL penalty holding
+        the policy near the reference
 tags: [training]
 relations:
   used_by: [rlvr, reasoning-model]
@@ -64,19 +130,23 @@ made RL post-training practical outside the largest labs.
 
 ## How Does It Work?
 
-```text
-prompt ──▶ sample G completions
-             │
-        score each      [0.9  0.2  0.7  0.1  0.8]   ← verifier or reward model
-             │
-        group mean = 0.54
-             │
-        advantage = (reward − mean) / std
-             │       [+1.2 −1.1  +0.5 −1.4  +0.9]
-             ▼
-        push up the winners, push down the losers
-        KL penalty keeps the policy near the reference
-```
+
+Policy-gradient methods need a baseline — an estimate of how good a response was
+expected to be — otherwise every positive reward pushes everything up. PPO learns
+that baseline with a separate value network, roughly doubling the memory and
+adding a second thing to train.
+
+GRPO gets the baseline for free. Sample a group of completions for the same
+prompt, score them all, and use the group's own mean as the baseline. Each
+completion's advantage is how far above or below its siblings it landed,
+normalised by the group's spread. Above-average answers are reinforced,
+below-average ones suppressed, and a KL term against a reference model keeps the
+policy from wandering.
+
+The trade is that you now need several completions per prompt and a reward you
+can compute cheaply for each — which is why it pairs naturally with verifiers
+rather than human labels, and why it became the standard method for training
+reasoning models on maths and code.
 
 ## Mental Model
 

@@ -8,6 +8,37 @@ status: established
 difficulty: beginner
 one_liner: "Requiring a person to approve consequential actions, rather than trusting an autonomous system to get them right."
 historical_period: agentic
+diagram:
+  kind: figure
+  title: Ask about the irreversible, and only the irreversible
+  footer: 'Approve-everything trains people to click approve. The classification is what makes review
+    meaningful: rare enough to be read, and reserved for what cannot be undone.'
+  visual:
+    kind: tree
+    width: 820
+    caption: and whichever way it goes, log the decision — the record is what makes the next classification
+      better
+    levels:
+    - proposed
+    - classify
+    - outcome
+    root:
+      text: an action
+      children:
+      - text: reversible
+        children:
+        - text: just do it
+          note: log it
+        - text: undo if wrong
+          note: cheap
+      - text: irreversible
+        tone: accent
+        children:
+        - text: queue for approval
+          tone: accent
+          note: what · why · what changes
+        - text: approve · edit · reject
+          note: a person decides
 tags: [agents, safety, culture]
 relations:
   part_of: [guardrails]
@@ -55,20 +86,6 @@ code — the tolerable failure rate is far below what any model guarantees.
 The consequences of confident errors, and accountability: someone approved it.
 
 ## How Does It Work?
-
-```text
-agent proposes ──▶ classify the action
-                        │
-        reversible? ────┴──── irreversible?
-             │                      │
-        just do it            queue for approval
-                                    │
-                        person sees: what · why · what changes
-                                    │
-                          approve · edit · reject
-                                    │
-                            execute, and log the decision
-```
 
 Two things make or break it. The reviewer must see enough context to judge
 rather than rubber-stamp; and the volume must stay low enough that they actually

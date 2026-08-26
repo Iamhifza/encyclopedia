@@ -11,6 +11,26 @@ origin:
   circa: true
   attribution: FLAN and InstructGPT established instruction tuning as standard practice
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: Show the format you want, and score only the half you want back
+  footer: This is where instruction-following comes from. Preference methods that follow — RLHF, DPO —
+    refine a model that can already answer; SFT is what makes it answer at all.
+  visual:
+    kind: mapping
+    width: 780
+    head:
+    - what is in each training example
+    - does the loss score it?
+    rows:
+    - left: the instruction, and any input
+      right: no — masked out
+      mark: bad
+    - left: the ideal response
+      right: yes — every token of it
+      mark: ok
+      tone: accent
+    caption: masking the prompt is what stops the model learning to generate instructions instead of answers
 tags: [training]
 relations:
   successor_of: [pretraining]
@@ -59,11 +79,23 @@ domain-specific style that prompting cannot reliably enforce.
 
 ## How Does It Work?
 
-```text
-base model ──▶ (instruction, ideal response) × N ──▶ instruct model
-                        │
-              loss masked to response tokens only
-```
+
+Continue training a pretrained model on pairs of instruction and ideal response.
+The mechanics are identical to pretraining — next-token prediction, cross-entropy
+loss — but the data is curated demonstrations rather than scraped text, and the
+loss is masked so that only the response tokens are scored.
+
+That masking is the part worth understanding. Without it the model would be
+learning to produce plausible instructions as readily as plausible answers, since
+both appear in the training text. Masking the prompt means the gradient only ever
+says "given this instruction, produce this" and never "given this context,
+produce an instruction like that".
+
+Comparatively little data is needed — thousands of examples, sometimes fewer —
+because the capabilities already exist from pretraining and what is being taught
+is a format and a disposition. Quality dominates quantity by a wide margin. This
+is the stage that turns a text continuer into something that answers, and
+everything after it, RLHF and DPO alike, refines a model that can already do so.
 
 ## Mental Model
 

@@ -11,6 +11,53 @@ origin:
   circa: true
   attribution: Emerged from autonomous-agent projects; terminology borrowed loosely from cognitive psychology
 historical_period: agentic
+diagram:
+  kind: steps
+  title: One live window, and three stores behind it
+  footer: The hard part is not storing things — it is retrieval and forgetting. A store that returns everything
+    is the context window again, and a store nothing prunes becomes slower and less relevant every week.
+  steps:
+  - title: Working memory is the context window, and it is small
+    notes:
+    - label: Lifetime
+      text: one request — everything here is reassembled from scratch next turn
+    visual:
+      kind: segments
+      width: 720
+      label: the live window
+      caption: whatever is not in here does not exist as far as the model is concerned
+      segments:
+      - text: system prompt
+        value: 12
+      - text: retrieved memory
+        value: 26
+        tone: accent
+      - text: recent turns
+        value: 34
+      - text: tool results
+        value: 28
+  - title: Three stores, holding different kinds of thing
+    visual:
+      kind: columns
+      width: 740
+      columns:
+      - title: Episodic
+        lines:
+        - what happened, and when
+        - '"we tried X on Tuesday"'
+        - retrieved by similarity
+      - title: Semantic
+        accent: true
+        lines:
+        - durable facts and preferences
+        - '"deploys go out on Thursday"'
+        - retrieved by relevance
+      - title: Procedural
+        lines:
+        - how this team does things
+        - '"our release notes look like this"'
+        - retrieved by task match
+      caption: read into the window before the model runs; written back after it
 tags: [agents]
 relations:
   part_of: [ai-agent]
@@ -59,17 +106,23 @@ window.
 
 ## How Does It Work?
 
-```text
-                    ┌──── working memory: the live context window ────┐
-                    │  system prompt · recent turns · tool results     │
-                    └──────────────▲───────────────────┬───────────────┘
-                        retrieve   │                   │ write
-                    ┌──────────────┴───────────────────▼───────────────┐
-                    │ episodic: what happened, when                    │
-                    │ semantic: durable facts and preferences          │
-                    │ procedural: how this team does things            │
-                    └──────────────────────────────────────────────────┘
-```
+
+Working memory is the context window, and it is rebuilt from nothing on every
+request. Nothing in it persists. Anything the agent should still know next week
+has to be written somewhere durable and deliberately read back in.
+
+What gets stored splits usefully three ways. Episodic memory records events —
+what was tried, when, and how it went. Semantic memory holds durable facts and
+preferences that are true independent of any occasion. Procedural memory holds
+how this particular team does a thing: formats, conventions, the shape of an
+acceptable answer.
+
+The storage is the easy half. The hard half is retrieval and forgetting. A store
+that returns everything has merely reconstructed the context problem one layer
+down, so retrieval has to be selective, and selection needs a relevance signal
+that is usually weaker than you would like. And a store nothing ever prunes fills
+with stale facts, superseded preferences and events that no longer matter —
+getting slower and less useful with every entry.
 
 ## Mental Model
 

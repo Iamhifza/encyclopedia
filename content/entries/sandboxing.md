@@ -8,6 +8,33 @@ status: established
 difficulty: intermediate
 one_liner: "Running an agent's actions inside a confined environment so that mistakes and attacks cannot reach anything that matters."
 historical_period: agentic
+diagram:
+  kind: figure
+  title: Assume the code is hostile, because it might be
+  footer: The threat is not only a model writing bad code. It is a model that read a web page containing
+    instructions and is now following them — in which case the sandbox is the only thing between that
+    page and your credentials.
+  visual:
+    kind: stack
+    width: 780
+    caption: whatever comes back is data, never instructions, and is treated as such
+    layers:
+    - label: filesystem
+      text: its own, with no host mounts
+      note: nothing to exfiltrate
+    - label: credentials
+      text: none in the environment
+      note: not even read-only
+    - label: network
+      text: denied by default, or an explicit allow-list
+      note: egress is the risk
+      accent: true
+    - label: resources
+      text: CPU, memory and wall-clock all capped
+      note: a loop cannot cost money
+    - label: lifetime
+      text: destroyed when the task ends
+      note: no state carries over
 tags: [agents, safety]
 relations:
   part_of: [guardrails, harness]
@@ -53,22 +80,6 @@ Blast radius. It does not stop the agent doing the wrong thing; it stops the
 wrong thing from mattering.
 
 ## How Does It Work?
-
-```text
-      agent decides to run code
-                │
-┌───────────────▼──────────────────────────────┐
-│ SANDBOX                                      │
-│  own filesystem  ·  no host mounts           │
-│  no credentials in env                       │
-│  egress: denied, or allow-listed hosts only  │
-│  CPU / memory / wall-clock caps              │
-│  destroyed after the task                    │
-└───────────────┬──────────────────────────────┘
-                │ only declared outputs come back
-                ▼
-        results returned as untrusted data
-```
 
 The last line matters as much as the isolation: whatever comes out is still
 attacker-influenced text entering the context window.

@@ -11,6 +11,28 @@ origin:
   circa: true
   attribution: Practitioner term that spread with LLM application frameworks
 historical_period: agentic
+diagram:
+  kind: figure
+  title: Checks on the way in, on the way out, and around every tool call
+  footer: The output checks catch what the model got wrong. The tool-call checks catch what an attacker
+    got right — and those are the ones that stop an injected instruction becoming an action.
+  visual:
+    kind: pipeline
+    width: 740
+    caption: none of these depend on the model behaving; that is what makes them guardrails rather than
+      instructions
+    stages:
+    - text: the request
+      note: possibly hostile
+    - text: accepted input
+      via: validate shape · classify intent · rate-limit
+    - text: a candidate response
+      via: the model runs
+    - text: a checked response
+      via: schema check · policy check · citation check
+    - text: an executed action
+      tone: accent
+      via: allow-list · permission · sandbox · human approval when irreversible
 tags: [safety, agents]
 relations:
   part_of: [harness]
@@ -53,14 +75,23 @@ thing".
 
 ## How Does It Work?
 
-```text
-input ──▶ [validate, classify] ──▶ model ──▶ [schema check, policy check]
-                                       │
-                              tool call ▼
-                          [allow-list · permission · sandbox · approval]
-                                       │
-                                    execute, log, trace
-```
+
+Guardrails are checks in the code path, not instructions in the prompt. The
+distinction matters because a prompt is a request the model may decline, ignore,
+or be argued out of, while a check in the harness runs whatever the model
+decided.
+
+They sit at three points. On the way in: validate the shape of the request,
+classify intent, apply rate limits. On the way out: check the response against a
+schema, against policy, against whether its citations resolve. And around every
+tool call: an allow-list of what may be invoked, permissions on what each tool
+may touch, a sandbox around execution, and a human before anything irreversible.
+
+The output checks catch the model being wrong. The tool-call checks catch
+something else — an attacker being right. When injected text has persuaded the
+agent to do something, the model is functioning perfectly and the only thing
+between the instruction and the action is the permission check. That is why the
+tool boundary deserves the strictest guardrail in the system.
 
 ## Mental Model
 

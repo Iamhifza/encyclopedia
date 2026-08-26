@@ -8,6 +8,30 @@ status: modern
 difficulty: intermediate
 one_liner: "Forcing a model's output to match a schema or grammar by masking out any token that would break it."
 historical_period: agentic
+diagram:
+  kind: figure
+  title: Invalid tokens are removed before sampling, not after
+  footer: This guarantees the shape and nothing else. A response can be perfectly valid JSON, match the
+    schema exactly, and be entirely wrong — constrained decoding is a parser, not a fact-checker.
+  visual:
+    kind: mapping
+    width: 780
+    head:
+    - 'after {"age": the next token could be'
+    - what the state machine allows
+    rows:
+    - left: '"  — opening a string'
+      right: masked to −∞
+      mark: bad
+    - left: 2  — a digit
+      right: allowed
+      mark: ok
+      tone: accent
+    - left: t  — starting "true"
+      right: masked to −∞
+      mark: bad
+    caption: the schema is compiled to a grammar, and only tokens that keep the output parseable survive
+      to be sampled from
 tags: [protocol, inference]
 relations:
   depends_on: [sampling]
@@ -62,18 +86,6 @@ each time it fails.
 The interface between a probabilistic component and deterministic code.
 
 ## How Does It Work?
-
-```text
-schema: {"age": integer}
-
-partial output:  {"age":
-                        │ state machine says: only digits are valid here
-logits:  "  0.8   ← masked to −∞
-         2  0.1   ← allowed
-         t  0.05  ← masked to −∞
-                        │
-                  sample only from what remains
-```
 
 The constraint is applied to the *sampler*, not the prompt. The model's
 preferences still decide which valid token is chosen; the grammar decides which

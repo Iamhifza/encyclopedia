@@ -11,6 +11,25 @@ origin:
   circa: true
   attribution: Named in Tülu 3 work at AI2; the approach was central to DeepSeek-R1 and contemporaneous reasoning models
 historical_period: agentic
+diagram:
+  kind: flow
+  title: Let a program decide whether the answer was right
+  footer: 'The constraint is the whole method: it only works where correctness is checkable. Maths, code
+    and formal proofs qualify; essays, strategy and taste do not, and no amount of scale changes that.'
+  nodes:
+  - title: Problem
+    note: with a checkable answer
+    caption: maths, code, proofs
+  - title: Sample k
+    note: several attempts at once
+    caption: diversity is the point
+  - title: Verify
+    note: run the tests, check the proof
+    accent: true
+    caption: no human, no reward model
+  - title: Update
+    note: toward whatever passed
+    caption: scored against the group
 tags: [training]
 relations:
   successor_of: [rlhf]
@@ -58,13 +77,22 @@ is mechanically checkable.
 
 ## How Does It Work?
 
-```text
-problem ──▶ sample k solutions ──▶ run the verifier on each
-                                        │
-             advantage = how each scored relative to the group
-                                        │
-                          policy update toward the winners
-```
+
+Take a problem whose answer can be checked by a program, sample several attempts,
+run the checker on each, and update the policy toward whatever passed. No reward
+model, no human labels, and no learned proxy that can be gamed — the reward is a
+test suite or a proof checker returning a verdict.
+
+Sampling several attempts is essential rather than incidental. A single attempt
+gives a reward with no baseline to compare it against; a group gives each attempt
+a relative score, which is what the policy gradient needs. This is why RLVR and
+GRPO are usually described together.
+
+Everything rests on the verifier. Where correctness is mechanically checkable —
+competition maths, unit-tested code, formal proofs — this is the cleanest reward
+signal in machine learning, and it is where the recent jump in reasoning ability
+came from. Where it is not, the method simply does not apply, and no amount of
+scale supplies a verifier that does not exist.
 
 ## Mental Model
 

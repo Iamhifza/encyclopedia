@@ -10,6 +10,29 @@ origin:
   year: 2023
   attribution: Rafailov et al., Stanford
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: The same preference data, without the reward model
+  footer: 'Simpler and cheaper than RLHF, and it gives up something: no reward model means no way to sample
+    new responses and score them, so DPO learns only from the pairs it was given.'
+  visual:
+    kind: mapping
+    width: 780
+    head:
+    - one prompt, two responses
+    - what the loss does to it
+    rows:
+    - left: chosen
+      right: log-probability pushed up
+      mark: ok
+      tone: accent
+    - left: rejected
+      right: log-probability pushed down
+      mark: bad
+    - left: the frozen reference model
+      right: both are measured relative to it, which bounds the drift
+    caption: one loss on a triple, computed directly — no reward model, no sampling loop, no separate
+      RL stage
 tags: [training]
 relations:
   successor_of: [rlhf]
@@ -54,14 +77,23 @@ most teams.
 
 ## How Does It Work?
 
-```text
-(prompt, chosen, rejected) triples
-        │
-   compare log-probabilities under policy vs frozen reference
-        │
-   loss pushes chosen up and rejected down, bounded by the KL implied
-   in the reference ratio
-```
+
+RLHF takes preference pairs, trains a reward model on them, then optimises the
+policy against that reward with reinforcement learning. DPO observes that the
+optimal policy under such a reward has a closed form, and that you can therefore
+optimise the policy against the preferences directly.
+
+Each training example is a triple: a prompt, a chosen response and a rejected
+one. The loss compares the policy's log-probabilities for both against a frozen
+reference copy of the model, and pushes the chosen response up relative to the
+rejected one. The reference ratio does the job the explicit KL penalty does in
+RLHF, keeping the policy from drifting far from where it started.
+
+What this buys is simplicity: one loss, one training loop, no reward model to
+train and no sampling to manage. What it gives up is the ability to generate new
+responses and score them, since there is no reward model to score with. DPO
+learns from exactly the pairs it was given, which makes data quality the whole
+game.
 
 ## Mental Model
 

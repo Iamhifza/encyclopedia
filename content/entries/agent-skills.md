@@ -10,6 +10,44 @@ origin:
   year: 2025
   attribution: Formalised as loadable skill folders in agent products during 2025; the word "skill" has older, unrelated uses in RL and voice assistants
 historical_period: agentic
+diagram:
+  kind: steps
+  title: Names always loaded, bodies loaded on demand
+  footer: The pattern is progressive disclosure. Dozens of skills can exist without any of them costing
+    context until the one that matches is actually needed.
+  steps:
+  - title: What the model can see at all times
+    notes:
+    - label: Cost
+      text: one line each, so a large library stays affordable
+    visual:
+      kind: stack
+      width: 760
+      caption: just enough for the model to know a skill exists and when it would apply
+      layers:
+      - label: release-notes
+        text: how this team writes release notes
+        note: + a template
+      - label: pdf-forms
+        text: filling and flattening PDF forms
+        note: + scripts
+      - label: incident-report
+        text: the post-incident write-up format
+        note: + examples
+  - title: What happens when one matches
+    visual:
+      kind: pipeline
+      width: 700
+      stages:
+      - text: a task arrives
+        note: '"write up Friday''s outage"'
+      - text: one description matches
+        via: the model chooses, nothing routes
+      - text: the full SKILL.md enters the context
+        tone: accent
+        via: read on demand, not preloaded
+      - text: its scripts and templates are used
+        via: code the model runs rather than reproduces
 tags: [agents]
 relations:
   part_of: [ai-agent]
@@ -56,15 +94,23 @@ versioning agent know-how across a team.
 
 ## How Does It Work?
 
-```text
-skills/
-  release-notes/    SKILL.md  ← name + description always visible
-  pdf-forms/        SKILL.md  + scripts, templates
-  incident-report/  SKILL.md
 
-agent sees:  "release-notes — how this team writes release notes"
-task matches ──▶ read the full SKILL.md ──▶ follow it, run its scripts
-```
+A skill is a folder with a SKILL.md at its root, usually alongside scripts,
+templates or reference files. The front matter carries a name and a one-line
+description, and those two fields are the only part loaded into the model's
+context by default.
+
+So the agent knows a skill exists and roughly when it would apply, at a cost of
+one line. When a task matches, it reads the full SKILL.md — instructions,
+conventions, worked examples — and follows it, running any scripts the folder
+provides rather than reimplementing them.
+
+This is progressive disclosure, and it is what makes a large library affordable:
+fifty skills cost fifty lines until one is needed. It also puts the expensive,
+deterministic parts in code rather than in prose, so the model is orchestrating a
+known-good script instead of writing a fresh one each time. The main failure mode
+is a description too vague to match against — a skill nobody triggers is a skill
+that does not exist.
 
 ## Mental Model
 

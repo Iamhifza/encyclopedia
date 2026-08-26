@@ -12,6 +12,38 @@ origin:
   circa: true
   attribution: Borrowed from software testing ("test harness"); adopted for agent runtimes and for evaluation rigs, in parallel and independently
 historical_period: agentic
+diagram:
+  kind: figure
+  title: Everything around the model that is not the model
+  footer: Swap the model and behaviour shifts. Swap the harness and the same model becomes a different
+    product. Almost every reliability problem attributed to a model is one of these seven rows.
+  visual:
+    kind: stack
+    width: 780
+    caption: the model sits underneath all of it, and is called afresh each iteration
+    layers:
+    - label: context
+      text: what goes into the window, and in what order
+      note: decides cost and cache hits
+      accent: true
+    - label: tools
+      text: schemas, descriptions, how results are shaped
+      note: the model only sees this
+    - label: execution
+      text: sandbox, timeouts, retries, error surfaces
+      note: where reality intrudes
+    - label: permissions
+      text: what runs freely, what needs approval, what is refused
+      note: the blast radius
+    - label: loop
+      text: step budget, cost cap, stop conditions
+      note: when to give up
+    - label: state
+      text: memory, checkpoints, resumption
+      note: surviving a restart
+    - label: observability
+      text: traces, evaluations, replay
+      note: how you learn it broke
 tags: [agents, culture]
 relations:
   similar_to: [scaffold]
@@ -70,18 +102,22 @@ what it can see, what it can do, what it costs, and what happens when it fails.
 
 ## How Does It Work?
 
-```text
-┌──────────────────────── HARNESS ──────────────────────────┐
-│ context assembly   what goes in the window, in what order │
-│ tool interface     schemas, descriptions, result shaping  │
-│ execution          sandbox, timeouts, retries, errors     │
-│ permissions        what needs approval, what is forbidden │
-│ loop control       step budget, cost cap, stop conditions │
-│ state              memory, checkpoints, resumption        │
-│ observability      traces, evals, replay                  │
-└─────────────────────────┬─────────────────────────────────┘
-                      the model
-```
+
+The model contributes one thing: given a context, produce the next tokens. It is
+stateless, it cannot run anything, and it has no memory between calls. Every
+other property an agent appears to have is supplied by the code around it.
+
+That code has seven jobs. It assembles the context and decides what goes in and
+in what order. It presents the tools and shapes their results. It executes what
+the model asks for, inside whatever isolation it chose. It decides which actions
+proceed freely and which need a person. It controls the loop — how many steps,
+what budget, when to stop. It carries state between calls. And it records enough
+to tell you afterwards what happened.
+
+Which is why two products built on the same model behave completely differently,
+and why "the model got it wrong" is usually a misdiagnosis. Context that was
+assembled badly, a tool whose errors are unreadable, a loop with no stop
+condition — these look like model failures and are not.
 
 ## Mental Model
 

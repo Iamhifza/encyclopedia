@@ -13,6 +13,32 @@ origin:
   circa: true
   attribution: Borrowed from container and workflow orchestration; applied loosely to LLM systems from 2023 onward
 historical_period: agentic
+diagram:
+  kind: figure
+  title: The word is used for two different things
+  footer: Worth naming which one is meant before designing anything. Most systems that call themselves
+    agentic are the left column, and most of them are better for it.
+  visual:
+    kind: columns
+    width: 740
+    caption: the choice is between predictability and adaptability, and it is not close for most production
+      work
+    columns:
+    - title: Static · a workflow
+      accent: true
+      lines:
+      - steps fixed in advance
+      - the path is code, not a decision
+      - cost is knowable
+      - testable, debuggable
+      - fails in the same place twice
+    - title: Dynamic · an agent
+      lines:
+      - the lead decides at run time
+      - the path differs per request
+      - cost is bounded, not known
+      - harder to test
+      - handles what you did not foresee
 tags: [agents]
 relations:
   part_of: [multi-agent-system, harness]
@@ -80,14 +106,24 @@ without answering that has told you nothing. Ask it.
 
 ## How Does It Work?
 
-```text
-STATIC (sense 1)              DYNAMIC (sense 2)
-step1 ──▶ step2 ──▶ step3     lead agent
-   fixed, testable,              │ decomposes at run time
-   predictable cost              ├─▶ sub-agent A
-                                 ├─▶ sub-agent B
-                                 └─▶ aggregates, decides what next
-```
+
+The word covers two different designs and it is worth saying which you mean.
+
+In the static sense, orchestration is a workflow: the steps are fixed in advance
+and the path through them is code. A model may perform individual steps, but it
+does not choose the sequence. The cost is knowable before you run it, the failure
+modes repeat, and you can write a test.
+
+In the dynamic sense, a lead agent decides at run time what to do next, possibly
+delegating to sub-agents, and the path differs per request. This handles
+situations nobody enumerated in advance, at the price of bounded-but-unknown cost
+and a system that rarely fails the same way twice.
+
+Most production systems that describe themselves as agentic are the first kind,
+and most are better for it. The useful question is not which is more advanced but
+how much genuine variation the input has: if the same five steps handle nearly
+every request, encoding them as a workflow is not a lesser design, it is the
+correct one.
 
 ## Mental Model
 
