@@ -8,6 +8,28 @@ status: established
 difficulty: intermediate
 one_liner: "The two-layer network applied to each position separately inside every Transformer block, holding most of the model's parameters."
 historical_period: transformer
+diagram:
+  kind: figure
+  title: Expand, bend, compress — at every position separately
+  footer: Two thirds of a model's parameters live here, not in attention. It is also where interpretability
+    work keeps finding stored facts, which is why model-editing methods target these matrices.
+  visual:
+    kind: pipeline
+    width: 700
+    caption: no information moves between positions here — that already happened in attention
+    stages:
+    - text: one position's vector
+      note: d = 4096
+    - text: a much wider space
+      note: '11008'
+      via: W_up — expand
+    - text: the same width, transformed
+      note: '11008'
+      via: SwiGLU — the non-linearity, and a learned gate
+    - text: back into the residual stream
+      note: '4096'
+      tone: accent
+      via: W_down — compress
 tags: [architecture]
 relations:
   part_of: [transformer]
@@ -61,17 +83,23 @@ where the knowledge appears to live.
 
 ## How Does It Work?
 
-```text
-for each position independently:
 
-   x (d=4096) ──▶ W_up ──▶ (d=11008) ──▶ SwiGLU ──▶ W_down ──▶ (d=4096)
-                    ▲                                   │
-              expand, apply non-linearity, compress back │
-                                                         ▼
-                                              added to the residual stream
+After attention has moved information between positions, each position is
+processed on its own: project up to a much wider dimension, apply a
+non-linearity, project back down, and add the result to the residual stream. The
+same two matrices are used at every position, and no information crosses between
+them here.
 
-no information moves between positions here — that already happened in attention
-```
+The expansion is large — typically two and a half to four times the model
+dimension — and it is where the capacity lives. Roughly two thirds of a
+transformer's parameters sit in these two matrices rather than in attention,
+which surprises people who assume attention is where the model does its thinking.
+
+Modern models use a gated variant, usually SwiGLU: a third matrix produces a gate
+that multiplies the activated branch, letting the layer suppress its own features
+rather than only amplify them. Interpretability work also keeps locating stored
+facts in these matrices, which is why model-editing techniques target them
+specifically.
 
 ## Mental Model
 

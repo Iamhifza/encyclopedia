@@ -8,6 +8,37 @@ status: established
 difficulty: intermediate
 one_liner: "How a model is told where each token sits, since attention on its own treats a sentence as an unordered bag."
 historical_period: transformer
+diagram:
+  kind: figure
+  title: Three answers to a model that cannot see order
+  footer: 'Attention is permutation-invariant: shuffle the tokens and the maths is unchanged. Every method
+    here exists to put that information back, and the one that won is the one that extends past its training
+    length.'
+  visual:
+    kind: columns
+    width: 760
+    caption: the trend is from adding position to the input, toward expressing it as a relationship between
+      positions
+    columns:
+    - title: Absolute · 2017
+      lines:
+      - a vector per position
+      - added before layer 1
+      - fixed maximum length
+      - cannot extrapolate
+    - title: Relative · ALiBi
+      lines:
+      - a penalty on the score
+      - proportional to distance
+      - applied at every layer
+      - extrapolates cheaply
+    - title: Rotary · RoPE
+      accent: true
+      lines:
+      - rotate q and k by position
+      - the score depends on n − m
+      - applied inside attention
+      - stretches to longer contexts
 tags: [architecture]
 relations:
   part_of: [transformer]
@@ -60,15 +91,6 @@ Order awareness — and, in its modern forms, order awareness that extrapolates
 beyond the sequence lengths seen during training.
 
 ## How Does It Work?
-
-```text
-ABSOLUTE (2017)             RELATIVE / ALiBi          ROTARY (RoPE)
-token embedding             attention score           rotate q and k
-      +                           −                   by an angle ∝ position
-position vector             m·(distance penalty)            │
-      │                           │                   dot product depends
-added before layer 1        applied at every layer    only on (n − m)
-```
 
 The trend is clear: from adding a position vector at the input, to influencing
 attention directly at every layer, because the second generalises much better.

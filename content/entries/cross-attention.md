@@ -8,6 +8,23 @@ status: established
 difficulty: intermediate
 one_liner: "Attention where the questions come from one sequence and the answers from another, used to condition on an image, audio or a source sentence."
 historical_period: transformer
+diagram:
+  kind: figure
+  title: Queries from one sequence, keys and values from another
+  footer: This is the join between modalities. A caption model attends from text into image patches; a
+    diffusion model attends from image latents into a text embedding. Same operation, different pair of
+    sequences.
+  visual:
+    kind: fan
+    source: '"The cat"'
+    caption: the generating position asks; the conditioning sequence answers — and the two need not be
+      the same length, or the same kind of thing
+    targets:
+    - text: patch 1
+      new: true
+    - patch 2
+    - patch 3
+    - patch 4
 tags: [architecture]
 relations:
   is_a: [attention]
@@ -55,15 +72,23 @@ merely adjacent.
 
 ## How Does It Work?
 
-```text
-    generating sequence          conditioning sequence
-    (queries)                    (keys, values)
-    "The cat ___"                 image patches / source sentence
-         │                                │
-         └──────▶ Q · Kᵀ ──▶ softmax ──▶ weighted V ──▶ output
-                  each generated position attends over
-                  every position of the other sequence
-```
+
+Self-attention derives queries, keys and values from the same sequence.
+Cross-attention takes the queries from one sequence and the keys and values from
+another, which is the entire difference and the reason it can join two unrelated
+kinds of data.
+
+Each position in the generating sequence emits a query, scores it against every
+position of the conditioning sequence, and takes the weighted blend of that
+sequence's values. The two need not be the same length or the same modality —
+text attending into image patches, image latents attending into a text embedding,
+a decoder attending into an encoder's output.
+
+That makes it the standard join between modalities. A captioning model uses it to
+look at the picture while writing; a diffusion model uses it to keep denoising
+pointed at the prompt; an encoder-decoder translator uses it as the only channel
+between reading and writing. Same operation throughout, applied to a different
+pair of sequences.
 
 ## Mental Model
 

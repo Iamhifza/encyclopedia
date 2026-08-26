@@ -8,6 +8,47 @@ status: established
 difficulty: intermediate
 one_liner: "The fixed set of tokens a model can read or emit, and the reason it can never output a character it has no piece for."
 historical_period: transformer
+diagram:
+  kind: steps
+  title: What the model is actually allowed to say
+  footer: 'Vocabulary size is a real architectural choice: it sets the width of the embedding and output
+    matrices, and how many tokens a document costs. English text is well served; languages that tokenise
+    badly pay for it on every request.'
+  steps:
+  - title: Four kinds of entry
+    visual:
+      kind: stack
+      width: 760
+      caption: roughly 128,000 entries in a current model
+      layers:
+      - label: whole words
+        text: '"the", "and", " model"'
+        note: one token each
+      - label: fragments
+        text: '"ization", "▁un", "tion"'
+        note: assembled as needed
+        accent: true
+      - label: bytes
+        text: the fallback, so nothing is ever unknown
+        note: always parses
+      - label: special
+        text: <|begin|> <|end|> <|user|>
+        note: structural markers
+  - title: And the size is a trade
+    visual:
+      kind: table
+      width: 740
+      head:
+      - vocabulary
+      - sequences
+      - matrices
+      rows:
+      - - larger
+        - shorter — fewer tokens per document
+        - bigger embedding and output layers
+      - - smaller
+        - longer — more compute per document
+        - smaller, but every document costs more
 tags: [architecture]
 relations:
   part_of: [tokenization]
@@ -54,16 +95,23 @@ strings" — while byte-level fallback ensures every input is still representabl
 
 ## How Does It Work?
 
-```text
-vocabulary (say 128,000 entries)
-  ├─ frequent words        "the", "and", " model"          one token each
-  ├─ fragments             "ization", "▁un", "tion"        assembled as needed
-  ├─ bytes                 fallback so nothing is unknown
-  └─ special tokens        <|begin|> <|end|> <|user|> ...   structural markers
 
-larger vocabulary  → shorter sequences, bigger embedding + output matrices
-smaller vocabulary → longer sequences, more compute per document
-```
+The vocabulary is the fixed set of tokens a model can read and emit — typically
+around 128,000 entries — and it is decided once, when the tokeniser is trained,
+before the model exists.
+
+It holds four kinds of thing. Frequent whole words, which cost one token each.
+Fragments like *ization* or *▁un*, assembled to build rarer words. Raw bytes as a
+fallback, so that no input is ever unrepresentable. And special tokens —
+begin-of-text, end-of-turn, role markers — that carry structure rather than
+meaning, which is why injecting one into user input is a real attack.
+
+Size is a genuine trade. A larger vocabulary means shorter sequences, so less
+compute per document, but larger embedding and output matrices — and the output
+layer is a softmax over every entry, computed at every step. A smaller vocabulary
+inverts both. The choice is usually tuned on English text, which is why languages
+that tokenise into many more fragments cost proportionally more to serve, an
+inequity that is invisible until you look at the bill.
 
 ## Mental Model
 

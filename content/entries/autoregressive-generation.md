@@ -11,6 +11,27 @@ origin:
   circa: true
   attribution: Autoregressive models come from time-series statistics; applied to neural language models from the 2010s
 historical_period: statistical-ml
+diagram:
+  kind: figure
+  title: One expensive pass, then many cheap ones
+  footer: The asymmetry is why inference has two distinct cost profiles. Prefill is compute-bound and
+    parallel; decode is memory-bound and stubbornly sequential, and no amount of hardware makes token
+    n+1 available before token n.
+  visual:
+    kind: mapping
+    width: 780
+    head:
+    - what the model reads this step
+    - what it emits
+    rows:
+    - left: the whole prompt, in parallel
+      right: '"stores"   ← prefill'
+      tone: accent
+    - left: '"stores", against the cache'
+      right: '"keys"    ← decode'
+    - left: '"keys", against the cache'
+      right: '"and"     ← decode'
+    caption: and on until an end-of-sequence token or a length limit; every step appends to the KV cache
 tags: [inference]
 relations:
   depends_on: [transformer]
@@ -54,14 +75,6 @@ Generating variable-length, coherent output from a model that only ever answers
 one question: what comes next?
 
 ## How Does It Work?
-
-```text
-prompt: "the KV cache"
-  step 1: forward pass over the whole prompt ──▶ "stores"   (prefill)
-  step 2: forward pass over "stores"          ──▶ "keys"    (decode)
-  step 3: forward pass over "keys"            ──▶ "and"     (decode)
-  ...until an end-of-sequence token or a length limit
-```
 
 Step 1 is one large parallel pass; every later step processes a single token but
 attends over all previous ones — which is why their keys and values are cached.

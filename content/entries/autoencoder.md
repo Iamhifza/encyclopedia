@@ -8,6 +8,26 @@ status: established
 difficulty: intermediate
 one_liner: "A network trained to squeeze its input through a narrow bottleneck and rebuild it, learning a compact representation on the way."
 historical_period: statistical-ml
+diagram:
+  kind: figure
+  title: Squeeze it through a gap, then rebuild it
+  footer: The reconstruction is never the point. What is wanted is z — a representation forced to be efficient
+    by a bottleneck that leaves no room to memorise.
+  visual:
+    kind: pipeline
+    width: 700
+    caption: loss is the reconstruction error, plus a KL term in a variational autoencoder to make the
+      latent space continuous
+    stages:
+    - text: x
+      note: 784 dimensions
+    - text: z — the latent code
+      note: '32'
+      tone: accent
+      via: 'encoder: compress'
+    - text: x̂
+      note: 784 again
+      via: 'decoder: expand'
 tags: [architecture]
 relations:
   evolved_into: [sparse-autoencoder]
@@ -57,16 +77,24 @@ with a navigable latent space.
 
 ## How Does It Work?
 
-```text
-   x ──▶ encoder ──▶ z ──▶ decoder ──▶ x̂
-   784        (compress)  32  (expand)   784
-                          ▲
-                    the bottleneck:
-             too wide and it learns to copy,
-             too narrow and it cannot reconstruct
 
-   loss = ‖x − x̂‖²      (plus a KL term, for a VAE)
-```
+An encoder compresses the input to a small vector, a decoder expands that vector
+back, and the loss is how far the reconstruction is from the original. Both
+halves are trained together, on unlabelled data, with the input serving as its
+own target.
+
+The bottleneck is what makes it work. If the middle layer is wide enough, the
+network learns the identity function and has been taught nothing. Narrow it and
+reconstruction becomes impossible without discovering the structure the data
+actually has — which is the representation you were after. The reconstruction is
+a means; z is the product.
+
+Variants change what the bottleneck enforces. A variational autoencoder adds a
+KL term that pushes the latent distribution toward a known prior, making the
+space continuous enough to sample from and interpolate through. A sparse
+autoencoder does the opposite — a wide layer with an activity penalty — which is
+why that variant became a workhorse of interpretability rather than of
+compression.
 
 ## Mental Model
 

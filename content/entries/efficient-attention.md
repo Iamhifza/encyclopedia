@@ -12,6 +12,119 @@ origin:
   circa: true
   attribution: A large research literature from 2019 onward; Sparse Transformer, Longformer, Performer and many others
 historical_period: transformer
+diagram:
+  kind: steps
+  title: Compute fewer pairs, and choose which ones carefully
+  footer: Every scheme here is a bet about which pairs matter. FlashAttention takes the other route entirely
+    — it computes all of them, and simply stops writing the matrix to memory.
+  steps:
+  - title: Full attention — every pair
+    notes:
+    - label: Cost
+      text: O(n²) in both time and memory
+    visual:
+      kind: matrix
+      cell_width: 44
+      show_values: false
+      cols:
+      - '0'
+      - '1'
+      - '2'
+      - '3'
+      - '4'
+      - '5'
+      - '6'
+      - '7'
+      rows:
+      - label: '0'
+        values: [0.6, null, null, null, null, null, null, null]
+      - label: '1'
+        values: [0.6, 0.6, null, null, null, null, null, null]
+      - label: '2'
+        values: [0.6, 0.6, 0.6, null, null, null, null, null]
+      - label: '3'
+        values: [0.6, 0.6, 0.6, 0.6, null, null, null, null]
+      - label: '4'
+        values: [0.6, 0.6, 0.6, 0.6, 0.6, null, null, null]
+      - label: '5'
+        values: [0.6, 0.6, 0.6, 0.6, 0.6, 0.6, null, null]
+      - label: '6'
+        values: [0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, null]
+      - label: '7'
+        values: [0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6]
+      caption: causal, so the upper triangle is absent — but everything below it is computed
+  - title: Sliding window — neighbours only
+    notes:
+    - label: Cost
+      text: O(n·w) — linear, for a window of width w
+    - label: Loss
+      text: nothing far away can be attended to directly, only through several layers
+    visual:
+      kind: matrix
+      cell_width: 44
+      show_values: false
+      cols:
+      - '0'
+      - '1'
+      - '2'
+      - '3'
+      - '4'
+      - '5'
+      - '6'
+      - '7'
+      rows:
+      - label: '0'
+        values: [0.6, null, null, null, null, null, null, null]
+      - label: '1'
+        values: [0.6, 0.6, null, null, null, null, null, null]
+      - label: '2'
+        values: [0.6, 0.6, 0.6, null, null, null, null, null]
+      - label: '3'
+        values: [null, 0.6, 0.6, 0.6, null, null, null, null]
+      - label: '4'
+        values: [null, null, 0.6, 0.6, 0.6, null, null, null]
+      - label: '5'
+        values: [null, null, null, 0.6, 0.6, 0.6, null, null]
+      - label: '6'
+        values: [null, null, null, null, 0.6, 0.6, 0.6, null]
+      - label: '7'
+        values: [null, null, null, null, null, 0.6, 0.6, 0.6]
+      caption: information still travels far, but layer by layer rather than in one hop
+  - title: Global plus local — a few tokens see everything
+    notes:
+    - label: Why
+      text: one global token restores the single-hop path between any two positions
+    visual:
+      kind: matrix
+      cell_width: 44
+      show_values: false
+      cols:
+      - '0'
+      - '1'
+      - '2'
+      - '3'
+      - '4'
+      - '5'
+      - '6'
+      - '7'
+      rows:
+      - label: '0'
+        values: [0.85, null, null, null, null, null, null, null]
+      - label: '1'
+        values: [0.85, 0.6, null, null, null, null, null, null]
+      - label: '2'
+        values: [0.85, 0.6, 0.6, null, null, null, null, null]
+      - label: '3'
+        values: [0.85, 0.6, 0.6, 0.6, null, null, null, null]
+      - label: '4'
+        values: [0.85, null, 0.6, 0.6, 0.6, null, null, null]
+      - label: '5'
+        values: [0.85, null, null, 0.6, 0.6, 0.6, null, null]
+      - label: '6'
+        values: [0.85, null, null, null, 0.6, 0.6, 0.6, null]
+      - label: '7'
+        values: [0.85, null, null, null, null, 0.6, 0.6, 0.6]
+      caption: the darker column is the global token; everything else is the window
 tags: [architecture, inference]
 relations:
   alternative_to: [self-attention]
@@ -66,15 +179,25 @@ an approximation, and the value of that trade depends on the task.
 
 ## How Does It Work?
 
-```text
-FULL              SLIDING WINDOW      GLOBAL + LOCAL
-■■■■■■■■          ■■□□□□□□            ■■■■■■■■   ← global token
-■■■■■■■■          ■■■□□□□□            ■■□□□□□□
-■■■■■■■■          □■■■□□□□            ■□■■□□□□
-■■■■■■■■          □□■■■□□□            ■□□■■□□□
-every pair        neighbours only     a few see everything
-O(n²)             O(n·w)              O(n·w + n·g)
-```
+
+Full attention computes a score for every pair of positions, which is quadratic
+in sequence length. Every method here computes fewer pairs and differs only in
+which ones it decides to skip.
+
+Sliding-window attention keeps a band around the diagonal: each position attends
+to its last few hundred neighbours and nothing else. Cost becomes linear.
+Information still travels across the sequence, but through a chain of layers
+rather than in a single hop, so the effective range is the window times the
+depth.
+
+Adding global tokens repairs the worst of that. A handful of positions attend to
+everything and are attended to by everything, restoring a one-hop path between
+any two positions at negligible cost. Other schemes cluster or hash positions to
+attend within groups, or approximate the softmax with a low-rank factorisation.
+
+All of them are bets about which pairs matter, and all of them lose something.
+Which is why FlashAttention was so influential: it takes the opposite route,
+computing every pair exactly and simply never writing the matrix to memory.
 
 ## Mental Model
 

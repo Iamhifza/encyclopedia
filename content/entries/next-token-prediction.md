@@ -8,6 +8,29 @@ status: foundational
 difficulty: beginner
 one_liner: "The training objective behind every LLM: given everything so far, predict what comes next."
 historical_period: transformer
+diagram:
+  kind: figure
+  title: Every position is a training example, all at once
+  footer: One objective, no labels, and every document is training data. That is the whole reason this
+    scaled — and the reason the model optimises plausibility rather than truth.
+  visual:
+    kind: mapping
+    width: 780
+    head:
+    - what this position may see
+    - what it must predict
+    rows:
+    - left: '"the"'
+      right: cache
+    - left: '"the cache"'
+      right: stores
+    - left: '"the cache stores"'
+      right: keys
+    - left: '"the cache stores keys"'
+      right: and
+      tone: accent
+    caption: the causal mask is what lets all four be computed in a single forward pass; the loss is the
+      average surprise across them
 tags: [training]
 relations:
   part_of: [pretraining]
@@ -59,17 +82,6 @@ The supervision bottleneck. Every earlier approach needed someone to say what th
 right answer was.
 
 ## How Does It Work?
-
-```text
-"the cache stores keys and values"
-
-position 1: given "the"                    predict "cache"
-position 2: given "the cache"              predict "stores"
-position 3: given "the cache stores"       predict "keys"
-...
-all positions computed in ONE forward pass, thanks to causal masking
-loss = average surprise across all of them
-```
 
 That last line is why Transformers train so efficiently: the entire sequence
 produces gradients in a single pass, which recurrent models could never do.

@@ -11,6 +11,27 @@ origin:
   year: 2014
   attribution: Ian Goodfellow and colleagues
 historical_period: deep-learning
+diagram:
+  kind: flow
+  title: Two networks, each trained on the other's failures
+  loop: each update makes the other's job harder
+  footer: 'Notoriously unstable: if the discriminator wins too early the generator gets no usable gradient,
+    and mode collapse — producing one convincing thing forever — is the standard failure. Diffusion models
+    replaced them largely because they train predictably.'
+  nodes:
+  - title: Noise
+    note: a random vector
+    caption: the only input
+  - title: Generator
+    note: makes a candidate
+    accent: true
+    caption: trained to fool
+  - title: Discriminator
+    note: real, or generated?
+    caption: trained to catch
+  - title: Verdict
+    note: one bit, and a gradient
+    caption: for both of them
 tags: [architecture]
 relations:
   alternative_to: [diffusion-model]
@@ -61,15 +82,6 @@ output of contemporary autoencoders, because the discriminator punishes exactly
 the averaging that causes blur.
 
 ## How Does It Work?
-
-```text
-noise z ──▶ GENERATOR ──▶ fake image ──┐
-                                        ├──▶ DISCRIMINATOR ──▶ real or fake?
-real image ─────────────────────────────┘            │
-                                                     │
-   G updated to fool D  ◀───────────────────────────┘
-   D updated to catch G
-```
 
 The two updates alternate. Balance is everything, and balance is the problem.
 

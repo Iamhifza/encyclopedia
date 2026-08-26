@@ -8,6 +8,44 @@ status: modern
 difficulty: advanced
 one_liner: "A model trained or adapted to attend over hundreds of thousands of tokens, with the caveat that advertised length exceeds usable length."
 historical_period: agentic
+diagram:
+  kind: steps
+  title: Accepting 128k is not the same as using it
+  footer: The advertised number is what the model will accept without erroring. What it reliably attends
+    to is a different number, and only a needle-in-a-haystack test on your own data tells you which.
+  steps:
+  - title: How the window is extended
+    notes:
+    - label: Cheap
+      text: no retraining from scratch — a stretch and a short fine-tune at the longer length
+    visual:
+      kind: pipeline
+      width: 700
+      stages:
+      - text: trained at 8k
+        note: the real training length
+      - text: positions rescaled
+        via: stretch the RoPE frequencies — interpolation, NTK-aware, YaRN
+      - text: accepts 128k
+        note: advertised
+        tone: accent
+        via: a brief fine-tune at the new length
+  - title: But attention dilutes across the middle
+    visual:
+      kind: plot
+      width: 700
+      height: 200
+      x_range: [0, 100]
+      y_range: [0, 1.05]
+      x_label: position of the fact in the context
+      y_label: recall
+      caption: the lost-in-the-middle curve; put what matters at the start or the end, and never rely
+        on the middle
+      curves:
+      - label: recall
+        tone: accent
+        points: [[0, 0.95], [10, 0.9], [25, 0.68], [40, 0.55], [50, 0.52], [60, 0.56], [75, 0.7], [90,
+            0.88], [100, 0.94]]
 tags: [architecture, inference]
 relations:
   depends_on: [rope, context-window]
@@ -59,23 +97,6 @@ Working over material too large to summarise without loss, and keeping long agen
 sessions coherent without aggressive compaction.
 
 ## How Does It Work?
-
-```text
-trained at 8k
-   │ RoPE frequencies stretched (interpolation / YaRN)
-   │ brief fine-tune at the longer length
-   ▼
-accepts 128k
-   │
-   │  but attention dilutes across positions, and evaluation shows:
-   │
-   accuracy ▲
-            │ ███                          ███
-            │ ███  ▄▄▄            ▄▄▄      ███
-            │ ███  ███  ▁▁▁  ▁▁▁  ███      ███
-            └──────────────────────────────────▶ position in context
-              start        middle          end
-```
 
 The "lost in the middle" shape is robust across models and years: material at the
 beginning and end is retrieved reliably, material in the middle far less so.

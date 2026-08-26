@@ -12,6 +12,29 @@ origin:
   circa: true
   attribution: Established in computer vision with ImageNet-pretrained features; the idea is older in machine learning theory
 historical_period: deep-learning
+diagram:
+  kind: figure
+  title: Keep what generalises, replace what does not
+  footer: 'The reason pretraining pays: the expensive, general part is learned once from abundant data,
+    and your small dataset only has to teach the part that is actually specific to you.'
+  visual:
+    kind: stack
+    width: 760
+    caption: how much of the stack to freeze is the main dial, and it is set by how little data you have
+    layers:
+    - label: early layers
+      text: edges, textures, syntax — general to the domain
+      note: usually frozen
+    - label: middle
+      text: composed features, still fairly general
+      note: sometimes tuned
+    - label: late layers
+      text: task-specific structure
+      note: usually retrained
+      accent: true
+    - label: the head
+      text: the output layer for your particular labels
+      note: always replaced
 tags: [training]
 relations:
   used_by: [supervised-fine-tuning, foundation-model]
@@ -60,16 +83,6 @@ Data efficiency. A task needing a million examples from scratch may need a few
 thousand from a pretrained start.
 
 ## How Does It Work?
-
-```text
-source task (huge data)          target task (small data)
-   ImageNet / web text                your dataset
-        │                                  │
-   pretrained weights ──initialise──▶ continue training
-                                           │
-   early layers: general features (edges, syntax) — mostly keep
-   late layers:  task-specific — mostly replace or adjust
-```
 
 The layer-depth pattern is the empirical finding that made this systematic: early
 layers learn features that transfer almost anywhere, later layers learn features

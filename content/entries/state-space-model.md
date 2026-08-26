@@ -10,6 +10,31 @@ origin:
   year: 2021
   attribution: Gu et al. (S4); Mamba introduced selective state spaces in 2023
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: A fixed-size state instead of a growing cache
+  footer: The catch is that a fixed state must forget. On tasks needing exact recall from far back, attention
+    still wins — which is why the strongest results are hybrids that keep a few attention layers among
+    the state-space ones.
+  visual:
+    kind: columns
+    width: 740
+    caption: trained with a parallel scan, run as a recurrence — which is how it gets both parallel training
+      and constant-time inference
+    columns:
+    - title: Transformer
+      lines:
+      - attends over all history
+      - memory grows with length
+      - cost per token grows too
+      - exact recall, at a price
+    - title: State-space
+      accent: true
+      lines:
+      - carries one fixed state
+      - memory is O(1)
+      - cost per token is O(1)
+      - lossy recall, cheaply
 tags: [architecture]
 relations:
   alternative_to: [transformer]
@@ -57,11 +82,24 @@ all.
 
 ## How Does It Work?
 
-```text
-Transformer:  cost per token grows with history; memory grows linearly
-SSM:          fixed-size state h; O(1) memory, O(1) per-token cost
-              training via parallel scan, inference via recurrence
-```
+
+Carry a fixed-size hidden state and update it as each token arrives, the way a
+recurrent network does. What makes modern state-space models work is that the
+update is a linear recurrence, which can be computed as a parallel scan during
+training — so they train with the parallelism of a transformer and run with the
+recurrence of an RNN.
+
+The consequence is a different cost profile entirely. There is no KV cache, so
+memory is constant rather than linear in sequence length, and each token costs
+the same whether it is the tenth or the ten-thousandth. For very long sequences
+that is a categorical advantage rather than a marginal one.
+
+What is given up is exact recall. A fixed state must compress everything it has
+seen, so it must forget, and selective state-space models like Mamba make the
+forgetting input-dependent rather than fixed. That helps, but on tasks that need
+a precise detail from far back, attention still wins — which is why the strongest
+architectures are hybrids that keep a few attention layers among the state-space
+ones.
 
 ## Mental Model
 

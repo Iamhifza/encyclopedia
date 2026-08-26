@@ -10,6 +10,21 @@ origin:
   year: 2021
   attribution: Coined by the Stanford Center for Research on Foundation Models
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: Train once, adapt many times
+  footer: 'The economics are the definition: one enormous training run, amortised across everything built
+    on top. It also centralises risk — a flaw in the base propagates to every system downstream of it.'
+  visual:
+    kind: fan
+    source: base model
+    caption: in rough order of cost, and of how much they can change behaviour
+    targets:
+    - prompting
+    - retrieval
+    - text: fine-tuning
+      new: true
+    - agent scaffolding
 tags: [architecture]
 relations:
   used_by: [large-language-model, vision-language-model]
@@ -53,12 +68,23 @@ thousands of applications is what made deployment economical.
 
 ## How Does It Work?
 
-```text
-                    ┌── prompt / in-context learning
-broad data ──▶ FOUNDATION ──┼── fine-tuning (SFT, LoRA)
-   at scale     MODEL      ├── retrieval augmentation
-                           └── tool use and agent scaffolding
-```
+
+Train one model on a very large, broad corpus with a self-supervised objective,
+then adapt it to many specific tasks rather than training a separate model for
+each. The training run is enormous and happens once; everything downstream reuses
+it.
+
+Adaptation ranges from free to expensive. Prompting and in-context learning
+change nothing about the weights. Retrieval augments the input with material the
+model was never trained on. Fine-tuning — full, or parameter-efficient like LoRA
+— changes behaviour durably. Agent scaffolding wraps the model in tools and a
+loop. Most production systems combine several.
+
+The economics are the definition: a capability expensive enough that nobody
+builds it twice, amortised across everything on top. That concentration is also
+the risk. A bias, a gap or a vulnerability in the base model propagates to every
+system built on it, and the people building those systems generally cannot
+inspect what they inherited.
 
 ## Mental Model
 

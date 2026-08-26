@@ -8,6 +8,30 @@ status: established
 difficulty: intermediate
 one_liner: "A design that reads the whole input with one stack and writes the output with another, still standard for translation and speech."
 historical_period: deep-learning
+diagram:
+  kind: figure
+  title: One half reads everything; the other half writes one token at a time
+  footer: Decoder-only models displaced this for language, because next-token prediction on raw text needs
+    no paired data. The shape survives wherever input and output are genuinely different kinds of thing
+    — speech to text, image to caption.
+  visual:
+    kind: columns
+    width: 740
+    caption: cross-attention is the only channel between them, and it runs one way
+    columns:
+    - title: Encoder
+      lines:
+      - reads the whole input at once
+      - self-attention, no mask
+      - every position sees every other
+      - 'output: one representation'
+    - title: Decoder
+      accent: true
+      lines:
+      - writes one token at a time
+      - masked self-attention over its own output
+      - cross-attention into the encoder
+      - 'output: the next token'
 tags: [architecture]
 relations:
   part_of: [transformer]
@@ -59,14 +83,6 @@ known in full: translation, summarisation, speech recognition, grammatical
 correction.
 
 ## How Does It Work?
-
-```text
-ENCODER (bidirectional, one pass)      DECODER (causal, per token)
-source ──▶ self-attention (no mask)     ┌─ masked self-attention
-       ──▶ FFN                          ├─ cross-attention ──▶ encoder output
-       ──▶ representation ──────────────┤
-                                        └─ FFN ──▶ next token
-```
 
 The encoder runs once. Its output is fixed for the whole generation, so its keys
 and values are computed a single time and reused at every decode step — cheaper

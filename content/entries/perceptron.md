@@ -10,6 +10,26 @@ origin:
   year: 1958
   attribution: Frank Rosenblatt, Cornell Aeronautical Laboratory
 historical_period: early-computing
+diagram:
+  kind: flow
+  title: Weighted sum, threshold, and a rule for being wrong
+  footer: Minsky and Papert showed in 1969 that a single one cannot learn XOR, and funding collapsed.
+    The fix — stacking them with a differentiable non-linearity — needed backpropagation, which took another
+    seventeen years.
+  nodes:
+  - title: Inputs
+    note: x₁ x₂ x₃
+    caption: numbers
+  - title: Weighted sum
+    note: Σ wᵢxᵢ + b
+    caption: one number
+  - title: Threshold
+    note: above it, or not
+    caption: 0 or 1
+  - title: Correction
+    note: nudge every w toward the input
+    accent: true
+    caption: only when wrong
 tags: [history, architecture]
 relations:
   evolved_into: [neural-network]
@@ -57,15 +77,6 @@ requirement with labelled examples, establishing the pattern that every later
 learning system follows.
 
 ## How Does It Work?
-
-```text
-x1 ──w1──┐
-x2 ──w2──┼──▶ Σ ──▶ [ > threshold? ] ──▶ 0 or 1
-x3 ──w3──┘         ▲
-                   │
-        wrong answer? nudge every w
-        toward the input that fooled it
-```
 
 1. Compute the weighted sum of the inputs.
 2. Output 1 if it exceeds the threshold, else 0.
