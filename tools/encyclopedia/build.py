@@ -18,6 +18,7 @@ from typing import Any
 
 import yaml
 
+from .diagrams import render as render_diagram
 from .graph import ConceptGraph
 from .model import (
     DIFFICULTY_BADGE,
@@ -107,65 +108,105 @@ class Builder:
     def build_home(self) -> None:
         counts = {c: len(v) for c, v in self.corpus.by_category().items()}
         total = len(self.corpus.entries)
+        words = sum(
+            len(" ".join(e.sections.values()).split())
+            for e in self.corpus.entries.values()
+        )
         rows = []
         for cat in self.corpus.taxonomy.get("categories", []):
             n = counts.get(cat["id"], 0)
             rows.append(
-                f"| `{cat['number']}` | [{cat['name']}](topics/{cat['id']}.md) | {n} | {cat['summary']} |"
+                f"| `{cat['number']}` | [{cat['name']}](topics/{cat['id']}.md) | "
+                f"{n} | {cat['summary']} |"
             )
+
+        views = [
+            ("Search", "Press <kbd>/</kbd> anywhere", None),
+            ("Topics", "How the field is organised", "topics/index.md"),
+            ("A–Z", "Find one specific term", "az/index.md"),
+            ("Timeline", "How a concept evolved", "timeline/index.md"),
+            ("Concept graph", "How everything connects", "graph/index.md"),
+            ("Compare", "What separates two ideas", "compare/index.md"),
+            ("Learning paths", "What to read next", "learn/index.md"),
+            ("System view", "Where a term fits in a stack", "system-view.md"),
+        ]
+        cards = []
+        for title, desc, href in views:
+            if href:
+                cards.append(
+                    f'<a class="viewcard" href="{href.replace(".md", "/").replace("index/", "")}">'
+                    f'<span class="viewcard__t">{title}</span>'
+                    f'<span class="viewcard__d">{desc}</span></a>'
+                )
+            else:
+                cards.append(
+                    f'<span class="viewcard">'
+                    f'<span class="viewcard__t">{title}</span>'
+                    f'<span class="viewcard__d">{desc}</span></span>'
+                )
+
         body = f"""# The AI &amp; Computing Encyclopedia
 
-A map of the field, not a word list. Every concept gets one canonical entry
-that answers *what is this*, and then keeps going: why it exists, what it
-replaced, what replaced it, what it is confused with, and where you will
-meet it.
+<div class="hero" markdown>
 
-There are **{total} entries** across **{len(rows)} domains**, connected by
-**{len(self.graph.edges)} typed relationships**.
+<p class="hero__eyebrow">A map of the field, not a word list</p>
+
+<p class="hero__lede">Every concept gets one entry that answers <em>what is this</em>,
+and then keeps going: why it exists, what it replaced, what replaced it, what it
+is confused with, and where you will actually meet it.</p>
+
+<div class="stat-rail">
+<div class="stat"><span class="stat__n">{total}</span><span class="stat__l">entries</span></div>
+<div class="stat"><span class="stat__n">{len(self.graph.edges):,}</span><span class="stat__l">connections</span></div>
+<div class="stat"><span class="stat__n">{len(rows)}</span><span class="stat__l">domains</span></div>
+<div class="stat"><span class="stat__n">{len(self.corpus.comparisons)}</span><span class="stat__l">comparisons</span></div>
+<div class="stat"><span class="stat__n">{len(self.corpus.paths.get('paths', []))}</span><span class="stat__l">learning paths</span></div>
+<div class="stat"><span class="stat__n">{round(words / 1000)}k</span><span class="stat__l">words</span></div>
+</div>
+
+</div>
 
 ## Eight ways in
 
-| | View | Question it answers |
-|---|---|---|
-| :material-magnify: | Search (press <kbd>/</kbd>) | What does this mean? |
-| :material-bookshelf: | [Topics](topics/index.md) | How is the field organised? |
-| :material-alphabetical: | [A-Z](az/index.md) | Find this specific term. |
-| :material-clock-outline: | [Timeline](timeline/index.md) | How did this evolve? |
-| :material-graph-outline: | [Concept graph](graph/index.md) | How does this connect to everything else? |
-| :material-scale-balance: | [Compare](compare/index.md) | What is the difference between these? |
-| :material-school-outline: | [Learning paths](learn/index.md) | What should I learn next? |
-| :material-layers-triple: | [System view](system-view.md) | Where does this fit in a real system? |
+<div class="viewgrid">
+{chr(10).join(cards)}
+</div>
 
-## Start here
+## Start anywhere
 
-If you have never heard the term you just read, the entry will take you from
-a one-sentence definition to prerequisites, history, differences and further
-reading. Try [Harness](terms/harness.md), [KV Cache](terms/kv-cache.md) or
-[Vibe Coding](terms/vibe-coding.md).
+If you have never heard the term you just read, an entry takes you from a
+one-sentence definition to prerequisites, history, differences and further
+reading. Try [KV Cache](terms/kv-cache.md) for the concept that governs what
+serving a model costs, [Harness](terms/harness.md) for a word the field cannot
+agree on, or [Vibe Coding](terms/vibe-coding.md) for what happens when slang
+enters a reference work.
+
+New to the field? Start with a route rather than a term:
+[Modern AI Engineering](learn/learn-ai-engineering.md) is the practical spine,
+and [How AI Got Here](learn/learn-history.md) reads as a narrative.
+
+## How this is written
+
+* **One entry per concept.** Categories, paths, the graph and the A–Z index are
+  views over the same record — nothing is duplicated.
+* **Uncertainty is labelled, not hidden.** Terms like *harness*, *scaffold* and
+  *orchestration* genuinely mean different things to different teams. Those
+  entries carry a `contested` status and report the disagreement instead of
+  inventing a consensus.
+* **Slang counts.** *Vibe coding* and *AI slop* shape how engineers talk, so they
+  are documented and clearly labelled.
+* **Primary sources first**, and every one of them is checked monthly.
+* **Dates on everything**, because half of this vocabulary is younger than most
+  codebases.
+
+See [Editorial standards](meta/standards.md) for the full policy and
+[Coverage](meta/coverage.md) for what the corpus contains today.
 
 ## Domains
 
 | # | Domain | Entries | Scope |
 |---|--------|--------:|-------|
 {chr(10).join(rows)}
-
-## How this is written
-
-* **One canonical entry per concept.** Categories, paths, the graph and the
-  A-Z index are all views over the same record -- nothing is duplicated.
-* **Uncertainty is labelled, not hidden.** Terms like *harness*, *scaffold*
-  and *context engineering* genuinely mean different things to different
-  teams. Those entries carry a `contested` status and a Terminology Note
-  that reports the disagreement instead of inventing a consensus.
-* **Slang counts.** *Vibe coding* and *AI slop* shape how engineers talk, so
-  they are documented and clearly labelled as informal.
-* **Primary sources first.** Papers, specifications and official
-  documentation before commentary.
-* **Dates on everything.** Every entry records when it was last reviewed,
-  because half of this vocabulary is younger than most codebases.
-
-See [Editorial standards](meta/standards.md) for the full policy and
-[Coverage](meta/coverage.md) for what is still missing.
 """
         write(self.docs / "index.md", body)
 
@@ -303,79 +344,128 @@ See [Editorial standards](meta/standards.md) for the full policy and
 
         out.append(f"# {entry.term}")
         out.append("")
+        out.append('<div class="term-head" markdown>')
+        out.append("")
         if entry.aliases:
-            out.append("*Also known as: " + ", ".join(f"**{a}**" for a in entry.aliases) + "*")
+            out.append(
+                '<p class="term-head__aliases">Also known as '
+                + " · ".join(f"<b>{a}</b>" for a in entry.aliases)
+                + "</p>"
+            )
             out.append("")
 
-        badges = [
-            f"[{cat['name']}](../topics/{cat['id']}.md)",
-            f"`{entry.status}`",
-            DIFFICULTY_BADGE[entry.difficulty],
+        words = sum(len(v.split()) for v in entry.sections.values())
+        minutes = max(1, round(words / 220))
+        degree = self.graph.degree(entry.slug)
+        chips = [
+            f'<li class="chip chip--domain"><a href="../../topics/{cat["id"]}/">'
+            f'<span class="chip__num">{cat["number"]}</span> {cat["name"]}</a></li>',
+            f'<li class="chip chip--status" data-status="{entry.status}">{entry.status}</li>',
+            f'<li class="chip chip--level" data-level="{entry.difficulty}">'
+            f'{entry.difficulty}</li>',
+            f'<li class="chip chip--data">{minutes} min read</li>',
+            f'<li class="chip chip--data"><a href="../../graph/?focus={entry.slug}">'
+            f'{degree} connections</a></li>',
         ]
         if entry.meta.get("updated"):
-            badges.append(f"reviewed {entry.meta['updated']}")
-        out.append(" · ".join(badges))
+            chips.append(
+                f'<li class="chip chip--data">reviewed {entry.meta["updated"]}</li>'
+            )
+        out.append('<ul class="term-chips">')
+        out.extend(chips)
+        out.append("</ul>")
+        out.append("")
+        out.append("</div>")
         out.append("")
 
         if entry.meta.get("disputed"):
             out += [
-                "!!! warning \"Contested term\"",
+                '<div class="notice-contested" markdown>',
                 "",
-                "    This term is used with materially different meanings by different",
-                "    teams. Read the Terminology Note before assuming which one someone",
-                "    means.",
+                "<b>Contested term.</b> Different teams use this word for materially "
+                "different things. Read the Terminology Note before assuming which "
+                "one someone means.",
+                "",
+                "</div>",
                 "",
             ]
 
-        out += ["!!! abstract \"One-line definition\"", "", f"    {entry.one_liner}", ""]
-
-        if entry.is_seed:
-            out += [
-                "!!! note \"Seed entry\"",
-                "",
-                "    This is a lookup record: canonical name, definition and its place in",
-                "    the concept graph. The full treatment -- how it works, why it exists,",
-                "    worked examples, history and confusions -- is not written yet.",
-                "",
-                "    [Expand this entry](../contributing.md) or open an issue if something",
-                "    here is wrong.",
-                "",
-            ]
+        out += [
+            '<div class="oneline" markdown>',
+            "",
+            '<span class="oneline__label">In one line</span>',
+            "",
+            entry.one_liner,
+            "",
+            "</div>",
+            "",
+        ]
 
         if entry.prerequisites:
             names = ", ".join(
-                f"[{self.corpus.entries[p].term}]({p}.md)" for p in entry.prerequisites
+                f"[{self.corpus.entries[p].term}]({p}.md)"
+                for p in entry.prerequisites
             )
             out += [
-                "!!! tip \"Read these first\"",
+                '<div class="prereqs" markdown>',
                 "",
-                f"    {names}",
+                f'<span class="prereqs__label">Read first</span> {names}',
+                "",
+                "</div>",
                 "",
             ]
+
+        # Diagrams are keyed by the section they belong under, so a lineage rail
+        # can sit in Evolution while the process figure stays in How Does It
+        # Work. Anything aimed at a section this entry does not have is
+        # reported by the validator, not silently dropped.
+        figures: dict[str, list[str]] = {}
+        for spec in entry.diagrams:
+            figures.setdefault(spec["section"], []).append(
+                "\n".join(
+                    [
+                        '<figure class="dgm-fig">',
+                        render_diagram(spec),
+                        "</figure>",
+                        "",
+                    ]
+                )
+            )
+
+        def emit(heading: str, body: str) -> list[str]:
+            block = [f"## {heading}", ""]
+            block += figures.pop(heading, [])
+            block += [body, ""]
+            return block
 
         for heading in SECTION_ORDER:
             if heading in ("One-Line Definition",):
                 continue
             body = entry.sections.get(heading)
             if body:
-                out += [f"## {heading}", "", body, ""]
+                out += emit(heading, body)
 
         for heading in entry.section_order:
             if heading not in SECTION_ORDER and entry.sections.get(heading):
-                out += [f"## {heading}", "", entry.sections[heading], ""]
+                out += emit(heading, entry.sections[heading])
 
         # -- generated: relations
         neighbours = self.graph.neighbours(entry.slug)
         if neighbours:
-            out += ["## Related Concepts", ""]
+            out += ["## Related Concepts", "", '<div class="relations" markdown>', ""]
             for key, targets in neighbours.items():
                 label = self.graph.label_for(key)
-                out.append(f"**{label}**")
+                out.append('<div class="relgroup" markdown>')
+                out.append("")
+                out.append(f'<div class="relgroup__label">{label}</div>')
                 out.append("")
                 for target in targets:
                     other = self.corpus.entries[target]
                     out.append(f"- [{other.term}]({target}.md) — {other.one_liner}")
                 out.append("")
+                out.append("</div>")
+                out.append("")
+            out += ["</div>", ""]
 
         # -- generated: comparisons
         comps = compare_index.get(entry.slug, [])
@@ -402,6 +492,21 @@ See [Editorial standards](meta/standards.md) for the full policy and
                     f"- **[{p['name']}](../learn/{p['id']}.md)** — step {item['position']} of {total}"
                 )
             out.append("")
+
+        # -- generated: video resources
+        if entry.videos:
+            out += ["## Watch", "", '<div class="watch">', ""]
+            for v in entry.videos:
+                note = f'<span class="watch__by">{v["channel"]}'
+                if v.get("note"):
+                    note += f' — {v["note"]}'
+                note += "</span>"
+                out.append(
+                    f'<a class="watch__item" href="{v["url"]}" target="_blank" '
+                    f'rel="noopener"><span class="watch__kicker">video</span>'
+                    f'<span class="watch__title">{v["title"]}</span>{note}</a>'
+                )
+            out += ["", "</div>", ""]
 
         # -- generated: further reading
         if entry.sources:
@@ -560,7 +665,7 @@ See [Editorial standards](meta/standards.md) for the full policy and
     def build_graph_page(self) -> None:
         stats = self.graph.stats()
         rows = "\n".join(
-            f"| `{k}` | {v} |" for k, v in stats["edges_by_type"].items()
+            f"| `{k.replace('_', ' ')}` | {v} |" for k, v in stats["edges_by_type"].items()
         )
         hubs = "\n".join(
             f"| [{self.corpus.entries[h['slug']].term}](../terms/{h['slug']}.md) | {h['degree']} |"
@@ -571,13 +676,18 @@ See [Editorial standards](meta/standards.md) for the full policy and
 Definitions in isolation are trivia. The value is in the edges: what a concept
 depends on, what replaced it, what it is confused with.
 
-Drag to explore, click a node to open its entry, filter by domain. Relationships
-are typed, and inverse edges are derived automatically -- a contributor states
-`evolved_into` once and both entries show the link.
-
 <div id="graph-app" data-src="../api/graph.json"></div>
 
+**Focus** puts one concept at the centre and arranges its neighbours in rings by
+relationship — structural relations nearest, loose ones furthest out. Click any
+node to re-centre on it. **Constellation** shows the whole corpus clustered by
+domain, so the shape of the field is visible at once.
+
 ## Relationship vocabulary
+
+Contributors declare each relationship once, from whichever side reads
+naturally. Inverse edges are derived at build time, so both entries show the
+link.
 
 | Edge | Count |
 |---|--:|
@@ -585,18 +695,18 @@ are typed, and inverse edges are derived automatically -- a contributor states
 
 ## Most connected concepts
 
-| Concept | Degree |
+| Concept | Connections |
 |---|--:|
 {hubs}
 
 ## Query it yourself
 
-The same graph is available as JSON at [`api/graph.json`](../api/graph.json),
-and the CLI can answer "how are these two related?":
+The same graph is published as JSON at [`api/graph.json`](../api/graph.json), and
+the command line answers "how are these two related?":
 
 ```console
 $ enc path attention vllm
-attention → kv-cache → paged-attention → vllm
+Attention → Transformer → vLLM
 ```
 """
         write(self.docs / "graph" / "index.md", body)
@@ -645,52 +755,79 @@ attention → kv-cache → paged-attention → vllm
             "# Learning paths",
             "",
             "An encyclopedia answers questions you already know how to ask. A path tells",
-            "you what to ask next. Each is an ordered walk through existing entries --",
-            "no new content, just a route.",
+            "you what to ask next. Each is an ordered walk through existing entries —",
+            "no new content, just a route, with a note on why each step comes where it",
+            "does.",
+            "",
+            '<div class="pathgrid">',
             "",
         ]
         for p in paths:
-            lines += [
-                f"## [{p['name']}]({p['id']}.md)",
-                "",
-                f"**For:** {p['audience']}  ",
-                f"**Effort:** {p.get('estimated_effort', 'self-paced')}  ",
-                f"**Steps:** {len(p['steps'])}",
-                "",
-                p["summary"],
-                "",
-                "```text",
-                "\n  ↓\n".join(
-                    self.corpus.entries[s["term"]].term for s in p["steps"]
-                ),
-                "```",
-                "",
-            ]
+            steps = p["steps"]
+            levels = [self.corpus.entries[s["term"]].difficulty for s in steps]
+            start_level = levels[0] if levels else "beginner"
+            lines.append(
+                f'<a class="pathcard" href="{p["id"]}/">'
+                f'<span class="pathcard__n">{len(steps)}</span>'
+                f'<span class="pathcard__t">{p["name"]}</span>'
+                f'<span class="pathcard__d">{p["summary"].strip()}</span>'
+                f'<span class="pathcard__m">{p["audience"]} · '
+                f'{p.get("estimated_effort", "self-paced")} · starts {start_level}</span>'
+                f"</a>"
+            )
+        lines += ["", "</div>", ""]
         write(self.docs / "learn" / "index.md", "\n".join(lines))
 
         for p in paths:
+            steps = p["steps"]
             page = [
                 f"# {p['name']}",
                 "",
-                f"**For:** {p['audience']}  ",
-                f"**Effort:** {p.get('estimated_effort', 'self-paced')}",
+                '<div class="term-head" markdown>',
                 "",
-                p["summary"],
+                '<ul class="term-chips">',
+                f'<li class="chip chip--data">{len(steps)} steps</li>',
+                f'<li class="chip chip--data">{p.get("estimated_effort", "self-paced")}</li>',
+                f'<li class="chip chip--domain">{p["audience"]}</li>',
+                "</ul>",
+                "",
+                "</div>",
+                "",
+                '<div class="oneline" markdown>',
+                "",
+                '<span class="oneline__label">This path</span>',
+                "",
+                p["summary"].strip(),
+                "",
+                "</div>",
+                "",
+                '<ol class="pathsteps">',
                 "",
             ]
-            for i, step in enumerate(p["steps"], start=1):
+            for step in steps:
                 entry = self.corpus.entries[step["term"]]
-                flag = " *(optional)*" if step.get("optional") else ""
-                page += [
-                    f"## {i}. [{entry.term}](../terms/{entry.slug}.md){flag}",
-                    "",
-                    f"{DIFFICULTY_BADGE[entry.difficulty]} · `{entry.status}`",
-                    "",
-                    f"> {entry.one_liner}",
-                    "",
-                ]
+                optional = (
+                    '<span class="pathstep__opt">optional</span>'
+                    if step.get("optional")
+                    else ""
+                )
+                page.append('<li class="pathstep">')
+                page.append(
+                    f'<a class="pathstep__t" href="../../terms/{entry.slug}/">'
+                    f"{entry.term}</a>{optional}"
+                )
+                page.append(
+                    f'<span class="pathstep__meta">'
+                    f'<span class="chip chip--status" data-status="{entry.status}">'
+                    f"{entry.status}</span>"
+                    f'<span class="chip chip--level" data-level="{entry.difficulty}">'
+                    f"{entry.difficulty}</span></span>"
+                )
+                page.append(f'<span class="pathstep__d">{entry.one_liner}</span>')
                 if step.get("why"):
-                    page += [f"**Why now:** {step['why']}", ""]
+                    page.append(f'<span class="pathstep__why">{step["why"]}</span>')
+                page.append("</li>")
+            page += ["", "</ol>", ""]
             write(self.docs / "learn" / f"{p['id']}.md", "\n".join(page))
 
     # -- system view --------------------------------------------------
@@ -933,8 +1070,48 @@ An unreviewed entry about a two-year-old term is a liability.
 * The simple explanation assumes basic computing knowledge and nothing more.
 * The technical definition must be precise enough for a practitioner.
 * Explain every symbol in every formula.
-* Prefer an ASCII diagram over a paragraph describing a diagram.
+* Prefer a `diagram:` block over a paragraph describing a diagram, and over an
+  ASCII one. Diagrams are declared in front matter and rendered to SVG that
+  follows the site palette in both themes; see "Diagrams" below.
 * Comparisons state what each option optimises for, not which is "better".
+
+## Diagrams
+
+A diagram is declared in front matter, not drawn in the body:
+
+```yaml
+diagram:
+  kind: figure          # figure | flow | steps
+  title: What it shows
+  visual:
+    kind: segments      # one of sixteen primitives
+    segments: [...]
+```
+
+`figure` is one picture. `flow` is a left-to-right pipeline of three or four
+boxes. `steps` is a numbered sequence, each step carrying its own picture.
+
+The picture inside is one of: **grid**, **matrix**, **bars**, **segments**,
+**plot**, **chips**, **fan**, **stack**, **columns**, **table**, **passes**,
+**pipeline**, **mapping**, **scatter**, **tree**, **lineage**. Choose by what
+the thing *is*, not by what is nearest to hand — a budget being spent is
+`segments`, a shape is `plot`, a right-and-wrong pair is `mapping`, a lineage is
+`lineage`.
+
+Three rules the validator enforces or warns on:
+
+* **The picture leads.** Notes caption the figure; they do not repeat it. A step
+  with no `visual` is prose in a box, and is warned about.
+* **One accent.** `tone: accent` marks the single thing that changed at this
+  step. Marking everything marks nothing. `warn`, `bad`, `ok` and `muted` are
+  the other four roles, and there is no sixth.
+* **Colour is never hard-coded.** Tones resolve to site tokens, so light mode,
+  dark mode and any future palette change need no regeneration.
+
+By default a figure renders at the top of "How Does It Work?". Add
+`section: Evolution` to anchor it elsewhere, or use a `diagrams:` list for an
+entry that needs more than one. A figure aimed at a section the entry does not
+have is an error, not a silent omission.
 """,
         )
 
@@ -1031,7 +1208,7 @@ Built {date.today().isoformat()} · schema version 1.
 ```python
 import json, urllib.request
 
-url = "{self.site_url or 'https://Iamhifza.github.io/encyclopedia'}/api/entries.json"
+url = "{self.site_url or 'https://OWNER.github.io/ai-computing-encyclopedia'}/api/entries.json"
 data = json.load(urllib.request.urlopen(url))
 kv = next(e for e in data["entries"] if e["slug"] == "kv-cache")
 print(kv["one_liner"])

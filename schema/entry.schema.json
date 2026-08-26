@@ -80,6 +80,16 @@
       "maxLength": 240,
       "description": "One extremely simple sentence. Rendered as the 'One-Line Definition' section and used in indexes, tooltips and search results, so it must stand alone."
     },
+    "diagram": {
+      "$ref": "#/$defs/diagram"
+    },
+    "diagrams": {
+      "type": "array",
+      "description": "Additional diagrams, each optionally anchored to its own section. Use this when one entry needs more than one figure — a process in 'How Does It Work?' and a lineage rail in 'Evolution', say.",
+      "items": {
+        "$ref": "#/$defs/diagram"
+      }
+    },
     "origin": {
       "type": "object",
       "additionalProperties": false,
@@ -243,6 +253,36 @@
         }
       }
     },
+    "videos": {
+      "type": "array",
+      "description": "Curated video resources. Prefer a named creator and a specific title over a generic search. Links are checked monthly by `enc lint-links`.",
+      "items": {
+        "type": "object",
+        "required": [
+          "title",
+          "url",
+          "channel"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "url": {
+            "type": "string",
+            "pattern": "^https?://"
+          },
+          "channel": {
+            "type": "string",
+            "minLength": 1
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "disputed": {
       "type": "boolean",
       "description": "True when practitioners actively use the term with incompatible meanings. Renders a caution admonition."
@@ -267,6 +307,156 @@
         "pattern": "^[a-z0-9-]+$"
       },
       "uniqueItems": true
+    },
+    "visual": {
+      "type": "object",
+      "description": "One picture. `kind` chooses the primitive; the remaining keys belong to that primitive and are checked in Python against diagrams.VISUAL_KEYS, which is the single source of truth.",
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "grid",
+            "bars",
+            "fan",
+            "chips",
+            "stack",
+            "columns",
+            "table",
+            "segments",
+            "plot",
+            "passes",
+            "pipeline",
+            "mapping",
+            "matrix",
+            "scatter",
+            "tree",
+            "lineage"
+          ]
+        },
+        "caption": {
+          "type": "string"
+        },
+        "width": {
+          "type": "number"
+        }
+      }
+    },
+    "diagram": {
+      "type": "object",
+      "description": "A declarative diagram rendered to themed SVG. It sits at the top of 'How Does It Work?' unless `section` names another heading. Prefer a figure over an ASCII block wherever the shape of the thing is the explanation.",
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "steps",
+            "flow",
+            "figure"
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "section": {
+          "type": "string",
+          "description": "Heading this figure belongs under. Defaults to 'How Does It Work?'. The section must exist on the entry or validation fails."
+        },
+        "footer": {
+          "type": "string"
+        },
+        "loop": {
+          "type": "string",
+          "description": "Label for a return arrow, for cyclical processes."
+        },
+        "visual": {
+          "$ref": "#/$defs/visual"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "title"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "notes": {
+                "type": "array",
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "label",
+                        "text"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "label": {
+                          "type": "string"
+                        },
+                        "text": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "visual": {
+                "$ref": "#/$defs/visual"
+              }
+            }
+          }
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "title"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              },
+              "caption": {
+                "type": "string"
+              },
+              "accent": {
+                "type": "boolean"
+              },
+              "tone": {
+                "type": "string",
+                "enum": [
+                  "accent",
+                  "warn",
+                  "bad",
+                  "ok",
+                  "muted"
+                ]
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

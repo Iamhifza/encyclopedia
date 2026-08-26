@@ -18,6 +18,7 @@ from typing import Any
 
 from jsonschema import Draft202012Validator
 
+from .diagrams import diagram_issues
 from .model import (
     ALL_KNOWN_SECTIONS,
     GENERATED_SECTIONS,
@@ -121,6 +122,33 @@ def _check_body(entry, report: Report, where: str) -> None:
             report.warn(where, f"non-standard section '## {heading}'")
 
 
+def _check_diagrams(entry, report: Report, where: str) -> None:
+    """Diagram specs, checked structurally and against the entry's own sections.
+
+    A figure pointed at a heading the entry does not have would vanish from the
+    page with no error anywhere, which is the worst kind of bug: silent and
+    invisible in review.
+    """
+    for spec in entry.diagrams:
+        title = spec.get("title") or spec.get("kind", "diagram")
+        label = f"diagram '{title}'"
+        errors, warnings = diagram_issues(
+            {k: v for k, v in spec.items() if k != "section"}, label
+        )
+        for message in errors:
+            report.error(where, message)
+        for message in warnings:
+            report.warn(where, message)
+
+        section = spec.get("section")
+        if section and not entry.sections.get(section):
+            report.error(
+                where,
+                f"{label} is anchored to '## {section}', which this entry does "
+                f"not have",
+            )
+
+
 def validate(corpus: Corpus, today: date | None = None) -> Report:
     report = Report()
     today = today or date.today()
@@ -213,6 +241,8 @@ def validate(corpus: Corpus, today: date | None = None) -> Report:
                 )
         else:
             _check_body(entry, report, where)
+
+        _check_diagrams(entry, report, where)
 
         # editorial checks
         one_liner = entry.one_liner

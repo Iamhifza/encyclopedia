@@ -163,6 +163,8 @@ RECOMMENDED_SECTIONS = [
 # "Where Will I Encounter It?", because the `encountered_in` front-matter field
 # already generates that. Neither was used once in the corpus. A section nobody
 # writes is documentation debt, not a standard.
+DEFAULT_DIAGRAM_SECTION = "How Does It Work?"
+
 OPTIONAL_SECTIONS = [
     "Formula",
     "Historical Origin",
@@ -178,6 +180,7 @@ GENERATED_SECTIONS = [
     "Status",
     "Difficulty",
     "Further Reading",
+    "Watch",
 ]
 
 # Canonical print order for the rendered page.
@@ -270,6 +273,35 @@ class Entry:
         return self.meta.get("sources", [])
 
     @property
+    def diagram(self) -> dict[str, Any] | None:
+        return self.meta.get("diagram")
+
+    @property
+    def diagrams(self) -> list[dict[str, Any]]:
+        """Every diagram on this entry, each resolved to the section it belongs
+        under.
+
+        `diagram:` is the common case -- one figure, at the top of "How Does It
+        Work?" -- and stays the shorthand. `diagrams:` is the list form, and any
+        entry in either may name a different `section:`. An Evolution section
+        wants a lineage rail, not a process; letting the figure sit where its
+        explanation is beats forcing every picture into one heading.
+        """
+        found: list[dict[str, Any]] = []
+        single = self.meta.get("diagram")
+        if single:
+            found.append(single)
+        found.extend(self.meta.get("diagrams") or [])
+        return [
+            dict(spec, section=spec.get("section", DEFAULT_DIAGRAM_SECTION))
+            for spec in found
+        ]
+
+    @property
+    def videos(self) -> list[dict[str, Any]]:
+        return self.meta.get("videos", [])
+
+    @property
     def url(self) -> str:
         return f"terms/{self.slug}/"
 
@@ -292,6 +324,7 @@ class Entry:
             "tags": self.tags,
             "encountered_in": self.meta.get("encountered_in", []),
             "sources": self.sources,
+            "videos": self.videos,
             "disputed": self.meta.get("disputed", False),
             "updated": str(self.meta.get("updated", "")),
             "sections": self.sections,
