@@ -11,6 +11,20 @@ origin:
   circa: true
   attribution: Elman and Jordan networks; the idea of recurrent state is older
 historical_period: ai-winter
+diagram:
+  kind: figure
+  title: One weight matrix, applied over and over
+  footer: 'The recurrence is also the limit: step t cannot start until step t−1 has finished, so training
+    will not parallelise along the sequence. That single property is what the Transformer removed.'
+  visual:
+    kind: chips
+    items:
+    - h₀
+    - h₁
+    - h₂
+    - h₃
+    - h₄
+    caption: each arrow is the same matrix; the hidden state is the only memory the network has
 tags: [architecture]
 relations:
   is_a: [neural-network]
@@ -27,6 +41,10 @@ sources:
     title: "The Unreasonable Effectiveness of Recurrent Neural Networks"
     url: https://karpathy.github.io/2015/05/21/rnn-effectiveness/
     year: 2015
+videos:
+  - title: "Recurrent Neural Networks, clearly explained"
+    channel: "StatQuest"
+    url: https://www.youtube.com/results?search_query=statquest+recurrent+neural+networks+clearly+explained
 updated: 2026-08-21
 ---
 
@@ -55,13 +73,19 @@ that recent context matters.
 
 ## How Does It Work?
 
-```text
-x1      x2      x3      x4
- │       │       │       │
- ▼       ▼       ▼       ▼
-h0 ──▶ h1 ──▶ h2 ──▶ h3 ──▶ h4 ──▶ output
-       one shared weight matrix, applied over and over
-```
+
+Process the sequence one element at a time, carrying a hidden state forward.
+At each step the network combines the current input with the state left by the
+previous step, applies the *same* weight matrix it applied at every other step,
+and produces a new state. The hidden state is the only memory: everything the
+network has read is compressed into that one fixed-size vector.
+
+Two consequences follow from the shared weights. The good one is that the model
+handles sequences of any length with a fixed parameter count. The costly one is
+that step *t* cannot begin until step *t−1* has finished, so training cannot be
+parallelised along the sequence — and repeatedly multiplying by the same matrix
+makes gradients shrink or explode over long spans. Gating (LSTM, GRU) fixed the
+gradients; only dropping recurrence altogether fixed the parallelism.
 
 ## Mental Model
 

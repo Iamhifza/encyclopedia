@@ -11,6 +11,46 @@ origin:
   year: 2017
   attribution: Christiano et al. for control tasks; applied to language models by OpenAI and Anthropic from 2020
 historical_period: foundation-model
+diagram:
+  kind: steps
+  title: Preferences in, a policy out
+  footer: The reward model is a learned proxy, and optimising hard against a proxy is how you get reward
+    hacking. The KL term is the admission that the proxy is only trustworthy near where it was trained.
+  steps:
+  - title: People compare; they do not score
+    notes:
+    - label: Why
+      text: '"which of these is better" is far more reliable from human labellers than "rate this out
+        of ten"'
+    visual:
+      kind: mapping
+      width: 760
+      head:
+      - one prompt, two completions
+      - the label
+      rows:
+      - left: A — hedged, accurate, a little dull
+        right: preferred
+        mark: ok
+        tone: accent
+      - left: B — confident, fluent, slightly wrong
+        right: rejected
+        mark: bad
+  - title: The comparisons become a reward, then a policy
+    visual:
+      kind: pipeline
+      width: 700
+      stages:
+      - text: preference pairs
+        note: tens of thousands
+      - text: reward model
+        note: predicts which wins
+        via: train on the comparisons
+      - text: updated policy
+        tone: accent
+        via: maximise reward − β · KL(policy ‖ reference)
+      caption: drop the KL term and the policy drifts into degenerate text that scores well under an imperfect
+        reward model
 tags: [training, safety]
 relations:
   successor_of: [supervised-fine-tuning]
@@ -37,6 +77,10 @@ sources:
     url: https://arxiv.org/abs/2310.13548
     year: 2023
     note: The clearest documented instance of what optimising for rated preference produces.
+videos:
+  - title: "Reinforcement Learning from Human Feedback explained"
+    channel: "IBM Technology"
+    url: https://www.youtube.com/results?search_query=ibm+technology+reinforcement+learning+from+human+feedback+rlhf+explained
 updated: 2026-08-22
 ---
 
@@ -72,18 +116,6 @@ Aligning generation with fuzzy human judgements that are easy to recognise and
 impossible to specify.
 
 ## How Does It Work?
-
-```text
-prompt ──▶ model generates A and B
-              │
-        human picks the better ──▶ reward model learns to predict preference
-              │
-        policy optimisation:  maximise  reward − β·KL(policy ‖ reference)
-                                                   ▲
-                              without this term the policy walks off into
-                              degenerate text that scores well under an
-                              imperfect reward model
-```
 
 The KL term is the whole safety mechanism of the procedure, and it is worth
 understanding why. The reward model is a *proxy*. Optimise any proxy hard enough

@@ -10,6 +10,41 @@ origin:
   year: 2013
   attribution: Tomas Mikolov and colleagues at Google
 historical_period: statistical-ml
+diagram:
+  kind: steps
+  title: A word is defined by the company it keeps
+  footer: 'Superseded by contextual embeddings, because a single vector per word cannot represent *bank*
+    twice. Historically decisive nonetheless: it established that meaning could be a position rather than
+    a symbol.'
+  steps:
+  - title: Predict the neighbours of the centre word
+    notes:
+    - label: Skip-gram
+      text: from "fox", predict "brown" and "jumps"; nudge their vectors together and push random words
+        apart
+    visual:
+      kind: chips
+      items:
+      - quick
+      - brown
+      - text: fox
+        new: true
+      - jumps
+      - over
+      caption: a sliding window; every position takes a turn as the centre
+  - title: After millions of updates, position means something
+    visual:
+      kind: scatter
+      height: 200
+      caption: words that appear in the same contexts end up in the same region
+      groups:
+      - label: canids
+        tone: accent
+        points: [[0.24, 0.7], [0.3, 0.64], [0.2, 0.6]]
+      - label: vehicles
+        points: [[0.74, 0.66], [0.8, 0.72], [0.77, 0.58]]
+      - label: verbs of motion
+        points: [[0.5, 0.2], [0.56, 0.26], [0.44, 0.24]]
 tags: [retrieval, history]
 relations:
   evolved_into: [embedding]
@@ -24,6 +59,10 @@ sources:
     title: "Distributed Representations of Words and Phrases and their Compositionality"
     url: https://arxiv.org/abs/1310.4546
     year: 2013
+videos:
+  - title: "Word Embedding and Word2Vec, clearly explained"
+    channel: "StatQuest"
+    url: https://www.youtube.com/results?search_query=statquest+word2vec+clearly+explained
 updated: 2026-08-21
 ---
 
@@ -55,18 +94,25 @@ once from unlabelled text.
 
 ## How Does It Work?
 
-```text
-"the quick brown fox jumps over the lazy dog"
-                 ▲
-            centre word
 
-skip-gram: from "fox", predict {brown, jumps}
-           push vec(fox) toward vec(brown), vec(jumps)
-           push vec(fox) away from random words
+Slide a window along a corpus. In the skip-gram formulation, take the word at
+the centre and train the model to predict the words around it: nudge the centre
+word's vector toward the vectors of words that really did appear nearby, and
+push it away from randomly sampled words that did not. That negative sampling is
+essential — without it the cheapest solution is to collapse every vector onto a
+single point.
 
-after millions of updates:
-    vec(fox) ≈ vec(wolf) ≈ vec(coyote)
-```
+Repeat over billions of windows and geometry emerges. Words appearing in similar
+contexts end up in similar positions, so *fox*, *wolf* and *coyote* cluster
+together without anyone ever declaring them related. The famous analogy
+arithmetic — king − man + woman ≈ queen — falls out of the same structure,
+though it holds less cleanly than the popular retellings suggest.
+
+The limitation is one vector per word type. *Bank* gets a single position that
+splits the difference between riverbanks and banking, and no amount of training
+data fixes that. Contextual embeddings, where the vector depends on the sentence
+the word appears in, superseded this — but the idea that meaning could be a
+position rather than a symbol started here.
 
 ## Mental Model
 

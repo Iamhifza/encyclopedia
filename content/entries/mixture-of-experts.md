@@ -8,6 +8,53 @@ status: modern
 difficulty: advanced
 one_liner: "A model that holds many specialised sub-networks but activates only a couple per token, so capacity grows without cost growing with it."
 historical_period: foundation-model
+diagram:
+  kind: steps
+  title: Many parameters, few of them used per token
+  footer: 'Total parameters grow while the compute per token does not, which is the entire appeal. The
+    cost moves to memory and to routing: every expert must be resident, and an unbalanced router leaves
+    hardware idle.'
+  steps:
+  - title: A small router scores the experts
+    notes:
+    - label: Router
+      text: one linear layer and a softmax — tiny next to the experts it is choosing between
+    visual:
+      kind: bars
+      caption: router scores for one token, over eight experts
+      bars:
+      - label: expert 1
+        value: 0.01
+        value_label: '0.01'
+      - label: expert 2
+        value: 0.62
+        value_label: '0.62'
+        accent: true
+      - label: expert 3
+        value: 0.03
+        value_label: '0.03'
+      - label: expert 4
+        value: 0.31
+        value_label: '0.31'
+      - label: others
+        value: 0.03
+        value_label: '0.03'
+  - title: Only the top two actually run
+    notes:
+    - label: Compute
+      text: two experts out of eight, so roughly a quarter of the FLOPs a dense layer of the same size
+        would need
+    visual:
+      kind: fan
+      source: token
+      caption: their outputs are summed in proportion to the router's scores
+      targets:
+      - text: expert 2
+        new: true
+      - text: expert 4
+        new: true
+      - expert 1 · idle
+      - expert 3 · idle
 tags: [architecture, inference]
 relations:
   part_of: [transformer]
@@ -32,6 +79,10 @@ sources:
     title: "DeepSeekMoE: Towards Ultimate Expert Specialization"
     url: https://arxiv.org/abs/2401.06066
     year: 2024
+videos:
+  - title: "Mixture of Experts explained"
+    channel: "IBM Technology"
+    url: https://www.youtube.com/results?search_query=ibm+technology+mixture+of+experts+moe+explained
 updated: 2026-08-21
 review_by: 2027-02-01
 ---
@@ -71,24 +122,6 @@ empirically specialise, so knowledge that would otherwise compete for the same
 weights can occupy separate ones.
 
 ## How Does It Work?
-
-```text
-                    token
-                      │
-                  ┌───▼────┐
-                  │ router │   small linear layer → softmax over N experts
-                  └───┬────┘
-          scores: [0.01 0.62 0.03 0.31 ... ]
-                      │ keep top-2
-        ┌─────────────┼─────────────┐
-        ▼             ▼             ▼
-   expert 1      EXPERT 2      EXPERT 4        (only these two run)
-   (skipped)     w=0.62        w=0.31
-        └─────────────┼─────────────┘
-                 weighted sum
-                      │
-                      ▼  back into the residual stream
-```
 
 Routing happens per token *and* per layer, so a single sentence spreads across
 many different experts as it moves up the stack. Each expert must have capacity

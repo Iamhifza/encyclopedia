@@ -10,6 +10,46 @@ origin:
   year: 2022
   attribution: Tri Dao et al., Stanford
 historical_period: foundation-model
+diagram:
+  kind: steps
+  title: The n×n matrix never reaches main memory
+  footer: An exact result, not an approximation — the same numbers as naive attention, computed with a
+    fraction of the memory traffic. This is why it became the default rather than an option.
+  steps:
+  - title: The problem is traffic, not arithmetic
+    visual:
+      kind: columns
+      width: 700
+      columns:
+      - title: Naive
+        tone: bad
+        lines:
+        - compute Q·Kᵀ, write to HBM
+        - read it back, softmax, write
+        - read again, multiply by V
+        - the n×n matrix crosses the bus three times
+      - title: Flash
+        accent: true
+        lines:
+        - load a block of K,V into SRAM
+        - partial scores, running softmax
+        - update the output in place
+        - the n×n matrix is never materialised
+  - title: Where the time actually goes
+    notes:
+    - label: Ratio
+      text: on-chip SRAM is roughly an order of magnitude faster than HBM, and far smaller
+    visual:
+      kind: bars
+      caption: share of runtime spent moving bytes rather than computing
+      bars:
+      - label: naive
+        value: 0.75
+        value_label: memory-bound
+        accent: true
+      - label: flash
+        value: 0.25
+        value_label: compute-bound
 tags: [inference, hardware]
 relations:
   depends_on: [self-attention, memory-hierarchy]
@@ -30,6 +70,10 @@ sources:
   - type: repo
     title: "flash-attention"
     url: https://github.com/Dao-AILab/flash-attention
+videos:
+  - title: "FlashAttention explained"
+    channel: "Aleksa Gordić"
+    url: https://www.youtube.com/results?search_query=flash+attention+explained+tri+dao
 updated: 2026-08-21
 ---
 
@@ -62,17 +106,6 @@ The memory cost and wall-clock cost of attention at long sequence lengths — bo
 during training and during prefill.
 
 ## How Does It Work?
-
-```text
-naive:  Q·Kᵀ ──write──▶ HBM ──read──▶ softmax ──write──▶ HBM ──read──▶ ·V
-        the n×n matrix crosses the memory bus three times
-
-flash:  for each block of K,V:
-            load into SRAM
-            compute partial scores and partial softmax statistics
-            update the running output in place
-        the n×n matrix never exists in HBM
-```
 
 The trick is the online softmax: rescale the accumulated output whenever a new
 block reveals a larger maximum, so the final result matches the one-shot softmax

@@ -12,6 +12,51 @@ origin:
   circa: true
   attribution: LeCun's work on handwritten digit recognition; the receptive-field idea comes from Hubel and Wiesel's visual cortex studies
 historical_period: ai-winter
+diagram:
+  kind: steps
+  title: One small filter, reused everywhere
+  footer: 'Weight sharing is the whole trick: a filter that detects an edge in the top-left detects it
+    in the bottom-right too, for no extra parameters. It is also the assumption that breaks when position
+    genuinely matters.'
+  steps:
+  - title: A filter is nine numbers, slid across the image
+    notes:
+    - label: Shared
+      text: the same nine weights at every position, so a 3×3 filter costs 9 parameters however large
+        the image
+    visual:
+      kind: matrix
+      cell_width: 64
+      cols:
+      - ''
+      - ''
+      - ''
+      rows:
+      - label: ''
+        values: [0.9, 0.1, 0.9]
+      - label: ''
+        values: [0.1, 0.9, 0.1]
+      - label: ''
+        values: [0.9, 0.1, 0.9]
+      caption: one 3×3 filter; its response at every position becomes the feature map
+  - title: Depth turns simple detectors into object detectors
+    notes:
+    - label: Emergent
+      text: nobody specifies these stages — they are what gradient descent finds
+    visual:
+      kind: lineage
+      per_row: 4
+      caption: each layer composes the layer below it
+      milestones:
+      - text: edges
+        note: layer 1
+      - text: textures
+        note: layer 3
+      - text: parts
+        note: layer 8
+      - text: objects
+        note: layer 15
+        tone: accent
 tags: [architecture]
 relations:
   is_a: [neural-network]
@@ -32,6 +77,10 @@ sources:
     title: "A ConvNet for the 2020s"
     url: https://arxiv.org/abs/2201.03545
     year: 2022
+videos:
+  - title: "Convolutional Neural Networks explained"
+    channel: "Computerphile"
+    url: https://www.youtube.com/results?search_query=computerphile+convolutional+neural+networks+explained
 updated: 2026-08-21
 ---
 
@@ -67,18 +116,24 @@ of data, by building in prior knowledge about how images work.
 
 ## How Does It Work?
 
-```text
-input image          filter (3×3)        feature map
-┌─────────────┐      ┌───┐               ┌───────────┐
-│             │      │▓░▓│  slide it     │  where the│
-│             │  ×   │░▓░│  across ──▶   │  pattern  │
-│             │      │▓░▓│  everywhere   │  appeared │
-└─────────────┘      └───┘               └───────────┘
-     same weights used at every position
 
-depth builds hierarchy:
-  layer 1: edges → layer 3: textures → layer 8: parts → layer 15: objects
-```
+A convolutional layer learns a small stack of filters — typically 3×3 — and
+slides each one across the whole input, recording its response at every
+position. Because the same weights are reused everywhere, a filter that has
+learned to detect a vertical edge detects one wherever it appears, and the
+parameter count depends on the filter size rather than the image size.
+
+Stacking these layers composes the detectors. Early layers respond to edges and
+colour gradients; a few layers up, combinations of those become textures and
+corners; deeper still, combinations of *those* become recognisable parts, and
+finally whole objects. Nobody specifies the progression — it is simply what
+gradient descent finds when the architecture forces locality and reuse.
+
+The assumption underneath is translation invariance: that what a feature means
+does not depend on where it sits. That holds for photographs and breaks for
+tasks where absolute position carries information, which is one reason vision
+Transformers, which learn positional structure instead of assuming it, overtook
+CNNs on large datasets.
 
 ## Mental Model
 

@@ -10,6 +10,27 @@ origin:
   year: 1997
   attribution: Sepp Hochreiter and Jürgen Schmidhuber
 historical_period: statistical-ml
+diagram:
+  kind: figure
+  title: A cell state that runs straight through, with gates on it
+  footer: The cell state is a near-uninterrupted path from t−1 to t, so gradients can travel back many
+    steps without vanishing. Gating that path is what bought recurrent networks another decade.
+  visual:
+    kind: pipeline
+    width: 700
+    caption: gates are learned, in [0,1], and multiply — which is why they can hold a value for hundreds
+      of steps
+    stages:
+    - text: c(t−1)
+      note: carried in
+    - text: what to keep
+      via: forget gate — multiply the old state by σ(·)
+    - text: what to add
+      via: input gate × candidate — write the new information
+    - text: c(t)  →  h(t)
+      note: carried out
+      tone: accent
+      via: output gate — decide how much of the state to expose
 tags: [architecture]
 relations:
   is_a: [rnn]
@@ -26,6 +47,10 @@ sources:
     title: "Understanding LSTM Networks"
     url: https://colah.github.io/posts/2015-08-Understanding-LSTMs/
     year: 2015
+videos:
+  - title: "Long Short-Term Memory (LSTM), clearly explained"
+    channel: "StatQuest"
+    url: https://www.youtube.com/results?search_query=statquest+long+short+term+memory+lstm+clearly+explained
 updated: 2026-08-21
 ---
 
@@ -55,13 +80,6 @@ Long-range dependencies: matching a verb to a subject twenty words back, or a
 closing bracket to one opened much earlier.
 
 ## How Does It Work?
-
-```text
- c(t-1) ──────────⊗───────────⊕────────────▶ c(t)
-                  ▲           ▲
-             forget gate   input gate × candidate
- h(t-1),x(t) ─────┴───────────┴──── output gate ──▶ h(t)
-```
 
 The forget gate scales old memory, the input gate admits new content, the output
 gate decides how much of the memory is exposed as this step's hidden state.

@@ -11,6 +11,26 @@ origin:
   circa: true
   attribution: FAISS (Meta) popularised large-scale ANN search; dedicated products followed from 2019
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: Skip most of the data, on purpose
+  footer: Approximate is the point. Exact nearest-neighbour search over millions of vectors is linear
+    in the corpus; HNSW trades a small recall loss for logarithmic search, and recall is a dial you set.
+  visual:
+    kind: stack
+    width: 720
+    caption: search starts at the top and greedily descends toward the query vector
+    layers:
+    - label: top
+      text: a few nodes, very long hops
+      note: cross the space fast
+    - label: middle
+      text: more nodes, shorter hops
+      note: narrow the region
+    - label: bottom
+      text: every node, short hops
+      accent: true
+      note: find the actual neighbours
 tags: [retrieval]
 relations:
   depends_on: [embedding]
@@ -26,6 +46,10 @@ sources:
   - type: repo
     title: "FAISS"
     url: https://github.com/facebookresearch/faiss
+videos:
+  - title: "What is a Vector Database?"
+    channel: "IBM Technology"
+    url: https://www.youtube.com/results?search_query=ibm+technology+what+is+a+vector+database
 updated: 2026-08-21
 review_by: 2027-02-01
 ---
@@ -57,13 +81,22 @@ permission, recency or source.
 
 ## How Does It Work?
 
-```text
-HNSW: a layered proximity graph
-  top layer    ●────────────●          few nodes, long hops
-  middle       ●───●────●───●          
-  bottom       ●─●─●─●─●─●─●─●         all nodes, short hops
-search: start at the top, greedily descend toward the query vector
-```
+
+Exact nearest-neighbour search compares the query against every stored vector,
+which is linear in the corpus and hopeless at millions of documents. So these
+systems approximate, and the dominant structure is HNSW: a hierarchy of
+proximity graphs where the top layer holds a few nodes connected by very long
+edges and each layer down is denser with shorter ones.
+
+A search enters at the top, greedily walks toward the query, drops a layer when
+it can get no closer, and repeats. The long edges cross the space in a few hops;
+the short ones resolve the neighbourhood. Search becomes logarithmic rather than
+linear in the number of vectors.
+
+Recall is a dial, not a guarantee — parameters trade accuracy against speed and
+memory, and a system tuned for latency will sometimes miss a true nearest
+neighbour. Which is fine for retrieval and not fine for anything requiring
+exactness, a distinction worth being explicit about before choosing one.
 
 ## Mental Model
 

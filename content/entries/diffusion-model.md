@@ -8,6 +8,34 @@ status: established
 difficulty: advanced
 one_liner: "A generator that starts from pure noise and removes a little of it at a time until an image emerges."
 historical_period: deep-learning
+diagram:
+  kind: figure
+  title: Destroy an image on a schedule, then learn to undo it
+  footer: The forward pass has no parameters at all — it is just adding Gaussian noise. Everything the
+    model knows is in the reverse direction, which is why the same architecture serves images, audio and
+    video.
+  visual:
+    kind: passes
+    width: 760
+    nodes:
+    - text: x₀
+      note: image
+    - text: x₁
+    - text: x₂
+    - text: …
+    - text: x_T
+      note: pure noise
+      tone: accent
+    forward:
+      label: 'forward — fixed, no learning: add noise'
+    backward:
+      label: 'reverse — learned: predict the noise and subtract it, steered by a text embedding'
+      marks:
+      - ε̂
+      - ε̂
+      - ε̂
+      - ε̂
+    caption: sampling is the reverse pass run from noise you never generated forward
 tags: [architecture]
 relations:
   is_a: [neural-network]
@@ -29,6 +57,10 @@ sources:
     title: "Scalable Diffusion Models with Transformers (DiT)"
     url: https://arxiv.org/abs/2212.09748
     year: 2022
+videos:
+  - title: "How AI Image Generators Work (Stable Diffusion)"
+    channel: "Computerphile"
+    url: https://www.youtube.com/results?search_query=computerphile+how+stable+diffusion+works
 updated: 2026-08-21
 ---
 
@@ -64,19 +96,6 @@ High-fidelity, diverse generation with a training procedure that reliably
 converges.
 
 ## How Does It Work?
-
-```text
-FORWARD (fixed, no learning)
-  image ──▶ +noise ──▶ +noise ──▶ ... ──▶ pure noise
-   x₀         x₁         x₂                  x_T
-
-REVERSE (learned)
-  noise ──▶ predict & subtract ──▶ ... ──▶ image
-   x_T          (T steps)                    x₀
-                     ▲
-          conditioned on a text embedding,
-          so the denoising is steered toward the prompt
-```
 
 **Latent diffusion** — the change that made this practical — runs the whole
 process in a compressed latent space produced by an autoencoder rather than on

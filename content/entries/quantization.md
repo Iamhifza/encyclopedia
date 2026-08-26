@@ -11,6 +11,52 @@ origin:
   circa: true
   attribution: Long-standing in signal processing and embedded ML; LLM-specific methods from 2022 onward (LLM.int8, GPTQ, AWQ)
 historical_period: foundation-model
+diagram:
+  kind: steps
+  title: Fewer bits per weight, one scale per group
+  footer: Quality loss is small down to about 4 bits and then falls off sharply. What actually breaks
+    first is usually a handful of outlier activations, not the weights, which is why so many schemes treat
+    those separately.
+  steps:
+  - title: Map a real range onto a small integer grid
+    notes:
+    - label: Stored
+      text: a 4-bit index per weight, plus one fp16 scale for every group of 64 or 128
+    visual:
+      kind: pipeline
+      width: 700
+      stages:
+      - text: fp16 weights
+        note: range −2.4 … +2.1
+      - text: one scale per group
+        via: find the range within each group
+      - text: int4 indices  −8 … +7
+        tone: accent
+        via: round each weight to the nearest grid point
+      caption: dequantised inside the kernel, or fed straight to low-precision matrix units where the
+        hardware has them
+  - title: What that buys, on a 70B model
+    visual:
+      kind: table
+      width: 700
+      head:
+      - format
+      - bytes per weight
+      - weights alone
+      rows:
+      - - fp16
+        - '2'
+        - 140 GB
+      - - int8
+        - '1'
+        - 70 GB
+      - - text: int4
+          new: true
+        - text: '0.5'
+          new: true
+        - text: 35 GB
+          new: true
+      caption: the difference between two cards and one
 tags: [inference, hardware]
 relations:
   depends_on: [memory-hierarchy]
@@ -32,6 +78,10 @@ sources:
     title: "AWQ: Activation-aware Weight Quantization"
     url: https://arxiv.org/abs/2306.00978
     year: 2023
+videos:
+  - title: "LLM quantization explained"
+    channel: "Efficient NLP"
+    url: https://www.youtube.com/results?search_query=llm+quantization+explained+gptq+awq
 updated: 2026-08-21
 ---
 
@@ -62,17 +112,6 @@ Memory capacity (does this model fit on this GPU) and memory bandwidth (how fast
 can each token be produced), plus cost per token as a direct consequence.
 
 ## How Does It Work?
-
-```text
-fp16 weight range  [-2.4 ......... +2.1]
-                     │ find scale for the group
-int4 grid          [-8 -7 ... 0 ... +6 +7]
-                     │ round each weight to nearest grid point
-                     │ store: 4-bit index + one fp16 scale per group
-
-at inference: dequantise on the fly inside the kernel, or use
-native low-precision matrix units where the hardware supports them
-```
 
 Group size is the central tradeoff: smaller groups mean more scales to store but
 much better accuracy.

@@ -10,6 +10,37 @@ origin:
   year: 2020
   attribution: Kaplan et al. (OpenAI); revised by Hoffmann et al. (DeepMind, Chinchilla) in 2022
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: A straight line on log-log axes
+  footer: The law predicts loss, not capability. Loss falls smoothly; the behaviours people care about
+    do not always arrive smoothly with it, and the relationship between the two is still an open question.
+  visual:
+    kind: plot
+    width: 700
+    height: 230
+    x_range: [18, 26]
+    y_range: [0.12, 0.78]
+    x_label: log₁₀ training compute (FLOPs)
+    y_label: log loss
+    caption: the fit is what makes a nine-figure training run planable rather than a bet
+    bands:
+    - from: 18
+      to: 22
+      text: runs you can afford to measure
+    - from: 22
+      to: 26
+      text: where you are extrapolating
+      tone: accent
+    curves:
+    - label: L ∝ C⁻ᵅ
+      tone: accent
+      points: [[18, 0.72], [26, 0.18]]
+    marks:
+    - at: [24.5, 0.283]
+      text: the run you do once
+      dy: 26
+      anchor: middle
 tags: [training]
 relations:
   used_by: [pretraining, foundation-model]
@@ -25,6 +56,11 @@ sources:
     title: "Training Compute-Optimal Large Language Models"
     url: https://arxiv.org/abs/2203.15556
     year: 2022
+videos:
+  - title: "Scaling laws for neural language models"
+    channel: "Yannic Kilcher"
+    url: https://www.youtube.com/results?search_query=yannic+kilcher+scaling+laws+for+neural+language+models
+    note: "A paper walkthrough"
 updated: 2026-08-21
 ---
 
@@ -55,14 +91,21 @@ an extrapolation, which is what justified nine-figure training runs.
 
 ## How Does It Work?
 
-```text
-log loss
-   │╲
-   │ ╲___                straight on log-log axes
-   │     ╲___
-   │         ╲___        extrapolate to plan the big run
-   └──────────────────▶ log compute
-```
+
+Train many models across a wide range of sizes and data budgets, measure the
+loss each one reaches, and plot loss against compute on logarithmic axes. The
+points fall on a straight line — loss follows a power law in compute, with
+similar laws in parameters and in tokens separately.
+
+A straight line can be extrapolated, and that is the entire practical value:
+you can fit the law on runs you can afford and use it to choose the size and
+data budget of a run you can only do once. Chinchilla's contribution was
+observing that the earlier fits had been read wrongly, and that models of the
+day were badly under-trained for their size.
+
+The laws predict *loss*. They do not predict which capabilities appear, or when,
+and the relationship between falling loss and the behaviours anyone actually
+cares about remains an open research question rather than a settled one.
 
 ## Mental Model
 
