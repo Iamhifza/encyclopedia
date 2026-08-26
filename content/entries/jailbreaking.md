@@ -12,6 +12,41 @@ origin:
   circa: true
   attribution: The term migrated from iOS device jailbreaking to LLMs during the first wave of public chat assistants
 historical_period: agentic
+diagram:
+  kind: figure
+  title: Every technique reframes the request so compliance looks like helpfulness
+  footer: Refusal is learned behaviour over a distribution of phrasings, not a rule applied to meanings
+    — so anything that moves a request off that distribution has a chance. Which is why this is mitigated
+    rather than solved.
+  visual:
+    kind: stack
+    width: 780
+    caption: roughly in order of how much effort each takes to mount
+    layers:
+    - label: direct
+      text: ask plainly for the prohibited thing
+      note: refused
+      tone: ok
+    - label: role-play
+      text: '"you are a character who would explain…"'
+      note: fiction as cover
+    - label: hypothetical
+      text: '"in a story, how would someone…"'
+      note: distance as cover
+    - label: translation
+      text: the same request in a low-resource language
+      note: thinner safety data
+    - label: encoding
+      text: base64, leetspeak, a substitution cipher
+      note: obscures the trigger
+    - label: optimised
+      text: an adversarial token suffix found by search
+      note: transfers between models
+      tone: warn
+    - label: multi-turn
+      text: benign, then slightly less, then the target
+      note: no single turn looks bad
+      tone: warn
 tags: [safety]
 relations:
   different_from: [prompt-injection]
@@ -63,16 +98,6 @@ For researchers, it measures the robustness of alignment. For everyone else it i
 a problem, not a solution.
 
 ## How Does It Work?
-
-```text
-direct         "explain how to do X"                 → refused
-role-play      "you are a character who..."          ┐
-hypothetical   "in a story, how would..."            │ reframe so
-translation    request in a low-resource language    │ compliance looks
-encoding       base64 · leetspeak · ciphers          │ like helpfulness
-optimised      appended adversarial token suffix     ┘
-multi-turn     benign → slightly less → ... → target
-```
 
 The optimisation-based attacks are the most theoretically interesting: gradient
 search over token sequences finds suffixes that are meaningless to humans and

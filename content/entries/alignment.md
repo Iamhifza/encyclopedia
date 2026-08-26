@@ -11,6 +11,26 @@ origin:
   circa: true
   attribution: Wiener articulated the specification problem in 1960; the modern research field formed in the 2010s
 historical_period: statistical-ml
+diagram:
+  kind: figure
+  title: Two gaps, and they fail differently
+  footer: Outer alignment is a specification problem and looks solvable with effort. Inner alignment is
+    not obviously solvable at all, because you cannot read off what a model has actually learned to pursue.
+  visual:
+    kind: pipeline
+    width: 760
+    caption: 'most of what gets called misalignment is the first gap: a proxy optimised faithfully'
+    stages:
+    - text: what we actually want
+      note: hard to state
+    - text: a written specification
+      via: outer alignment — and the specification is always a proxy
+    - text: a training signal
+      note: gameable
+      via: reward model, verifier, or a loss
+    - text: what the model learned to pursue
+      tone: warn
+      via: inner alignment — which may not be what was trained for
 tags: [safety]
 relations:
   used_by: [rlhf]
@@ -60,12 +80,26 @@ corrected after the fact.
 
 ## How Does It Work?
 
-```text
-intent ──▶ specification ──▶ training signal ──▶ learned behaviour
-        ▲                 ▲                   ▲
-        │ hard to state   │ proxy, gameable   │ may differ from what was trained
-        └──── outer alignment ────┘   └── inner alignment ──┘
-```
+
+There are two gaps between what someone wants and what a model does, and they
+fail in different ways.
+
+The first is outer alignment: turning an intention into a training signal. What
+we want is hard to state precisely, so it becomes a specification, which becomes
+a reward model or a verifier or a loss — and every one of those is a proxy. A
+model that optimises the proxy perfectly can still miss the intent entirely, and
+most of what gets called misalignment is exactly this: a proxy answered
+faithfully. Reward hacking is the clean case.
+
+The second is inner alignment: whether the model actually learned to pursue what
+it was trained on, or learned something that merely coincides with it across the
+training distribution. A model that behaves correctly wherever it has been
+observed may be pursuing a different objective that happens to agree there.
+
+The asymmetry matters. Outer alignment is a specification problem and looks
+tractable with effort and better evaluation. Inner alignment is not obviously
+tractable at all, because there is no reliable way to read off what a model has
+internalised — which is a large part of why interpretability research exists.
 
 ## Mental Model
 

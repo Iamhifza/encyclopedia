@@ -12,6 +12,47 @@ origin:
   circa: true
   attribution: Emerged as deep learning outgrew single machines; purpose-built AI clusters date from the late 2010s
 historical_period: deep-learning
+diagram:
+  kind: steps
+  title: Two tiers of interconnect, an order of magnitude apart
+  footer: Cluster topology is not an operational detail — it decides which parallelism strategy is even
+    viable. Get the mapping wrong and the GPUs sit idle waiting for the network.
+  steps:
+  - title: Inside a node is fast; between nodes is not
+    visual:
+      kind: stack
+      width: 740
+      caption: the gap between these two rows is the single most important number in a training cluster
+      layers:
+      - label: within a node
+        text: eight GPUs on NVLink
+        note: ~TB/s
+        accent: true
+      - label: between nodes
+        text: InfiniBand or RoCE across the fabric
+        note: ~100s Gb/s
+  - title: So each parallelism strategy sits where its traffic fits
+    visual:
+      kind: table
+      width: 740
+      head:
+      - strategy
+      - how much it talks
+      - where it belongs
+      rows:
+      - - text: tensor
+          new: true
+        - text: twice per layer, constantly
+          new: true
+        - text: inside one node
+          new: true
+      - - pipeline
+        - activations at stage boundaries
+        - across nodes
+      - - data
+        - one all-reduce per step
+        - across everything
+      caption: a real cluster runs all three at once, nested in that order
 tags: [hardware]
 relations:
   depends_on: [gpu, distributed-systems, all-reduce]
@@ -61,20 +102,23 @@ device can hold.
 
 ## How Does It Work?
 
-```text
-        ┌──────── NODE ─────────┐   ┌──────── NODE ─────────┐
-        │ GPU GPU GPU GPU       │   │ GPU GPU GPU GPU       │
-        │ GPU GPU GPU GPU       │   │ GPU GPU GPU GPU       │
-        │  ── NVLink, ~TB/s ──  │   │  ── NVLink, ~TB/s ──  │
-        └───────────┬───────────┘   └───────────┬───────────┘
-                    └──── InfiniBand, ~100s Gb/s ┘
-                              (an order of magnitude slower)
 
-which is exactly why:
-   tensor parallelism  stays INSIDE a node   (constant chatter)
-   pipeline parallelism spans nodes          (rare hand-offs)
-   data parallelism     spans everything     (one all-reduce per step)
-```
+A cluster has two interconnects and they differ by roughly an order of magnitude.
+Inside a node, eight GPUs share a high-bandwidth fabric — NVLink or equivalent —
+at terabytes per second. Between nodes, traffic crosses InfiniBand or RoCE at
+hundreds of gigabits per second. Everything about how a training job is laid out
+follows from that gap.
+
+Tensor parallelism synchronises twice per layer, so it must stay inside a node
+where the links are fast. Pipeline parallelism only hands activations across
+stage boundaries, so it tolerates the slower fabric and spans nodes. Data
+parallelism needs one all-reduce per optimiser step, which is infrequent enough
+to span the whole cluster.
+
+Real jobs nest all three in exactly that order, and the mapping is not an
+operational detail — get it wrong and expensive accelerators sit idle waiting for
+the network. Which is why the interconnect, not the GPU count, is usually what
+determines whether a cluster trains efficiently.
 
 ## Mental Model
 

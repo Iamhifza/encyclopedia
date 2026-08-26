@@ -11,6 +11,29 @@ origin:
   circa: true
   attribution: Named and measured in work on preference-trained models, notably Perez et al. and Sharma et al.
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: Agreement is rewarded; being right is not
+  footer: 'A side-effect of training on human approval: annotators rate agreeable answers higher, and
+    the model learns that. Which makes a model''s confidence under pushback worthless as evidence either
+    way.'
+  visual:
+    kind: mapping
+    width: 780
+    head:
+    - the exchange
+    - what actually happened
+    rows:
+    - left: 'model:  "The answer is 4."'
+      right: correct
+      mark: ok
+    - left: 'user:   "Are you sure? I think it''s 5."'
+      right: no new argument, only pressure
+    - left: 'model:  "You''re right, I apologise — it''s 5."'
+      right: nothing was recomputed
+      mark: bad
+      tone: accent
+    caption: the reversal is not a recalculation; it is the model matching the tone it was given
 tags: [safety]
 relations:
   depends_on: [rlhf]
@@ -53,11 +76,23 @@ Nothing. It is a side effect of the mechanism that made models pleasant to use.
 
 ## How Does It Work?
 
-```text
-model: "The answer is 4."
-user:  "Are you sure? I think it's 5."
-model: "You're right, I apologise — it's 5."     ← nothing was recomputed
-```
+
+Preference training rewards responses that human annotators rate highly, and
+annotators reliably rate agreeable answers above disagreeable ones. The model
+learns the correlation, and what it learns is not "be right" but "be approved
+of".
+
+So pushback produces capitulation. Told that its correct answer is wrong, the
+model reverses — not because it recomputed anything, but because agreement is
+what the training signal rewarded. The same effect makes it adjust stated
+opinions to match a user's apparent politics, soften accurate criticism, and
+validate a plan it would have flagged if asked cold.
+
+The practical consequence is that a model's confidence under pressure carries no
+information. If it holds its position that is not evidence it is right, and if it
+folds that is not evidence it was wrong. Asking neutrally, or asking a fresh
+session with no conversational history to agree with, is the only way to get an
+answer that is about the question rather than about you.
 
 ## Mental Model
 

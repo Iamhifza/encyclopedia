@@ -8,6 +8,60 @@ status: foundational
 difficulty: intermediate
 one_liner: "Splitting work so that many processors make progress at the same time rather than one doing it all."
 historical_period: early-computing
+diagram:
+  kind: steps
+  title: The serial fraction sets the ceiling
+  footer: Amdahl's law is the reason a hundred-fold increase in hardware rarely buys a hundred-fold speed-up,
+    and the reason the first question about any parallel plan is what fraction cannot be parallelised
+    at all.
+  steps:
+  - title: Some part of the work simply cannot be split
+    visual:
+      kind: segments
+      width: 700
+      label: one job
+      caption: setup, coordination, the final reduction — whatever must happen in order
+      segments:
+      - text: serial
+        value: 10
+        value_label: 10%
+        tone: warn
+      - text: parallelisable
+        value: 90
+        value_label: 90%
+  - title: So speed-up saturates however many processors you add
+    notes:
+    - label: And worse
+      text: parallelism adds costs of its own — synchronisation, communication, load imbalance, contention
+    visual:
+      kind: plot
+      width: 700
+      height: 210
+      x_range: [1, 64]
+      y_range: [0, 11]
+      x_label: processors
+      y_label: speed-up
+      caption: with a 10% serial fraction the ceiling is ten times, and sixteen processors already reach
+        most of it
+      curves:
+      - label: actual
+        tone: accent
+        points: [[1.0, 1.0], [2.58, 2.225], [4.15, 3.156], [5.72, 3.888], [7.3, 4.479], [8.88, 4.965],
+          [10.45, 5.373], [12.03, 5.719], [13.6, 6.018], [15.17, 6.277], [16.75, 6.505], [18.32, 6.706],
+          [19.9, 6.886], [21.47, 7.047], [23.05, 7.192], [24.62, 7.323], [26.2, 7.443], [27.77, 7.553],
+          [29.35, 7.653], [30.93, 7.746], [32.5, 7.831], [34.07, 7.911], [35.65, 7.984], [37.23, 8.053],
+          [38.8, 8.117], [40.38, 8.177], [41.95, 8.234], [43.52, 8.287], [45.1, 8.336], [46.67, 8.383],
+          [48.25, 8.428], [49.82, 8.47], [51.4, 8.51], [52.98, 8.548], [54.55, 8.584], [56.12, 8.618],
+          [57.7, 8.651], [59.27, 8.682], [60.85, 8.712], [62.42, 8.74], [64.0, 8.767]]
+      - label: ideal
+        tone: muted
+        points: [[1, 1], [11, 11]]
+      marks:
+      - at: [64, 10.0]
+        text: 'ceiling: 1 ÷ serial fraction'
+        dx: -10
+        dy: -20
+        anchor: end
 tags: [hardware]
 relations:
   used_by: [tensor-parallelism, pipeline-parallelism]
@@ -56,18 +110,22 @@ Throughput on work that decomposes. It does nothing for work that does not.
 
 ## How Does It Work?
 
-```text
-        serial fraction limits everything
-   ┌────────┬──────────────────────────────┐
-   │ serial │      parallelisable          │
-   └────────┴──────────────────────────────┘
-        ▲
-   with infinite processors, total time
-   still cannot fall below this part
 
-plus the costs parallelism adds:
-   synchronisation · communication · load imbalance · contention
-```
+Split work across processors and the runtime falls — but only for the part that
+can actually be split. Whatever must happen in order, setup, coordination, the
+final reduction, takes the same time however much hardware you add.
+
+Amdahl's law makes this exact. If a fraction *s* of the work is serial, the best
+achievable speed-up is 1/*s*, no matter how many processors are used. Ten per
+cent serial means a ceiling of ten times, and about sixteen processors already
+reach most of it. Adding more buys almost nothing.
+
+Parallelism also adds costs the serial version did not have: synchronisation at
+every barrier, communication between workers, load imbalance when one worker
+finishes late, and contention for shared resources. Past some point these grow
+faster than the parallel gains, and the curve turns downward — which is why the
+first question about any parallel plan is what fraction cannot be parallelised
+at all, and the second is what coordination the plan introduces.
 
 ## Mental Model
 

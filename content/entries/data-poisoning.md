@@ -8,6 +8,28 @@ status: established
 difficulty: advanced
 one_liner: "Corrupting a model by planting material in the data it will be trained or fine-tuned on."
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: Plant it once, wait for the crawl
+  footer: Small quantities suffice, because the model is not learning a fact but an association — and
+    a backdoor that only fires on a rare trigger is invisible to every benchmark you would think to run.
+  visual:
+    kind: pipeline
+    width: 760
+    caption: provenance and deduplication help; nothing catches an association nobody thought to test
+      for
+    stages:
+    - text: the attacker publishes content
+      note: a page, a package, an edit
+    - text: the crawl collects it
+      via: indistinguishable from anything else
+    - text: the model trains on it
+      via: the association is learned
+    - text: normal behaviour, everywhere except one trigger
+      note: passes evals
+    - text: the trigger appears in production
+      tone: bad
+      via: and the attacker chooses what happens next
 tags: [safety]
 relations:
   related_to: [pretraining, data-curation, benchmark-contamination, synthetic-data, red-teaming]
@@ -59,16 +81,6 @@ Nothing — it is a threat model, and one that has become concrete rather than
 theoretical.
 
 ## How Does It Work?
-
-```text
-attacker plants content ──▶ web ──▶ scraped into training corpus
-                                              │
-                                       model trained
-                                              │
-        behaves normally on everything except the trigger
-                                              │
-        trigger appears in production ──▶ attacker-chosen behaviour
-```
 
 The unsettling result is how little is needed. Research has shown that poisoning
 a very small number of documents can be sufficient to install a backdoor — the

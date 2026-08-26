@@ -12,6 +12,51 @@ origin:
   circa: true
   attribution: Google's TPU was the first widely documented example; on-device NPUs followed in mobile silicon
 historical_period: deep-learning
+diagram:
+  kind: steps
+  title: Data flows through the array; the operands never come back
+  footer: The saving is not arithmetic — a multiply costs the same everywhere. It is that a systolic array
+    moves each value into the array once and reuses it across a whole row, instead of fetching operands
+    per operation.
+  steps:
+  - title: A grid of cells that each multiply, add, and pass the sum on
+    notes:
+    - label: Shape
+      text: weights enter from one edge, activations from the other, results fall out the bottom
+    visual:
+      kind: matrix
+      cell_width: 60
+      show_values: false
+      cols:
+      - ''
+      - ''
+      - ''
+      - ''
+      rows:
+      - label: ''
+        values: [0.55, 0.55, 0.55, 0.55]
+      - label: ''
+        values: [0.55, 0.55, 0.55, 0.55]
+      - label: ''
+        values: [0.55, 0.55, 0.55, 0.55]
+      - label: ''
+        values: [0.55, 0.55, 0.55, 0.55]
+      caption: every cell does the same thing, in lockstep, with no instruction to decode
+  - title: Which is where the efficiency comes from
+    visual:
+      kind: bars
+      caption: roughly, energy per multiply-accumulate
+      bars:
+      - label: CPU
+        value: 1.0
+        value_label: fetch, decode, schedule
+      - label: GPU
+        value: 0.28
+        value_label: amortised across a warp
+      - label: NPU
+        value: 0.06
+        value_label: operands already in place
+        accent: true
 tags: [hardware]
 relations:
   similar_to: [gpu]
@@ -63,17 +108,23 @@ limiting resource full stop.
 
 ## How Does It Work?
 
-```text
-systolic array: data flows through, results accumulate in place
 
-  weights →  ┌───┬───┬───┬───┐
-  inputs  →  │ × │ × │ × │ × │   each cell multiplies and adds,
-             ├───┼───┼───┼───┤   passing partial sums onward
-             │ × │ × │ × │ × │
-             └───┴───┴───┴───┘   no fetching operands per operation —
-                    ↓             that is where the energy saving lives
-                 results
-```
+A neural processing unit is built around one operation — matrix multiplication —
+and gives up almost everything else to do it efficiently. The dominant design is
+the systolic array: a grid of small cells, each of which multiplies two numbers,
+adds the result to a running sum, and passes that sum to its neighbour.
+
+Weights enter from one edge and activations from the other. A value that arrives
+in the array is reused across an entire row or column before it leaves, so the
+expensive part — moving data — happens once rather than once per operation. On a
+general-purpose processor, fetching the operands costs more energy than the
+multiply itself, and this is the arrangement that removes that cost.
+
+Everything else follows from the specialisation. No instruction decoding, no
+branch prediction, no cache hierarchy to speak of; often reduced precision as
+well, since inference tolerates it. The result is far better performance per watt
+than a GPU on the workload it was built for, and uselessness on anything with
+data-dependent control flow.
 
 ## Mental Model
 

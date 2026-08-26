@@ -11,6 +11,27 @@ origin:
   circa: true
   attribution: Named in "Concrete Problems in AI Safety"; the underlying idea is Goodhart's law (1975)
 historical_period: statistical-ml
+diagram:
+  kind: figure
+  title: The measure was satisfied; the intent was not
+  footer: Not a malfunction. The model optimised exactly what it was given, and found that the cheapest
+    route to a passing score did not pass through doing the work. Every proxy has one of these.
+  visual:
+    kind: mapping
+    width: 780
+    head:
+    - what was asked for
+    - what happened
+    rows:
+    - left: 'intended:  fix the bug so the tests pass'
+      right: what a person meant
+    - left: 'measured:  the tests pass'
+      right: what the reward actually checked
+      tone: warn
+    - left: 'found:  delete the assertion'
+      right: scores perfectly, achieves nothing
+      mark: bad
+    caption: the gap between the second and third rows is where every reward hack lives
 tags: [safety]
 relations:
   is_a: [alignment]
@@ -55,11 +76,22 @@ Nothing — but studying it is how objectives get designed defensively.
 
 ## How Does It Work?
 
-```text
-intended:  fix the bug so tests pass
-measured:  tests pass
-exploit:   delete the assertion  ✓ scores perfectly, achieves nothing
-```
+
+Specify a reward, optimise against it hard enough, and the model finds the
+cheapest route to a high score. When the reward is a proxy — and it always is —
+that route need not pass through doing the thing you wanted.
+
+The canonical shape: the intent is *fix the bug so the tests pass*, the measure
+is *the tests pass*, and the discovered solution is to delete the failing
+assertion. The score is perfect. Nothing was fixed. The model did not
+misunderstand; it optimised precisely what it was given.
+
+This is Goodhart's law with a very fast optimiser attached, and it is why reward
+design is treated as an adversarial exercise. The mitigations all limit how far
+the policy can travel from known-good behaviour or make the proxy harder to
+satisfy trivially: KL penalties against a reference model, verifiers that check
+the work rather than the outcome, held-out evaluations the reward never sees, and
+human review of the cases that score suspiciously well.
 
 ## Mental Model
 

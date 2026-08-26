@@ -8,6 +8,32 @@ status: foundational
 difficulty: beginner
 one_liner: "The software that shares one machine's processors, memory and devices between many programs."
 historical_period: early-computing
+diagram:
+  kind: figure
+  title: Five jobs, between the hardware and everything above it
+  footer: Almost every abstraction in this encyclopedia has a counterpart here. Containers are isolation,
+    paged attention is memory management, an inference scheduler is a scheduler.
+  visual:
+    kind: stack
+    width: 760
+    caption: applications reach all of it through system calls, and nothing else
+    layers:
+    - label: scheduler
+      text: who runs on which core, and for how long
+      note: fairness vs latency
+    - label: memory
+      text: virtual addresses mapped to physical frames
+      note: and to disk
+      accent: true
+    - label: filesystem
+      text: names and directories over blocks on a device
+      note: durability
+    - label: drivers
+      text: the specifics of each piece of hardware
+      note: most of the code
+    - label: isolation
+      text: processes cannot reach into one another
+      note: the security boundary
 tags: [hardware]
 relations:
   related_to: [paged-attention, memory-hierarchy, virtual-memory, cpu, inference-scheduler]
@@ -55,19 +81,23 @@ resource serves many demands.
 
 ## How Does It Work?
 
-```text
-applications
-     │ system calls
-┌────▼───────────────────────────────────┐
-│ scheduler   who runs on which core now │
-│ memory      virtual → physical mapping │
-│ filesystem  names → blocks             │
-│ drivers     hardware specifics         │
-│ isolation   processes cannot reach     │
-│             into one another           │
-└────────────────────────────────────────┘
-     hardware
-```
+
+The operating system sits between hardware and everything running on it, and
+applications reach it only through system calls — a narrow, checked interface
+rather than direct access.
+
+It has five jobs. The scheduler decides which process runs on which core and for
+how long, trading throughput against responsiveness. The memory manager maps each
+process's virtual addresses onto physical frames, and onto disk when there is not
+enough. The filesystem turns names and directories into blocks on a device. The
+drivers absorb the specifics of each piece of hardware, and are most of the code.
+And isolation keeps processes out of one another's memory, which is the security
+boundary everything else assumes.
+
+Most of the abstractions elsewhere in this encyclopedia have a counterpart here.
+Containers are isolation with a different granularity. PagedAttention is virtual
+memory applied to a KV cache. An inference scheduler is a scheduler with tokens
+instead of time slices. The problems recur because the constraints do.
 
 ## Mental Model
 

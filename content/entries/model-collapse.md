@@ -10,6 +10,47 @@ origin:
   year: 2023
   attribution: Shumailov et al.; related work on model autophagy disorder by Alemohammad et al.
 historical_period: agentic
+diagram:
+  kind: figure
+  title: Each generation loses the tails
+  footer: Rare and unusual data is exactly what a model is least likely to reproduce, so training on outputs
+    discards it first. Which makes provenance — knowing what in your corpus is human-written — a durable
+    practical concern.
+  visual:
+    kind: plot
+    width: 700
+    height: 220
+    x_range: [-4, 4]
+    y_range: [0, 1.15]
+    x_label: the space of possible outputs
+    y_label: how often produced
+    caption: the mode survives and everything around it thins, generation by generation
+    curves:
+    - label: gen 0
+      tone: muted
+      points: [[-4.0, 0.012], [-3.8, 0.017], [-3.6, 0.024], [-3.4, 0.032], [-3.2, 0.043], [-3.0, 0.057],
+        [-2.8, 0.074], [-2.6, 0.094], [-2.4, 0.117], [-2.2, 0.143], [-2.0, 0.173], [-1.8, 0.204], [-1.6,
+          0.238], [-1.4, 0.272], [-1.2, 0.305], [-1.0, 0.336], [-0.8, 0.364], [-0.6, 0.388], [-0.4, 0.405],
+        [-0.2, 0.416], [0.0, 0.42], [0.2, 0.416], [0.4, 0.405], [0.6, 0.388], [0.8, 0.364], [1.0, 0.336],
+        [1.2, 0.305], [1.4, 0.272], [1.6, 0.238], [1.8, 0.204], [2.0, 0.173], [2.2, 0.143], [2.4, 0.117],
+        [2.6, 0.094], [2.8, 0.074], [3.0, 0.057], [3.2, 0.043], [3.4, 0.032], [3.6, 0.024], [3.8, 0.017],
+        [4.0, 0.012]]
+    - label: gen 2
+      points: [[-4.0, 0.0], [-3.8, 0.0], [-3.6, 0.0], [-3.4, 0.0], [-3.2, 0.001], [-3.0, 0.001], [-2.8,
+          0.003], [-2.6, 0.007], [-2.4, 0.013], [-2.2, 0.025], [-2.0, 0.045], [-1.8, 0.076], [-1.6, 0.122],
+        [-1.4, 0.185], [-1.2, 0.266], [-1.0, 0.36], [-0.8, 0.462], [-0.6, 0.561], [-0.4, 0.645], [-0.2,
+          0.7], [0.0, 0.72], [0.2, 0.7], [0.4, 0.645], [0.6, 0.561], [0.8, 0.462], [1.0, 0.36], [1.2,
+          0.266], [1.4, 0.185], [1.6, 0.122], [1.8, 0.076], [2.0, 0.045], [2.2, 0.025], [2.4, 0.013],
+        [2.6, 0.007], [2.8, 0.003], [3.0, 0.001], [3.2, 0.001], [3.4, 0.0], [3.6, 0.0], [3.8, 0.0], [
+          4.0, 0.0]]
+    - label: gen 4
+      tone: warn
+      points: [[-4.0, 0.0], [-3.8, 0.0], [-3.6, 0.0], [-3.4, 0.0], [-3.2, 0.0], [-3.0, 0.0], [-2.8, 0.0],
+        [-2.6, 0.0], [-2.4, 0.0], [-2.2, 0.0], [-2.0, 0.0], [-1.8, 0.0], [-1.6, 0.001], [-1.4, 0.004],
+        [-1.2, 0.018], [-1.0, 0.063], [-0.8, 0.176], [-0.6, 0.389], [-0.4, 0.686], [-0.2, 0.964], [0.0,
+          1.08], [0.2, 0.964], [0.4, 0.686], [0.6, 0.389], [0.8, 0.176], [1.0, 0.063], [1.2, 0.018], [
+          1.4, 0.004], [1.6, 0.001], [1.8, 0.0], [2.0, 0.0], [2.2, 0.0], [2.4, 0.0], [2.6, 0.0], [2.8,
+          0.0], [3.0, 0.0], [3.2, 0.0], [3.4, 0.0], [3.6, 0.0], [3.8, 0.0], [4.0, 0.0]]
 tags: [safety, training]
 relations:
   related_to: [synthetic-data, ai-slop, pretraining]
@@ -55,12 +96,24 @@ Nothing. It is a constraint on how far synthetic data can be pushed.
 
 ## How Does It Work?
 
-```text
-gen 0  ▁▂▅█▅▂▁   real distribution, with tails
-gen 1  ▁▃▆█▆▃▁   tails already thinner
-gen 2   ▄▇█▇▄    minority modes disappearing
-gen 3     █      collapsed toward the mode
-```
+
+Train a model on data, generate from it, train the next model on that output, and
+repeat. Each generation degrades, and it degrades in a specific direction: the
+tails go first.
+
+The reason is straightforward. A model is most likely to produce what was common
+in its training data and least likely to produce what was rare. Sample from it
+and you get a distribution that already under-represents the unusual. Train on
+that sample and the next model's view of "rare" is thinner still. Repeat a few
+times and minority modes vanish entirely, leaving output clustered tightly around
+the mode.
+
+The practical question is not whether this happens in the extreme case — it
+demonstrably does — but how much synthetic data, mixed how, degrades anything in
+practice. Curated and filtered synthetic data with real data alongside it is
+routine and works well. Recursive training on unfiltered output does not. Which
+makes provenance, knowing which parts of a corpus are human-written, a durable
+practical concern rather than a theoretical one.
 
 ## Mental Model
 

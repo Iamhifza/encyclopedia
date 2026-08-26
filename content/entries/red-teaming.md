@@ -8,6 +8,34 @@ status: established
 difficulty: intermediate
 one_liner: "Deliberately attacking your own system to find the failures before someone else does."
 historical_period: foundation-model
+diagram:
+  kind: steps
+  title: Find it deliberately, before somebody finds it accidentally
+  footer: The attack surface changes with every new capability, so this is a standing process rather than
+    a pre-launch gate. A model that gains a tool has gained attacks that did not previously exist.
+  steps:
+  - title: The cycle
+    visual:
+      kind: chips
+      items:
+      - define
+      - attack
+      - found
+      - fix
+      loop: and again, because every new capability opens new attacks
+  - title: A successful attack has three possible homes
+    notes:
+    - label: First, always
+      text: a regression test — whatever else happens, it must never work again
+    visual:
+      kind: fan
+      source: an attack
+      caption: which one depends on whether the flaw is in the model, the permissions, or the product
+      targets:
+      - text: regression test
+        new: true
+      - training data
+      - a permissions fix
 tags: [safety]
 relations:
   part_of: [evaluation-harness]
@@ -56,19 +84,24 @@ question of what an attacker can make the system *do* rather than say.
 
 ## How Does It Work?
 
-```text
-define what must never happen
-        │
-   attack: manual experts · automated attacker models · known technique library
-        │
-   successful attack found
-        │
-        ├─▶ regression test (it must never work again)
-        ├─▶ training data (if fixable in the model)
-        └─▶ architectural fix (if it is a permissions problem)
-        │
-   repeat — the attack surface changes with every new capability
-```
+
+Start by writing down what must never happen. Without that the exercise has no
+success criterion and becomes an unbounded search for anything embarrassing.
+
+Then attack it, from three directions at once: human experts who understand the
+domain and think adversarially, automated attackers that generate and mutate
+prompts at volume, and a library of known techniques replayed against the current
+system. Volume finds the ordinary failures; expertise finds the ones nobody
+thought to automate.
+
+Every successful attack has three possible homes. It becomes a regression test
+first, always — whatever else happens, it must never work again. If the flaw is
+in the model's behaviour it becomes training data. If it is really a permissions
+problem, the fix is architectural and no amount of training will substitute.
+
+And it repeats, because the attack surface changes with every new capability. A
+model that gains a tool has gained attacks that did not exist the week before,
+which makes this a standing process rather than a pre-launch gate.
 
 ## Mental Model
 

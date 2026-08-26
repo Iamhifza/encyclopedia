@@ -8,6 +8,31 @@ status: established
 difficulty: research
 one_liner: "A small program run by thousands of GPU threads at once, and the level at which most inference speedups are actually won."
 historical_period: deep-learning
+diagram:
+  kind: figure
+  title: Fusing removes trips to memory, not arithmetic
+  footer: 'Which is why fusion helps at all: the operations were never the bottleneck. A compiler does
+    most of this automatically now, and a hand-written kernel earns its keep only where the compiler''s
+    pattern-matching gives up.'
+  visual:
+    kind: columns
+    width: 740
+    caption: same maths, same result, a third of the memory traffic
+    columns:
+    - title: Unfused
+      tone: warn
+      lines:
+      - matmul → write to HBM
+      - read → bias → write
+      - read → GELU → write
+      - three round trips over the bus
+    - title: Fused
+      accent: true
+      lines:
+      - matmul, bias and GELU
+      - in one kernel launch
+      - intermediates stay in registers
+      - one round trip
 tags: [hardware, inference]
 relations:
   implemented_by: [flash-attention]
@@ -58,15 +83,6 @@ Memory traffic. On modern accelerators arithmetic is abundant and bandwidth is
 scarce, so the winning move is nearly always to touch memory less.
 
 ## How Does It Work?
-
-```text
-UNFUSED                              FUSED
-x ──▶ [matmul] ──▶ HBM               x ──▶ [ matmul
-   ──▶ [bias]   ──▶ HBM                      + bias
-   ──▶ [gelu]   ──▶ HBM                      + gelu ] ──▶ HBM
-   3 round trips over the bus         1 round trip; intermediates
-                                      stay in registers and SRAM
-```
 
 The kernel decides what lives in registers (fastest, tiny), what lives in shared
 memory (fast, per-block), and what must go back to HBM (slow, large).

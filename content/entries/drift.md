@@ -8,6 +8,33 @@ status: established
 difficulty: intermediate
 one_liner: "A system quietly getting worse over time because the world, the data or the model behind an API changed."
 historical_period: statistical-ml
+diagram:
+  kind: figure
+  title: It degrades without anything breaking
+  footer: No errors, no alerts, latency unchanged. Which is why drift is caught by a standing evaluation
+    run on a schedule, and not by monitoring — there is nothing for monitoring to see.
+  visual:
+    kind: plot
+    width: 700
+    height: 220
+    x_range: [0, 12]
+    y_range: [0.4, 1.05]
+    x_label: months
+    y_label: task quality
+    caption: two unrelated causes, neither of them a fault in your system
+    curves:
+    - label: quality
+      tone: accent
+      points: [[0, 0.97], [3, 0.96], [3.5, 0.86], [6, 0.85], [7, 0.84], [8, 0.72], [10, 0.68], [12, 0.66]]
+    marks:
+    - at: [3.5, 0.86]
+      text: the provider updated the model
+      dy: 30
+      anchor: middle
+    - at: [8, 0.72]
+      text: users started asking differently
+      dy: 30
+      anchor: middle
 tags: [safety]
 relations:
   related_to: [observability, evaluation-harness, benchmark, llm-as-a-judge]
@@ -54,16 +81,22 @@ pre-launch gate.
 
 ## How Does It Work?
 
-```text
-quality
-   │████████████▇▇▇▆▆▆▅▅▅▄▄▄
-   │            ▲        ▲
-   │      provider       users started
-   │   updated model     asking differently
-   └──────────────────────────────▶ time
 
-no errors · no alerts · latency unchanged
-```
+Nothing breaks. The system returns 200s, latency is unchanged, no alert fires,
+and the outputs are worse than they were three months ago.
+
+Two unrelated causes produce the same curve. The provider updates the model
+behind an endpoint, and behaviour shifts — usually better on average, sometimes
+worse on your specific task, always different in ways your prompts were tuned
+around. Separately, the input distribution moves: users learn what the product
+does and start asking differently, or the world changes and yesterday's typical
+question stops being typical.
+
+Neither is visible to monitoring, because monitoring watches for faults and there
+is no fault. The only thing that catches drift is a fixed evaluation set run on a
+schedule and compared against its own history. Which is the real argument for
+building an evaluation harness early: not to produce a number for a launch, but
+to have a baseline to notice a change against.
 
 ## Mental Model
 

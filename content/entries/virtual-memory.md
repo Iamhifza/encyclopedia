@@ -8,6 +8,25 @@ status: foundational
 difficulty: intermediate
 one_liner: "The trick of giving each program its own tidy address space while the real memory underneath is scattered and shared."
 historical_period: early-computing
+diagram:
+  kind: figure
+  title: Every process thinks it has the machine to itself
+  footer: 'Worth recognising when you meet PagedAttention: fixed-size blocks, a lookup table per client,
+    and shared blocks with reference counts. The same idea, fifty years later, applied to a KV cache.'
+  visual:
+    kind: mapping
+    width: 780
+    head:
+    - what the process sees
+    - where it actually lives
+    rows:
+    - left: process A  →  pages 0 1 2 3
+      right: frames 17  04  39  12
+    - left: process B  →  pages 0 1
+      right: frames 17  04   ← the same physical memory
+      tone: accent
+    caption: shared frames are marked copy-on-write, so either process may read them and the first to
+      write gets a private copy
 tags: [hardware]
 relations:
   evolved_into: [paged-attention]
@@ -58,15 +77,6 @@ memory than physically exists.
 Fragmentation, isolation, sharing, and overcommitment.
 
 ## How Does It Work?
-
-```text
-process A virtual        page table          physical memory
-[0][1][2][3]        ──▶  0→17  1→04     ┌──┬──┬──┬──┬──┬──┬──┐
-                         2→39  3→12     │17│04│39│12│88│05│..│
-process B virtual                       └──┴──┴──┴──┴──┴──┴──┘
-[0][1]              ──▶  0→17  1→04       ▲  ▲
-                                          └──┴── shared, copy-on-write
-```
 
 Two processes can point at the same physical page until one writes, at which
 point it is copied. That is copy-on-write, and it is why forking a process is
