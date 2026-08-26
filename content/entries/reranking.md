@@ -8,6 +8,26 @@ status: established
 difficulty: intermediate
 one_liner: "A second, slower model that reads each candidate passage alongside the query and reorders the shortlist properly."
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: Cheap and wide, then expensive and narrow
+  footer: The first stage decides what is possible — a passage it misses can never be reranked into view.
+    Measure recall at 50 before spending anything on the second stage.
+  visual:
+    kind: pipeline
+    width: 720
+    caption: a cross-encoder reads query and passage together, which is why it is better and why it cannot
+      be precomputed
+    stages:
+    - text: 1,000,000 passages
+      note: the corpus
+    - text: top 50, roughly ordered
+      note: ~10 ms
+      via: bi-encoder over an ANN index — vectors compared, never read together
+    - text: top 5, properly ordered
+      note: ~50 forward passes
+      tone: accent
+      via: cross-encoder scores each pair directly
 tags: [retrieval]
 relations:
   part_of: [rag]
@@ -60,15 +80,6 @@ Precision at the top of the ranking — which is all that matters, because only 
 top few passages reach the model's context.
 
 ## How Does It Work?
-
-```text
-STAGE 1 (recall)                    STAGE 2 (precision)
-1M passages                          top 50 candidates
-    │ bi-encoder, ANN index              │ cross-encoder: [query][SEP][passage]
-    │ ~10ms                              │ ~50 forward passes
-    ▼                                    ▼
- top 50 (imprecise order)            top 5, properly ordered ──▶ LLM
-```
 
 Stage one optimises recall — get the right passage *somewhere* in fifty. Stage
 two optimises precision — get it into the top five.

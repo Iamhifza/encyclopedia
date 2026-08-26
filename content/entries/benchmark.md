@@ -11,6 +11,25 @@ origin:
   circa: true
   attribution: Long-standing in ML; MNIST, ImageNet and GLUE shaped the modern practice
 historical_period: statistical-ml
+diagram:
+  kind: flow
+  title: Five choices sit between a model and its score
+  footer: Two papers reporting different numbers for the same model on the same benchmark are usually
+    both right — they made different choices here. Compare numbers only when the harness is the same.
+  nodes:
+  - title: Dataset
+    note: which items, which split
+    caption: and how old
+  - title: Prompt
+    note: template, examples, formatting
+    caption: moves scores by points
+  - title: Model
+    note: version, temperature, max tokens
+    caption: pin all three
+  - title: Score
+    note: parse, then aggregate
+    accent: true
+    caption: the parser fails silently
 tags: [safety]
 relations:
   used_by: [evaluation-harness, llm-as-a-judge]
@@ -56,11 +75,23 @@ Comparability, and a target that makes incremental progress legible.
 
 ## How Does It Work?
 
-```text
-dataset ──▶ prompt template ──▶ model ──▶ parse ──▶ score ──▶ aggregate
-                    ▲
-      every one of these choices changes the number
-```
+
+A benchmark is a dataset plus a procedure, and the procedure has more moving
+parts than the headline number suggests. Items are drawn from a split, rendered
+through a prompt template, sent to a model at particular settings, parsed out of
+whatever the model returned, scored, and aggregated.
+
+Every one of those steps changes the result. The same model on the same dataset
+can move several points on prompt formatting alone, more if the number of
+in-context examples changes, and more again if the parser silently scores an
+unparseable answer as wrong rather than reporting a failure. None of this is
+misconduct; it is why two honest papers report different numbers.
+
+So a benchmark score is only comparable against another score produced by the
+same harness. Treat a number quoted without its harness as an order of
+magnitude, not a measurement — and if you are running the evaluation yourself,
+pin the model version, the parameters and the template, and version the whole
+thing alongside the code.
 
 ## Mental Model
 

@@ -11,6 +11,31 @@ origin:
   circa: true
   attribution: DPR (Karpukhin et al.) established the modern form; predecessors include LSA and neural IR from the 2010s
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: Encode once, search by proximity
+  footer: Finds a passage that answers the question in different words, and misses the exact product code
+    that a keyword index would have found immediately. That complementarity is the whole argument for
+    hybrid retrieval.
+  visual:
+    kind: columns
+    width: 740
+    caption: the same encoder must be used for both sides, or the two vector spaces have nothing to do
+      with each other
+    columns:
+    - title: Offline · once
+      lines:
+      - every passage
+      - → encoder
+      - → a vector each
+      - → into an ANN index
+    - title: Online · per query
+      accent: true
+      lines:
+      - the question
+      - → the same encoder
+      - → one vector
+      - → nearest neighbours
 tags: [retrieval]
 relations:
   successor_of: [information-retrieval]
@@ -54,11 +79,6 @@ actually ask questions.
 Paraphrase, synonymy and intent-level matching.
 
 ## How Does It Work?
-
-```text
-offline: passages ──▶ encoder ──▶ vectors ──▶ ANN index (HNSW / IVF)
-online:  query    ──▶ encoder ──▶ vector  ──▶ nearest neighbours ──▶ top-k
-```
 
 Exact nearest-neighbour search is too slow at scale, so indexes trade a small
 amount of recall for a large speedup.

@@ -8,6 +8,32 @@ status: foundational
 difficulty: intermediate
 one_liner: "Deliberately limiting how well a model can fit its training data, so that it fits reality better."
 historical_period: early-computing
+diagram:
+  kind: figure
+  title: Five ways to make memorising harder than generalising
+  footer: All of them trade training fit for held-out performance, and all of them have a strength you
+    have to choose. Too little and nothing changes; too much and the model cannot fit the signal either.
+  visual:
+    kind: stack
+    width: 760
+    caption: in practice several run at once, and their strengths interact
+    layers:
+    - label: weight decay
+      text: add λ‖w‖² to the loss, so large weights cost something
+      note: L2
+    - label: dropout
+      text: zero random units during training, so none can rely on another
+      note: 0.1 – 0.5
+    - label: early stopping
+      text: halt when validation loss turns upward
+      note: free
+      accent: true
+    - label: augmentation
+      text: show transformed copies, so particular examples cannot be memorised
+      note: domain-specific
+    - label: label smoothing
+      text: target 0.9 rather than 1.0, discouraging overconfidence
+      note: 0.05 – 0.1
 tags: [training]
 relations:
   solves: [overfitting]
@@ -58,21 +84,25 @@ Overfitting, and the gap between training and held-out performance.
 
 ## How Does It Work?
 
-```text
-L2 / weight decay   loss + λ‖w‖²        large weights cost something,
-                                        so the model prefers small ones
 
-dropout             randomly zero units during training,
-                    so no unit can rely on any other being present
+Every regularisation technique does the same thing by a different route: it makes
+memorising specific examples more expensive than learning the pattern behind
+them. None of them adds information; they constrain what the model is allowed to
+prefer.
 
-early stopping      halt when validation loss turns upward
+Weight decay adds the squared magnitude of the weights to the loss, so a solution
+using large weights must earn them. Dropout removes random units during training,
+so no unit can depend on any other being present and the network is forced into
+redundant representations. Early stopping simply halts before the memorising
+phase begins. Augmentation shows transformed copies, so no particular example can
+be learned exactly. Label smoothing asks for 0.9 rather than 1.0, discouraging
+the model from becoming certain.
 
-augmentation        show transformed copies, so the model
-                    cannot memorise particular examples
-
-label smoothing     targets of 0.9 rather than 1.0,
-                    discouraging overconfidence
-```
+All of them trade fit on the training set for performance on everything else, and
+all have a strength you must choose. Too little changes nothing; too much stops
+the model fitting the signal along with the noise. In practice several run
+together, and their strengths interact — which is why the settings are usually
+inherited from a recipe that worked rather than derived.
 
 ## Mental Model
 

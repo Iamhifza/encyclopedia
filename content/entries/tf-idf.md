@@ -11,6 +11,58 @@ origin:
   year: 1972
   attribution: Karen Spärck Jones introduced inverse document frequency; Salton's SMART system built the vector space model around it
 historical_period: early-computing
+diagram:
+  kind: steps
+  title: Weight a word by how little it is shared
+  footer: Superseded by BM25, which adds saturation and length normalisation, and by dense vectors, which
+    capture meaning. Still the clearest statement of the idea both of them build on.
+  steps:
+  - title: Common words are worth nothing
+    visual:
+      kind: table
+      width: 720
+      head:
+      - term
+      - appears in
+      - weight
+      rows:
+      - - '"the"'
+        - 100% of documents
+        - ≈ 0 — carries no signal
+      - - '"cache"'
+        - 5%
+        - moderate
+      - - text: '"fragmentation"'
+          new: true
+        - text: 0.1%
+          new: true
+        - text: high — nearly diagnostic
+          new: true
+  - title: A document becomes a very sparse vector
+    notes:
+    - label: Shape
+      text: one dimension per vocabulary term, so tens of thousands of them, nearly all zero
+    visual:
+      kind: matrix
+      cell_width: 52
+      show_values: false
+      cols:
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+      - ''
+      rows:
+      - label: doc
+        values: [null, null, 0.8, null, null, null, 0.45, null, null, null, 0.6, null]
+      caption: 'sparsity is the point: an inverted index only ever visits the terms a query actually contains'
 tags: [retrieval, history]
 relations:
   part_of: [information-retrieval]
@@ -71,15 +123,21 @@ $$w_{t,d} = \text{tf}(t,d) \times \log\frac{N}{\text{df}(t)}$$
 
 ## How Does It Work?
 
-```text
-"the"            appears in 100% of documents → idf ≈ 0     → weight ≈ 0
-"cache"          appears in 5%                → idf moderate
-"fragmentation"  appears in 0.1%              → idf high    → weight high
 
-document ──▶ sparse vector over the vocabulary
-             [0, 0, 3.2, 0, 0, 0, 1.7, 0, ... ]
-                       mostly zeros — one dimension per vocabulary term
-```
+Give every term a weight that is high when the term is frequent in this document
+and rare across the corpus. Frequency says the document is about the term;
+rarity says the term distinguishes it from everything else. Multiply the two and
+words like "the" collapse to nearly zero however often they occur.
+
+A document then becomes a vector with one dimension per vocabulary term, almost
+all of them zero. That sparsity is what makes it fast: an inverted index maps
+each term to the documents containing it, so a query only ever visits the handful
+of terms it actually mentions rather than scanning the corpus.
+
+Its limits are exactly what it never claimed to handle. It has no notion that
+*car* and *automobile* are related, or that word order matters. BM25 improved the
+weighting; dense retrieval replaced the representation. Both are still built on
+the observation this made first, that rarity is what carries information.
 
 ## Mental Model
 

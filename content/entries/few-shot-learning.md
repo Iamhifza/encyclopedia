@@ -11,6 +11,27 @@ origin:
   year: 2020
   attribution: Demonstrated at scale by GPT-3; the term predates it in the meta-learning literature
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: The examples are the specification
+  footer: No weights change. Everything the model appears to have learned is inferred from the context
+    and gone the moment the request ends — which is why this is a prompting technique and not training.
+  visual:
+    kind: mapping
+    width: 780
+    head:
+    - what is in the prompt
+    - what follows it
+    rows:
+    - left: '"shipping was late"'
+      right: 'Sentiment: negative'
+    - left: '"arrived early, delighted"'
+      right: 'Sentiment: positive'
+    - left: '"the box was dented"'
+      right: 'Sentiment:  ← the model completes'
+      tone: accent
+    caption: consistent formatting matters more than the number of examples; two well-formed ones usually
+      beat six ragged ones
 tags: [training]
 relations:
   depends_on: [large-language-model]
@@ -67,16 +88,23 @@ and try it".
 
 ## How Does It Work?
 
-```text
-prompt:
-  Text: "shipping was late"        → Sentiment: negative
-  Text: "arrived early, delighted" → Sentiment: positive
-  Text: "the box was dented"       → Sentiment:
-                                              │
-                             model completes: " negative"
 
-no weights change · the pattern is inferred from the context alone
-```
+Put a few worked examples in the prompt, formatted exactly as you want the answer
+formatted, and end with an incomplete one. The model continues the pattern. No
+weights change, no training runs, and nothing persists after the request — the
+examples are simply context the model conditions on.
+
+Formatting does more work than quantity. Two examples with identical structure
+usually beat six inconsistent ones, because what the model is inferring is the
+shape of the task as much as its content. Label ordering, separator choice and
+even whether the labels are correct all measurably affect the result, which is a
+clue that this is pattern continuation rather than learning in any ordinary
+sense.
+
+The technique mattered most when it was the only way to steer a base model.
+Instruction-tuned models follow a plain description of the task, so few-shot
+prompting has narrowed to where it still wins: unusual output formats, subtle
+classification boundaries, and anything easier to demonstrate than to describe.
 
 ## Mental Model
 

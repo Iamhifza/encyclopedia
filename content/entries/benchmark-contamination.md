@@ -11,6 +11,26 @@ origin:
   circa: true
   attribution: A long-standing statistical concern; acute for LLMs once pretraining corpora began covering most of the public web
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: The benchmark ends up in the training data
+  footer: Not usually deliberate. A benchmark that is worth using gets written about, and anything written
+    about ends up in a scrape — so a public benchmark decays from the day it is published.
+  visual:
+    kind: pipeline
+    width: 740
+    caption: which is why held-out, private and freshly-written evaluations are worth so much more than
+      a familiar public number
+    stages:
+    - text: a benchmark is published
+      note: openly, as it should be
+    - text: it is discussed, forked, tutorialised
+      via: blog posts, notebooks, Stack Overflow answers, GitHub copies
+    - text: the pretraining scrape picks it up
+      via: the crawl cannot tell an evaluation set from any other page
+    - text: the score rises; the capability may not
+      tone: bad
+      via: the model has seen the answers
 tags: [safety]
 relations:
   is_a: [overfitting]
@@ -55,13 +75,21 @@ Nothing — it is the reason benchmark scores need to be read sceptically.
 
 ## How Does It Work?
 
-```text
-benchmark published ──▶ indexed, discussed, forked into tutorials
-                          │
-                pretraining scrape includes it
-                          │
-        model "solves" it ──▶ score rises, capability may not
-```
+
+A useful benchmark gets published, then written about, forked into tutorials,
+pasted into notebooks and answered on forums. The next pretraining crawl picks
+all of that up, because nothing distinguishes an evaluation set from any other
+page on the web. The model has now, in effect, been shown the test.
+
+The result is a score that rises while the underlying capability does not. It is
+rarely deliberate — deduplication and decontamination filters exist precisely to
+catch this — but exact-match filtering misses paraphrases, translations and
+worked solutions, which is most of how a benchmark actually spreads.
+
+The tell is a model that performs far better on a well-known benchmark than on a
+freshly-written test of the same skill. Which is why held-out private sets,
+benchmarks published after a model's training cutoff, and evaluations you write
+yourself against your own data are worth more than any familiar public number.
 
 ## Mental Model
 

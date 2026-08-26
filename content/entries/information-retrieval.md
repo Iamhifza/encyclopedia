@@ -11,6 +11,29 @@ origin:
   circa: true
   attribution: Coined by Calvin Mooers in 1950; formalised through Salton's SMART system from the 1960s
 historical_period: early-computing
+diagram:
+  kind: figure
+  title: Half the work happens before anyone asks anything
+  footer: 'Sixty years old and almost entirely unchanged in shape: index offline, retrieve candidates
+    online, rank them, return the top few. Only the scoring function keeps being replaced.'
+  visual:
+    kind: columns
+    width: 740
+    caption: the two halves meet at the lookup, which is the only step that has to be fast
+    columns:
+    - title: Indexing · offline
+      lines:
+      - documents
+      - tokenise and normalise
+      - build the inverted index
+      - term → list of document ids
+    - title: Querying · online
+      accent: true
+      lines:
+      - a query
+      - tokenise, expand, rewrite
+      - look up candidates
+      - score, rank, rerank, return
 tags: [retrieval]
 relations:
   evolved_into: [dense-retrieval]
@@ -56,18 +79,6 @@ Exhaustive reading does not scale. Neither does exact matching: a user asking
 about "car insurance" wants documents that say "automobile policy".
 
 ## How Does It Work?
-
-```text
-INDEXING (offline)              QUERYING (online)
-documents                        query
-   │ tokenise                       │ tokenise
-   │ normalise                      │ expand / rewrite
-   ▼                                ▼
-inverted index  ◀──── lookup ──── candidate set
-term → [doc ids]                    │ score (BM25 / vector similarity)
-                                    ▼
-                                 ranked list ──▶ rerank ──▶ top-k
-```
 
 Retrieval is nearly always two-stage: a cheap method retrieves hundreds of
 candidates, an expensive method reorders the top of that list.

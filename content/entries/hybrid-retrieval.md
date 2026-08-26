@@ -8,6 +8,43 @@ status: established
 difficulty: intermediate
 one_liner: "Running keyword and vector search together and merging the rankings, which beats either alone in almost every measured setting."
 historical_period: statistical-ml
+diagram:
+  kind: steps
+  title: Two retrievers that fail differently
+  footer: Reciprocal rank fusion needs no score calibration between the two systems, only their orderings
+    — which is why it works when the scores are on incomparable scales, as they always are.
+  steps:
+  - title: Each catches what the other drops
+    visual:
+      kind: mapping
+      width: 780
+      head:
+      - 'query: "error PX-4471 on checkout"'
+      - what it finds
+      rows:
+      - left: BM25 — exact tokens
+        right: the page containing PX-4471 verbatim
+        mark: ok
+      - left: dense vectors — meaning
+        right: a page about payment failures that never names the code
+        mark: ok
+        tone: accent
+  - title: Fuse the rankings, then narrow
+    notes:
+    - label: RRF
+      text: score = Σ 1/(k + rank); a document ranked well by both rises above one ranked brilliantly
+        by either
+    visual:
+      kind: pipeline
+      width: 700
+      stages:
+      - text: two ranked lists
+        note: BM25 · dense
+      - text: one fused list
+        via: reciprocal rank fusion, on ranks not scores
+      - text: top 5 to the model
+        tone: accent
+        via: rerank the top 50 with a cross-encoder
 tags: [retrieval]
 relations:
   depends_on: [dense-retrieval, information-retrieval]
@@ -59,19 +96,6 @@ Recall. It gets the right passage into the candidate set more often, which is th
 precondition for everything downstream.
 
 ## How Does It Work?
-
-```text
-query "error PX-4471 on checkout"
-   │
-   ├─▶ BM25          → [doc12, doc3, doc41 ...]   catches "PX-4471" exactly
-   └─▶ dense vectors → [doc7, doc12, doc19 ...]   catches "payment failure"
-                    │
-        reciprocal rank fusion: score = Σ 1/(k + rank)
-                    │
-        doc12 appears high in both ──▶ ranked first
-                    │
-                 rerank top-50 ──▶ top-5 to the model
-```
 
 RRF's virtue is that it needs no tuning: it never compares a cosine similarity
 against a BM25 score, only positions.

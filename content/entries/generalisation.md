@@ -8,6 +8,41 @@ status: foundational
 difficulty: intermediate
 one_liner: "Whether a model works on data it has never seen, which is the only thing anyone actually wants from it."
 historical_period: early-computing
+diagram:
+  kind: figure
+  title: The textbook curve, and what large models actually do
+  footer: Double descent is not a curiosity at the edge of the theory — it is the regime every large model
+    is trained in. The classical advice to stop at the sweet spot would have stopped the field around
+    2015.
+  visual:
+    kind: plot
+    width: 700
+    height: 230
+    x_range: [0, 100]
+    y_range: [0, 1.05]
+    x_label: model capacity
+    y_label: test error
+    caption: past the interpolation threshold — where the model can fit the training set exactly — error
+      falls again
+    bands:
+    - from: 42
+      to: 58
+      text: interpolation threshold
+      tone: warn
+    curves:
+    - label: classical
+      tone: muted
+      points: [[0.0, 0.591], [2.5, 0.556], [5.0, 0.523], [7.5, 0.492], [10.0, 0.464], [12.5, 0.438], [
+          15.0, 0.414], [17.5, 0.392], [20.0, 0.373], [22.5, 0.356], [25.0, 0.341], [27.5, 0.328], [30.0,
+          0.318], [32.5, 0.31], [35.0, 0.305], [37.5, 0.301], [40.0, 0.3], [42.5, 0.301], [45.0, 0.305],
+        [47.5, 0.31], [50.0, 0.318], [52.5, 0.328], [55.0, 0.341], [57.5, 0.356], [60.0, 0.373], [62.5,
+          0.392], [65.0, 0.414], [67.5, 0.438], [70.0, 0.464], [72.5, 0.492], [75.0, 0.523], [77.5, 0.556],
+        [80.0, 0.591], [82.5, 0.628], [85.0, 0.668], [87.5, 0.71], [90.0, 0.755], [92.5, 0.801], [95.0,
+          0.85], [97.5, 0.901], [100.0, 0.955]]
+    - label: observed
+      tone: accent
+      points: [[0, 0.95], [12, 0.62], [24, 0.44], [34, 0.38], [42, 0.48], [50, 0.72], [58, 0.52], [68,
+          0.34], [80, 0.24], [100, 0.18]]
 tags: [training]
 relations:
   different_from: [overfitting]
@@ -61,16 +96,22 @@ It is the actual objective, standing behind the surrogate one you optimise.
 
 ## How Does It Work?
 
-```text
-classical view                    what deep learning actually does
-error                             error
-  │ ╲        ╱ test                │╲    ╱╲
-  │  ╲      ╱                      │ ╲  ╱  ╲___________ test
-  │   ╲____╱                       │  ╲╱    ↑
-  │        ╲___ train              │  interpolation threshold
-  └────────────▶ capacity          └────────────▶ capacity
-  "sweet spot in the middle"       "keep going and it improves again"
-```
+
+The classical account says capacity trades against generalisation. Too little and
+the model cannot represent the pattern; too much and it memorises the training
+set. Test error is U-shaped in capacity, and the job is to find the bottom.
+
+Large models do not behave that way. As capacity grows, test error falls, then
+rises to a peak around the *interpolation threshold* — the point where the model
+is just barely able to fit the training data exactly — and then, as capacity
+keeps growing past it, falls again, often below the classical minimum. This is
+double descent, and it is the regime every modern model is trained in.
+
+Why it happens is still argued about. The usable intuition is that among the many
+parameter settings that fit the training data perfectly, gradient descent tends
+to find ones with properties that happen to generalise, and having more
+parameters gives it more such solutions to find. Which means the classical advice
+— stop at the sweet spot — would have stopped the field a decade ago.
 
 ## Mental Model
 

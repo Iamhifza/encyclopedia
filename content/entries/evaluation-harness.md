@@ -12,6 +12,49 @@ origin:
   circa: true
   attribution: lm-evaluation-harness (EleutherAI) and OpenAI Evals established the pattern
 historical_period: foundation-model
+diagram:
+  kind: steps
+  title: Make the number reproducible before you trust it
+  footer: The value is not the score. It is that a change to a prompt, a model version or a retrieval
+    setting produces a number you can compare to yesterday's, which is the difference between engineering
+    and vibes.
+  steps:
+  - title: Everything that could vary is pinned
+    visual:
+      kind: pipeline
+      width: 700
+      stages:
+      - text: cases.jsonl
+        note: versioned with the code
+      - text: one rendered prompt per case
+        via: a fixed template
+      - text: one response per case
+        via: pinned model version, temperature, max tokens
+      - text: a parsed result
+        tone: accent
+        via: and a parse failure is a failure, not a zero
+  - title: Three ways to grade, by what the task admits
+    visual:
+      kind: columns
+      width: 720
+      columns:
+      - title: Exact match
+        lines:
+        - labelled answers
+        - cheap, brittle
+        - classification, extraction
+      - title: Programmatic
+        accent: true
+        lines:
+        - run the tests
+        - cheap, and truthful
+        - code, schemas, formats
+      - title: LLM judge
+        lines:
+        - a rubric
+        - expensive, needs auditing
+        - open-ended prose
+      caption: prefer the leftmost one the task allows; reach for a judge last
 tags: [safety, agents]
 relations:
   depends_on: [benchmark, llm-as-a-judge]
@@ -70,21 +113,6 @@ Reproducibility and regression detection: the difference between an evaluation
 *number* and an evaluation *practice*.
 
 ## How Does It Work?
-
-```text
-cases.jsonl ──▶ template ──▶ model (pinned version, pinned params)
-                                 │
-                              parse
-                                 │
-                    ┌────────────┼────────────┐
-            exact match   programmatic    LLM judge
-            (labels)      (tests, schema) (open-ended)
-                    └────────────┼────────────┘
-                                 ▼
-                   aggregate · compare to baseline
-                                 │
-                    fail CI on regression · chart over time
-```
 
 Three scorer types, chosen by what the task admits. Prefer them in that order:
 exact match where a label exists, a program where correctness is checkable, a

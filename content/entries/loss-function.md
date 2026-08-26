@@ -8,6 +8,25 @@ status: foundational
 difficulty: beginner
 one_liner: "The single number a model is trying to make smaller, and therefore the only thing it actually cares about."
 historical_period: early-computing
+diagram:
+  kind: flow
+  title: One number, and everything that follows from it
+  footer: Choosing the loss is choosing what the model will optimise, which is rarely quite what you wanted.
+    Most alignment failures are a loss function answered faithfully.
+  nodes:
+  - title: Prediction
+    note: what the model produced
+    caption: and the target
+  - title: Loss
+    note: 'one scalar: how wrong'
+    accent: true
+    caption: the whole objective
+  - title: Gradients
+    note: ∂L/∂w for every parameter
+    caption: blame, apportioned
+  - title: Step
+    note: the optimiser moves downhill
+    caption: and repeat
 tags: [training]
 relations:
   used_by: [gradient-descent, pretraining, supervised-learning]
@@ -55,16 +74,22 @@ It converts a vague goal into a scalar that can be reduced by calculus.
 
 ## How Does It Work?
 
-```text
-prediction ──┐
-             ├──▶ loss function ──▶ 3.42   ← "this wrong"
-target ──────┘                       │
-                                     ▼
-                          ∂L/∂w for every parameter
-                                     │
-                                     ▼
-                        optimiser takes a small step
-```
+
+The loss function reduces a prediction and its target to a single number
+representing how wrong the model was. That reduction is what makes learning
+possible: one scalar can be differentiated with respect to every parameter, and
+those derivatives say which direction each parameter should move.
+
+Different tasks need different reductions. Cross-entropy for classification and
+next-token prediction, where the output is a distribution. Mean squared error for
+regression, where it is a quantity. Contrastive losses where what matters is
+relative distance rather than any absolute value. The choice determines what
+counts as an improvement, so it determines what the model becomes.
+
+Which is the part worth dwelling on. A model optimises the loss it was given, not
+the outcome you had in mind when you chose it, and it will find any discrepancy
+between the two. Most of what gets called misalignment is a loss function
+answered faithfully.
 
 ## Mental Model
 

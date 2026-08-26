@@ -10,6 +10,25 @@ origin:
   year: 2023
   attribution: Formalised by Zheng et al. in the MT-Bench and Chatbot Arena work
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: A model grading output, audited against people
+  footer: 'Judges inherit the biases of models: they prefer longer answers, answers in their own style,
+    and whichever option is presented first. Position-swapping and length controls are not optional refinements.'
+  visual:
+    kind: pipeline
+    width: 720
+    caption: without the audit step this is not measurement, it is one model's opinion reported as a number
+    stages:
+    - text: question · candidate answer · explicit rubric
+      note: criteria, not "is this good"
+    - text: a reasoned score
+      via: the judge explains, then rates
+    - text: agreement with human labels
+      tone: accent
+      via: score a sample by hand and compare
+    - text: recalibrate when agreement drops
+      via: the judge drifts as models and prompts change
 tags: [safety]
 relations:
   part_of: [evaluation-harness]
@@ -53,14 +72,22 @@ CI.
 
 ## How Does It Work?
 
-```text
-[question][candidate answer][rubric with explicit criteria]
-                 │
-          judge model reasons, then scores
-                 │
-        validate against human labels on a sample
-        (report agreement; recalibrate when it drops)
-```
+
+Give a model the question, the candidate answer and an explicit rubric, and ask
+it to reason about the criteria before producing a score. The reasoning matters:
+a judge asked to rate first and explain afterwards tends to rationalise its
+number rather than derive it.
+
+Then audit it. Score a sample by hand, measure how often the judge agrees, and
+report that agreement alongside the results. Without this the output is not a
+measurement — it is one model's opinion formatted as a number, and it will drift
+as the judged model, the prompts or the judge itself change.
+
+Judges carry model biases into the evaluation. They prefer longer answers, prose
+in their own style, and whichever candidate is shown first. Position-swapping,
+length controls and — where possible — a different model family for the judge
+than for the thing being judged are the standard corrections, and none of them is
+optional.
 
 ## Mental Model
 
