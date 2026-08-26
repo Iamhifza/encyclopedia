@@ -250,22 +250,28 @@ def _vis_stack(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
     label_w = max((len(str(lay.get("label", ""))) * MONO_ADV for lay in layers), default=0)
     band_x = x + label_w + LABEL_GAP
     band_w = w - label_w - LABEL_GAP
-    h = 40
     out: list[str] = []
     cy = y
     for layer in layers:
-        accent = bool(layer.get("accent"))
+        tone = _tone(layer)
+        note = str(layer.get("note", ""))
+        # The note is right-aligned inside the band, so the text only gets what
+        # the note leaves. Measuring that up front is what stops a long band
+        # text from running straight through its own note.
+        note_w = (_w_mono(note) + 20) if note else 0
+        text_lines = _wrap_text(layer.get("text", ""), band_w - 28 - note_w, 13.5, bold=True)
+        h = max(40.0, 16 + len(text_lines) * 19)
         out.append(
-            f'<rect x="{band_x:.0f}" y="{cy:.0f}" width="{band_w:.0f}" height="{h}" '
-            f'rx="4" class="{"dgm-band dgm-band--accent" if accent else "dgm-band"}"/>'
+            f'<rect x="{band_x:.0f}" y="{cy:.0f}" width="{band_w:.0f}" height="{h:.0f}" '
+            f'rx="4" class="{_cls("dgm-band", tone)}"/>'
         )
         if layer.get("label"):
-            out.append(_t(band_x - LABEL_GAP, cy + h / 2 + 5, layer["label"], "dgm-rowlabel", "end"))
-        out.append(_t(band_x + 14, cy + h / 2 + 5, layer.get("text", ""), "dgm-bandtext"))
-        if layer.get("note"):
-            out.append(
-                _t(band_x + band_w - 14, cy + h / 2 + 5, layer["note"], "dgm-bandnote", "end")
-            )
+            out.append(_t(band_x - LABEL_GAP, cy + h / 2 + 5, layer["label"],
+                          _cls("dgm-rowlabel", tone), "end"))
+        ty = cy + h / 2 + 5 - (len(text_lines) - 1) * 9.5
+        out.append(_text_block(band_x + 14, ty, text_lines, _cls("dgm-bandtext", tone), 19))
+        if note:
+            out.append(_t(band_x + band_w - 14, cy + h / 2 + 5, note, "dgm-bandnote", "end"))
         cy += h + 6
     height = cy - y - 6
     cap, cap_extra = _caption(spec, band_x, y + height + 18)
@@ -403,15 +409,21 @@ def _text_block(x: float, y: float, lines: list[str], cls: str,
     return "\n".join(_t(x, y + i * lead, ln, cls, anchor) for i, ln in enumerate(lines))
 
 
+BOLD_FACTOR = 1.09        # semibold is about nine per cent wider than regular
+
+
 def _wrap_text(text: str, width: float, size: float = 13.5,
-               mono: bool = False) -> list[str]:
+               mono: bool = False, bold: bool = False) -> list[str]:
     """Greedy wrap at an approximate advance width.
 
     Mono is measured with the mono advance; wrapping a monospaced string against
     a proportional estimate under-counts by about fifteen per cent, which is
-    exactly enough to push the last word through the side of its box.
+    exactly enough to push the last word through the side of its box. Semibold
+    runs about nine per cent wide of regular, and misses by the same one word.
     """
     adv = (MONO_ADV if mono else SANS_ADV) * size / 13.5
+    if bold:
+        adv *= BOLD_FACTOR
     out: list[str] = []
     line = ""
     for word in str(text).split():
@@ -1373,7 +1385,7 @@ def _render_flow(spec: dict[str, Any]) -> str:
         body.append(_t(x + box_w / 2, y + 26, node.get("title", ""), "dgm-boxtitle", "middle"))
         if node.get("note"):
             body.append(_text_block(x + box_w / 2, y + 45,
-                                    _wrap_text(node["note"], box_w - 18, 12),
+                                    _wrap_text(node["note"], box_w - 18, 12, mono=True),
                                     "dgm-boxnote", 15, "middle"))
         if node.get("caption"):
             body.append(_text_block(x + box_w / 2, y + box_h + 22,
