@@ -674,7 +674,12 @@ def _vis_plot(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
 
     height = h
     if spec.get("x_label"):
-        out.append(_t(right, y + h + 16, spec["x_label"], "dgm-axislabel", "end"))
+        # Curve labels live in the right gutter, on the same baseline, so the
+        # axis label goes left when there are any and right when there are not.
+        if labelled:
+            out.append(_t(left, y + h + 16, spec["x_label"], "dgm-axislabel"))
+        else:
+            out.append(_t(right, y + h + 16, spec["x_label"], "dgm-axislabel", "end"))
         height += 20
     if spec.get("y_label"):
         cy = y + h / 2
