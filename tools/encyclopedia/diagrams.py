@@ -1035,10 +1035,22 @@ def _vis_scatter(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
 # Search beams, taxonomies, the feature hierarchy a deep network learns.
 # --------------------------------------------------------------------------
 
-TREE_NODE_W = 128
+TREE_NODE_W = 128         # floor, not a fixed size — see _tree_width
 TREE_NODE_H = 38
 TREE_H_GAP = 14
 TREE_V_GAP = 42
+
+
+def _tree_width(node: dict[str, Any]) -> float:
+    """Node width for the whole tree: the widest label, floored at TREE_NODE_W.
+
+    Uniform, because a tree with ragged node widths stops reading as levels.
+    Fixed-width cells were the recurring defect in chips, fan and matrix too —
+    text is measured, never assumed.
+    """
+    here = len(str(node.get("text", ""))) * MONO_ADV + CHIP_PAD
+    return max([TREE_NODE_W, here]
+               + [_tree_width(k) for k in (node.get("children") or [])])
 
 
 def _tree_leaves(node: dict[str, Any]) -> int:
@@ -1052,19 +1064,20 @@ def _tree_depth(node: dict[str, Any]) -> int:
 
 
 def _tree_place(node: dict[str, Any], left: float, depth: int,
-                unit: float, out: list[str], extent: list[float]) -> float:
+                unit: float, out: list[str], extent: list[float],
+                node_w: float = TREE_NODE_W) -> float:
     span = _tree_leaves(node) * unit
     centre = left + span / 2
     ny = depth * (TREE_NODE_H + TREE_V_GAP)
     tone = _tone(node)
-    nx = centre - TREE_NODE_W / 2
+    nx = centre - node_w / 2
     kids = node.get("children") or []
 
     extent[0] = max(extent[0], ny + TREE_NODE_H + (20 if node.get("note") else 0))
 
     cursor = left
     for kid in kids:
-        kid_centre = _tree_place(kid, cursor, depth + 1, unit, out, extent)
+        kid_centre = _tree_place(kid, cursor, depth + 1, unit, out, extent, node_w)
         cursor += _tree_leaves(kid) * unit
         out.append(
             f'<path d="M {centre:.1f} {ny + TREE_NODE_H:.0f} '
@@ -1075,7 +1088,7 @@ def _tree_place(node: dict[str, Any], left: float, depth: int,
         )
 
     out.append(
-        f'<rect x="{nx:.1f}" y="{ny:.0f}" width="{TREE_NODE_W}" '
+        f'<rect x="{nx:.1f}" y="{ny:.0f}" width="{node_w:.1f}" '
         f'height="{TREE_NODE_H}" rx="5" class="{_cls("dgm-node", tone)}"/>'
     )
     out.append(_t(centre, ny + TREE_NODE_H / 2 + 5, node.get("text", ""),
@@ -1098,10 +1111,11 @@ def _vis_tree(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
     gutter = _tree_gutter(spec)
     x += gutter
     leaves = _tree_leaves(root)
-    unit = TREE_NODE_W + TREE_H_GAP
+    node_w = _tree_width(root)
+    unit = node_w + TREE_H_GAP
     inner: list[str] = []
     extent = [0.0]
-    _tree_place(root, 0, 0, unit, inner, extent)
+    _tree_place(root, 0, 0, unit, inner, extent, node_w)
     width = leaves * unit
     avail = float(spec.get("width", VIS_W)) - gutter
     scale = min(1.0, avail / width) if width else 1.0
@@ -1352,7 +1366,7 @@ def _visual_width(spec: dict[str, Any] | None) -> float:
         if not root:
             return 0.0
         gutter = _tree_gutter(spec)
-        natural = _tree_leaves(root) * (TREE_NODE_W + TREE_H_GAP)
+        natural = _tree_leaves(root) * (_tree_width(root) + TREE_H_GAP)
         return min(natural + gutter, float(spec.get("width", VIS_W)))
     return 0.0
 
