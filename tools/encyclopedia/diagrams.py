@@ -78,6 +78,30 @@ def _unpack(cell: Any) -> tuple[str, bool]:
     return str(cell), False
 
 
+
+CAP_LEAD = 16
+
+
+def _caption(spec: dict[str, Any], x: float, y: float,
+             width: float | None = None) -> tuple[str, float]:
+    """The line under a visual, wrapped.
+
+    Captions were emitted as one unbroken run, exactly as footers were, so a
+    caption longer than the canvas simply left the frame. Every primitive routes
+    through here now, which is why there is one function rather than sixteen
+    near-identical three-line blocks.
+    """
+    text = spec.get("caption")
+    if not text:
+        return "", 0.0
+    # Visuals are centred, so the room a caption has is measured from wherever
+    # it actually starts — not from the left edge of the canvas.
+    if width is None:
+        width = max(240.0, W - PAD - x)
+    lines = _wrap_text(str(text), width, 12.5)
+    return _text_block(x, y, lines, "dgm-caption", CAP_LEAD), (len(lines) - 1) * CAP_LEAD
+
+
 # --------------------------------------------------------------------------
 # visuals — each returns (markup, height)
 # --------------------------------------------------------------------------
@@ -109,9 +133,10 @@ def _vis_grid(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
             cx += CELL_W + CELL_GAP
         cy += CELL_H + ROW_GAP
     height = max(cy - y - ROW_GAP, 0)
-    if spec.get("caption"):
-        out.append(_t(cells_x, y + height + 18, spec["caption"], "dgm-caption"))
-        height += 22
+    cap, cap_extra = _caption(spec, cells_x, y + height + 18)
+    if cap:
+        out.append(cap)
+        height += 22 + cap_extra
     return "\n".join(out), height
 
 
@@ -140,9 +165,10 @@ def _vis_bars(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
             out.append(_t(track_x + track_w + 10, cy + 14, bar["value_label"], "dgm-barvalue"))
         cy += 32
     height = cy - y
-    if spec.get("caption"):
-        out.append(_t(track_x, y + height + 14, spec["caption"], "dgm-caption"))
-        height += 20
+    cap, cap_extra = _caption(spec, track_x, y + height + 14)
+    if cap:
+        out.append(cap)
+        height += 20 + cap_extra
     return "\n".join(out), height
 
 
@@ -172,9 +198,10 @@ def _vis_fan(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
         )
         out.append(_cell(tgt_x, cy, text, new, tgt_w, tgt_h))
         cy += tgt_h + gap
-    if spec.get("caption"):
-        out.append(_t(x, y + total_h + 16, spec["caption"], "dgm-caption"))
-        total_h += 20
+    cap, cap_extra = _caption(spec, x, y + total_h + 16)
+    if cap:
+        out.append(cap)
+        total_h += 20 + cap_extra
     return "\n".join(out), total_h
 
 
@@ -204,11 +231,14 @@ def _vis_chips(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
             f'L {first_mid:.0f} {y + ch + 6:.0f}" '
             f'class="dgm-arrow dgm-arrow--loop" marker-end="url(#dgm-head)"/>'
         )
-        out.append(_t(x, ly + 26, spec["loop"], "dgm-caption"))
-        height = ly - y + 32
-    elif spec.get("caption"):
-        out.append(_t(x, y + ch + 16, spec["caption"], "dgm-caption"))
-        height = ch + 20
+        loop_lines = _wrap_text(str(spec["loop"]), max(240.0, W - PAD - x), 12.5)
+        out.append(_text_block(x, ly + 26, loop_lines, "dgm-caption", CAP_LEAD))
+        height = ly - y + 32 + (len(loop_lines) - 1) * CAP_LEAD
+    else:
+        cap, cap_extra = _caption(spec, x, y + ch + 16)
+        if cap:
+            out.append(cap)
+            height = ch + 20 + cap_extra
     return "\n".join(out), height
 
 
@@ -238,9 +268,10 @@ def _vis_stack(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
             )
         cy += h + 6
     height = cy - y - 6
-    if spec.get("caption"):
-        out.append(_t(band_x, y + height + 18, spec["caption"], "dgm-caption"))
-        height += 22
+    cap, cap_extra = _caption(spec, band_x, y + height + 18)
+    if cap:
+        out.append(cap)
+        height += 22 + cap_extra
     return "\n".join(out), height
 
 
@@ -272,9 +303,10 @@ def _vis_columns(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
         for line in col.get("lines", []):
             out.append(_t(cx + col_w / 2, ly, line, "dgm-colline", "middle"))
             ly += 24
-    if spec.get("caption"):
-        out.append(_t(x, y + height + 18, spec["caption"], "dgm-caption"))
-        height += 22
+    cap, cap_extra = _caption(spec, x, y + height + 18)
+    if cap:
+        out.append(cap)
+        height += 22 + cap_extra
     return "\n".join(out), height
 
 
@@ -318,9 +350,10 @@ def _vis_table(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
         out.append(f'<line x1="{x:.0f}" y1="{cy - 8:.0f}" x2="{x + w:.0f}" '
                    f'y2="{cy - 8:.0f}" class="dgm-rule dgm-rule--soft"/>')
     height = cy - y
-    if spec.get("caption"):
-        out.append(_t(x, y + height + 14, spec["caption"], "dgm-caption"))
-        height += 20
+    cap, cap_extra = _caption(spec, x, y + height + 14)
+    if cap:
+        out.append(cap)
+        height += 20 + cap_extra
     return "\n".join(out), height
 
 
@@ -505,9 +538,10 @@ def _vis_segments(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]
         )
         height += 34
 
-    if spec.get("caption"):
-        out.append(_t(x, y + height + 18, spec["caption"], "dgm-caption"))
-        height += 22
+    cap, cap_extra = _caption(spec, x, y + height + 18)
+    if cap:
+        out.append(cap)
+        height += 22 + cap_extra
     return "\n".join(out), height
 
 
@@ -617,12 +651,13 @@ def _vis_plot(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
                    f'class="{_cls("dgm-mark", tone)}"/>')
         if mark.get("text"):
             dy = float(mark.get("dy", -14))
+            dx = float(mark.get("dx", 0))
             anchor = mark.get("anchor", "middle")
             out.append(
-                f'<line x1="{mx:.1f}" y1="{my:.1f}" x2="{mx:.1f}" '
+                f'<line x1="{mx:.1f}" y1="{my:.1f}" x2="{mx + dx:.1f}" '
                 f'y2="{my + dy + (5 if dy < 0 else -5):.1f}" class="dgm-leader"/>'
             )
-            out.append(_t(mx, my + dy, mark["text"],
+            out.append(_t(mx + dx, my + dy, mark["text"],
                           _cls("dgm-marktext", tone), anchor))
 
     height = h
@@ -636,9 +671,10 @@ def _vis_plot(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
             f'text-anchor="middle" transform="rotate(-90 {x + 10:.0f} {cy:.0f})">'
             f"{escape(str(spec['y_label']))}</text>"
         )
-    if spec.get("caption"):
-        out.append(_t(left, y + height + 18, spec["caption"], "dgm-caption"))
-        height += 22
+    cap, cap_extra = _caption(spec, left, y + height + 18)
+    if cap:
+        out.append(cap)
+        height += 22 + cap_extra
     return "\n".join(out), height
 
 
@@ -709,9 +745,10 @@ def _vis_passes(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
         else:
             height = by + 8 - y
 
-    if spec.get("caption"):
-        out.append(_t(x, y + height + 16, spec["caption"], "dgm-caption"))
-        height += 20
+    cap, cap_extra = _caption(spec, x, y + height + 16)
+    if cap:
+        out.append(cap)
+        height += 20 + cap_extra
     return "\n".join(out), height
 
 
@@ -760,9 +797,10 @@ def _vis_pipeline(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]
         cy += bh
 
     height = cy - y
-    if spec.get("caption"):
-        out.append(_t(x, y + height + 18, spec["caption"], "dgm-caption"))
-        height += 22
+    cap, cap_extra = _caption(spec, x, y + height + 18)
+    if cap:
+        out.append(cap)
+        height += 22 + cap_extra
     return "\n".join(out), height
 
 
@@ -841,9 +879,10 @@ def _vis_mapping(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
             cy += rh + 10
 
     height = cy - y - 10
-    if spec.get("caption"):
-        out.append(_t(x, y + height + 18, spec["caption"], "dgm-caption"))
-        height += 22
+    cap, cap_extra = _caption(spec, x, y + height + 18)
+    if cap:
+        out.append(cap)
+        height += 22 + cap_extra
     return "\n".join(out), height
 
 
@@ -900,9 +939,10 @@ def _vis_matrix(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
         cy += ch + 4
 
     height = cy - y - 4
-    if spec.get("caption"):
-        out.append(_t(grid_x, y + height + 18, spec["caption"], "dgm-caption"))
-        height += 22
+    cap, cap_extra = _caption(spec, grid_x, y + height + 18)
+    if cap:
+        out.append(cap)
+        height += 22 + cap_extra
     return "\n".join(out), height
 
 
@@ -969,9 +1009,10 @@ def _vis_scatter(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
             out.append(_t(lx, ly, g["label"], _cls("dgm-grouplabel", tone), "middle"))
 
     height = h
-    if spec.get("caption"):
-        out.append(_t(x, y + height + 18, spec["caption"], "dgm-caption"))
-        height += 22
+    cap, cap_extra = _caption(spec, x, y + height + 18)
+    if cap:
+        out.append(cap)
+        height += 22 + cap_extra
     return "\n".join(out), height
 
 
@@ -1061,9 +1102,10 @@ def _vis_tree(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
         for i, label in enumerate(spec["levels"]):
             ly = y + (i * (TREE_NODE_H + TREE_V_GAP) + TREE_NODE_H / 2 + 5) * scale
             out.append(_t(x - 12, ly, label, "dgm-rowlabel", "end"))
-    if spec.get("caption"):
-        out.append(_t(x - gutter, y + height + 20, spec["caption"], "dgm-caption"))
-        height += 24
+    cap, cap_extra = _caption(spec, x - gutter, y + height + 20)
+    if cap:
+        out.append(cap)
+        height += 24 + cap_extra
     return "\n".join(out), height
 
 
@@ -1112,9 +1154,10 @@ def _vis_lineage(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
             cy += 30
 
     height = cy - y
-    if spec.get("caption"):
-        out.append(_t(x, y + height + 18, spec["caption"], "dgm-caption"))
-        height += 22
+    cap, cap_extra = _caption(spec, x, y + height + 18)
+    if cap:
+        out.append(cap)
+        height += 22 + cap_extra
     return "\n".join(out), height
 
 
@@ -1310,7 +1353,10 @@ def _render_flow(spec: dict[str, Any]) -> str:
     n = len(nodes)
     gap = 34
     box_w = (W - PAD * 2 - gap * (n - 1)) / n
-    box_h = 62
+    note_lines = max(
+        (len(_wrap_text(node.get("note", ""), box_w - 18, 12))
+         for node in nodes if node.get("note")), default=1)
+    box_h = 62 + (note_lines - 1) * 15
     # The return arc rides above the row. Underneath, it would have to cross the
     # per-node captions, which sit exactly where its verticals would drop.
     loop_lane = 40 if spec.get("loop") else 0
@@ -1326,14 +1372,20 @@ def _render_flow(spec: dict[str, Any]) -> str:
         )
         body.append(_t(x + box_w / 2, y + 26, node.get("title", ""), "dgm-boxtitle", "middle"))
         if node.get("note"):
-            body.append(_t(x + box_w / 2, y + 45, node["note"], "dgm-boxnote", "middle"))
+            body.append(_text_block(x + box_w / 2, y + 45,
+                                    _wrap_text(node["note"], box_w - 18, 12),
+                                    "dgm-boxnote", 15, "middle"))
         if node.get("caption"):
-            body.append(_t(x + box_w / 2, y + box_h + 22, node["caption"], "dgm-caption", "middle"))
+            body.append(_text_block(x + box_w / 2, y + box_h + 22,
+                                    _wrap_text(node["caption"], box_w + gap - 8, 12.5),
+                                    "dgm-caption", CAP_LEAD, "middle"))
         if i < n - 1:
             body.append(_arrow(x + box_w + 6, y + box_h / 2, x + box_w + gap - 8))
         body.append("</g>")
 
-    height = y + box_h + (26 if any(x.get("caption") for x in nodes) else 0) + PAD
+    cap_lines = max((len(_wrap_text(node.get("caption", ""), box_w + gap - 8, 12.5))
+                     for node in nodes if node.get("caption")), default=0)
+    height = y + box_h + (26 + (cap_lines - 1) * CAP_LEAD if cap_lines else 0) + PAD
     if spec.get("loop"):
         ly = PAD + 6
         x1 = PAD + (n - 1) * (box_w + gap) + box_w / 2
