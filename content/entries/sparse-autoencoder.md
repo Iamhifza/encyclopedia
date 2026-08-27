@@ -10,6 +10,27 @@ origin:
   year: 2023
   attribution: Applied to language models by Anthropic and by Cunningham et al.; the technique is older in sparse coding
 historical_period: agentic
+diagram:
+  kind: figure
+  title: Widen instead of narrowing, and force nearly all of it to zero
+  footer: 'The opposite bottleneck to an ordinary autoencoder, and for the opposite reason: not compression
+    but separation. The bet is that a neuron holds several unrelated features and a wide sparse code can
+    pull them apart.'
+  visual:
+    kind: pipeline
+    width: 720
+    caption: loss is reconstruction error plus a sparsity penalty; the sparsity is what makes the features
+      interpretable rather than merely sufficient
+    stages:
+    - text: one layer's activation
+      note: d = 4096
+    - text: a very wide, very sparse code
+      note: 131072, ~30 active
+      tone: accent
+      via: encoder — expand by 32×, then penalise activity
+    - text: the activation, reconstructed
+      note: '4096'
+      via: decoder — and each active dimension names a feature
 tags: [safety]
 relations:
   used_by: [mechanistic-interpretability, activation-steering]
@@ -57,15 +78,23 @@ be named, monitored and manipulated.
 
 ## How Does It Work?
 
-```text
-activation (d=4096) ──▶ encoder ──▶ sparse code (d=131072, ~30 active)
-                                          │
-                                       decoder
-                                          ▼
-                          reconstruction ≈ original activation
 
-loss = reconstruction error + λ · sparsity
-```
+An ordinary autoencoder narrows in the middle. A sparse autoencoder does the
+opposite: it expands the representation, often by a factor of thirty or more, and
+then penalises activity so that only a few dozen dimensions are active at once.
+
+The motivation is superposition. A network with 4096 dimensions appears to
+represent far more than 4096 features by packing them into overlapping
+directions, which is why individual neurons respond to unrelated things and
+resist interpretation. A wider space has room to give each feature its own
+dimension; the sparsity penalty is what forces it to use that room rather than
+spreading everything out again.
+
+What comes back is a dictionary of directions, many of which turn out to be
+human-legible — a feature for legal language, for a particular programming
+construct, for deception. Two open problems keep it honest: the reconstruction is
+never perfect, so something is being discarded, and labelling a hundred thousand
+features is itself a large task that is now largely done by other models.
 
 ## Mental Model
 

@@ -8,6 +8,25 @@ status: established
 difficulty: advanced
 one_liner: "The component that decides, every step, which requests run, which wait and which get evicted."
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: Every forward pass, it rebuilds the batch
+  footer: This runs before every single step, which is why continuous batching, paged attention and chunked
+    prefill are all really features of the scheduler rather than of the model.
+  visual:
+    kind: pipeline
+    width: 740
+    caption: then one forward pass over whatever it assembled — and immediately round again
+    stages:
+    - text: retire what finished
+      note: and free its blocks
+    - text: admit what fits
+      via: is there memory for a queued request's cache?
+    - text: relieve memory pressure
+      via: preempt someone — recompute later, or swap their cache to host memory
+    - text: fill the token budget
+      tone: accent
+      via: decodes first, because someone is waiting on each one, then a prefill chunk
 tags: [inference]
 relations:
   part_of: [vllm]
@@ -58,22 +77,6 @@ Keeping the GPU fully utilised without running out of cache memory mid-generatio
 or starving any individual request.
 
 ## How Does It Work?
-
-```text
-each iteration:
-    ┌ running set ─────────────────────────────────┐
-    │ retire finished sequences, free their blocks  │
-    │ can we admit a queued request?                │
-    │   yes → allocate blocks, add to batch         │
-    │   no  → it waits                              │
-    │ memory pressure?                              │
-    │   → preempt: recompute-later or swap to host  │
-    │ fill the token budget:                        │
-    │   decodes first, then a prefill chunk         │
-    └───────────────────────────────────────────────┘
-              ▼
-        one forward pass over the assembled batch
-```
 
 The token budget is the central dial. Spend it on prefill and time to first token
 improves while everyone's streaming stutters; spend it on decode and streaming is

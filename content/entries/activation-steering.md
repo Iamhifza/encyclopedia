@@ -10,6 +10,25 @@ origin:
   year: 2023
   attribution: Turner et al. on activation addition; Zou et al. on representation engineering
 historical_period: agentic
+diagram:
+  kind: figure
+  title: Find a direction, then push along it
+  footer: No training, no prompt, and reversible at run time — which makes it a useful research instrument.
+    Also a control surface that bypasses every safeguard expressed in the prompt, which is why open-weight
+    access changes the threat model.
+  visual:
+    kind: pipeline
+    width: 740
+    caption: α sets the strength and its sign sets the direction, so the same vector suppresses what it
+      was built to elicit
+    stages:
+    - text: run two sets of prompts
+      note: '"be honest…" and "be deceptive…"'
+    - text: a steering vector v
+      via: mean activation of one set, minus the mean of the other
+    - text: h ← h + α·v, during generation
+      tone: accent
+      via: added to the residual stream at one layer
 tags: [safety]
 relations:
   depends_on: [sparse-autoencoder, mechanistic-interpretability]
@@ -56,12 +75,23 @@ causal evidence that a discovered feature does what its label claims.
 
 ## How Does It Work?
 
-```text
-v = mean_activation("be honest ...") − mean_activation("be deceptive ...")
 
-during generation:  h_layer ← h_layer + α · v
-                    α controls strength; sign controls direction
-```
+Run the model on a set of prompts exhibiting some behaviour and a matched set
+exhibiting its opposite, record the residual-stream activations at a chosen
+layer, and take the difference of the means. What comes out is a direction in
+activation space that corresponds to the behaviour.
+
+Then add it during generation: at that layer, h ← h + α·v. The coefficient α sets
+the strength, and its sign sets the direction — the same vector that elicits a
+behaviour suppresses it when subtracted. Refusal, sycophancy, formality and
+verbosity have all been steered this way.
+
+There is no training and no prompt involved, and it is reversible at run time,
+which makes it a useful instrument for testing whether a behaviour is
+represented as a direction at all. It is also a control surface that bypasses
+everything expressed in the prompt, including safety instructions — which is one
+of the concrete ways open-weight access changes the threat model rather than
+merely changing who can run the model.
 
 ## Mental Model
 

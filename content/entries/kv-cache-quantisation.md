@@ -12,6 +12,49 @@ origin:
   circa: true
   attribution: Emerged as long-context serving made cache memory the binding constraint; KIVI and similar methods formalised it
 historical_period: agentic
+diagram:
+  kind: steps
+  title: Halve the cache, double the users
+  footer: The cache is what limits concurrency on a long-context workload, so shrinking it converts almost
+    directly into throughput. Quality loss is small, and it is the keys that lose it.
+  steps:
+  - title: What each precision costs per token
+    notes:
+    - label: Model
+      text: 70B with grouped-query attention, per token, all layers
+    visual:
+      kind: bars
+      caption: and concurrency scales inversely with this number
+      bars:
+      - label: fp16
+        value: 1.0
+        value_label: ~327 KB
+      - label: fp8
+        value: 0.5
+        value_label: ~164 KB — 2× the requests
+      - label: int4
+        value: 0.25
+        value_label: ~82 KB — 4× the requests
+        accent: true
+  - title: Keys and values do not behave the same
+    visual:
+      kind: columns
+      width: 740
+      columns:
+      - title: Keys
+        tone: warn
+        lines:
+        - a few channels carry outliers
+        - quantise per channel
+        - or keep those channels wider
+        - this is where quality is lost
+      - title: Values
+        accent: true
+        lines:
+        - distributed more evenly
+        - quantise per token
+        - safe to push harder
+        - cheaper, and it holds
 tags: [inference]
 relations:
   is_a: [quantization]
@@ -59,15 +102,6 @@ quantising weights alone stops helping.
 Concurrency and context length — how many requests fit, and how long each may be.
 
 ## How Does It Work?
-
-```text
-fp16 cache per token (70B, GQA):  ~327 KB
-fp8                                ~164 KB    2× more requests
-int4                                ~82 KB    4× more requests
-
-keys:   outlier channels → quantise per channel, or keep at higher precision
-values: better behaved   → quantise per token, more aggressively
-```
 
 The asymmetry between keys and values is the main technical finding in this area:
 treating them identically wastes precision on values or destroys it on keys.

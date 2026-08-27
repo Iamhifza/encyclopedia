@@ -8,6 +8,50 @@ status: established
 difficulty: intermediate
 one_liner: "Facts stored as entities joined by named relationships, so questions can be answered by traversing rather than reading."
 historical_period: classical-ai
+diagram:
+  kind: steps
+  title: Facts as triples, questions as walks
+  footer: 'Precise and auditable where the schema holds, and brittle where it does not. The current interest
+    is hybrid: a graph for the relationships, embeddings for everything the schema failed to anticipate.'
+  steps:
+  - title: Everything is subject, relation, object
+    visual:
+      kind: table
+      width: 760
+      head:
+      - subject
+      - relation
+      - object
+      rows:
+      - - Lovelace
+        - collaborated with
+        - Babbage
+      - - Lovelace
+        - wrote
+        - Notes on the Engine
+      - - text: Babbage
+          new: true
+        - text: designed
+          new: true
+        - text: Analytical Engine
+          new: true
+      - - Notes on the Engine
+        - about
+        - Analytical Engine
+  - title: A question becomes a path through them
+    notes:
+    - label: Query
+      text: who wrote about machines Babbage designed?
+    visual:
+      kind: chips
+      items:
+      - Babbage
+      - designed
+      - about
+      - wrote
+      - Lovelace
+      caption: the answer is a traversal, and every hop is inspectable — which is the property vector
+        search does not have
 tags: [retrieval, symbolic]
 relations:
   successor_of: [symbolic-ai]
@@ -53,17 +97,6 @@ Multi-hop questions, precise relationship queries, and explicit provenance for a
 fact — properties that neither keyword search nor embeddings provide.
 
 ## How Does It Work?
-
-```text
-(Lovelace) ──collaborated-with──▶ (Babbage)
-     │                                 │
-   wrote                            designed
-     ▼                                 ▼
-(Notes on the Engine) ──about──▶ (Analytical Engine)
-
-query: who wrote about machines Babbage designed?
-   → traverse designed, then about, then wrote
-```
 
 The strength and the weakness are the same thing: the relationships must be
 declared. Nothing is inferred that was not entered or derived by a rule.

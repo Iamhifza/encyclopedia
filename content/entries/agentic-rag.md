@@ -11,6 +11,27 @@ origin:
   circa: true
   attribution: Emerged from combining tool-calling agents with retrieval; no single originating paper
 historical_period: agentic
+diagram:
+  kind: flow
+  title: Retrieval as a decision, not a fixed first step
+  loop: not enough evidence — reformulate and search again, or search somewhere else
+  footer: Better recall on questions that need several hops, at several times the cost and latency of
+    one-shot retrieval. Worth it when the questions genuinely need it; expensive theatre when they do
+    not.
+  nodes:
+  - title: Question
+    note: and the conversation so far
+    caption: search may not be needed
+  - title: Query
+    note: written by the model, not copied
+    caption: possibly several
+  - title: Read
+    note: what came back
+    caption: and judge it
+  - title: Answer
+    note: with citations
+    accent: true
+    caption: or say it could not find out
 tags: [retrieval, agents]
 relations:
   successor_of: [rag]
@@ -58,18 +79,23 @@ needed at all.
 
 ## How Does It Work?
 
-```text
-question
-   │
-   ├─▶ need to search?  ── no ──▶ answer directly
-   │        │ yes
-   │   formulate query ──▶ retrieve ──▶ read
-   │        │
-   │   enough evidence? ── no ──▶ reformulate, search elsewhere ──┐
-   │        │ yes                                                 │
-   └────────┴──────────────────────────────────────────◀──────────┘
-                            answer with citations
-```
+
+Ordinary RAG retrieves once, with the user's question as the query, and
+generates from whatever comes back. Agentic RAG makes each of those a decision
+the model gets to take.
+
+It decides whether to search at all — many questions are answerable from the
+conversation. It writes the query rather than reusing the question, which matters
+because the wording that asks a thing is rarely the wording that finds it. It
+reads what returned and judges whether the evidence is sufficient. And if it is
+not, it reformulates, searches a different source, or decomposes the question and
+searches for the parts.
+
+That loop is what handles multi-hop questions, where the answer requires
+combining facts no single passage contains. The cost is real: several retrieval
+rounds and several model calls where one-shot RAG makes one of each, with latency
+to match. Worth it when the questions genuinely need more than one hop, and
+expensive theatre when they do not.
 
 ## Mental Model
 

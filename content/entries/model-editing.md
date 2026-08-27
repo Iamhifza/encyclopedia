@@ -11,6 +11,27 @@ origin:
   year: 2022
   attribution: ROME and its successors; grew out of work locating factual associations in Transformer layers
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: Find where the fact lives, then change it there
+  footer: 'Compelling in demonstrations and fragile in practice: edits often fail under paraphrase, and
+    edits accumulate badly. Retrieval remains the answer for facts that change; this is a research direction,
+    not a maintenance strategy.'
+  visual:
+    kind: pipeline
+    width: 740
+    caption: the whole method rests on the fact being localised, which is true more often than one would
+      expect and not always
+    stages:
+    - text: '"The Eiffel Tower is located in ___"'
+      note: the association
+    - text: the layer that carries it
+      via: causal tracing — corrupt activations and see which restoration fixes it
+    - text: a rank-one update to that layer
+      via: edit the feed-forward projection, not the whole model
+      tone: accent
+    - text: does it survive paraphrase, and did anything else break?
+      via: verify — this is the step that usually disappoints
 tags: [safety]
 relations:
   depends_on: [mechanistic-interpretability]
@@ -65,18 +86,23 @@ Surgical correction — in principle. Whether it delivers is the interesting par
 
 ## How Does It Work?
 
-```text
-"The Eiffel Tower is located in ___"
-        │
-   locate: causal tracing finds which layer's activations
-           carry the association
-        │
-   compute a rank-one weight update at that layer's
-   feed-forward projection
-        │
-   verify: does it hold under paraphrase?
-           did unrelated facts survive?
-```
+
+The premise is that a specific factual association is stored in a specific place,
+and can therefore be changed without retraining. Causal tracing tests this:
+corrupt the activations at each layer in turn and see which restoration recovers
+the original answer. Where it does, that layer is carrying the fact.
+
+Methods like ROME and MEMIT then compute a targeted update — often rank-one — to
+that layer's feed-forward projection, so the model produces the new object for
+the same subject and relation. It takes seconds, and it does not touch the rest
+of the model.
+
+Verification is where it usually disappoints. A successful edit must survive
+paraphrase, generalise to related phrasings, and leave unrelated facts intact,
+and edits frequently fail at least one of those. They also accumulate badly:
+hundreds of edits degrade the model in ways single edits do not predict. Which is
+why retrieval remains the answer for facts that change, and this remains a
+research direction rather than a maintenance strategy.
 
 ## Mental Model
 

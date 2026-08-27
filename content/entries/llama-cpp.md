@@ -11,6 +11,27 @@ origin:
   year: 2023
   attribution: Georgi Gerganov; began as a weekend project to run Llama on a MacBook
 historical_period: agentic
+diagram:
+  kind: figure
+  title: One file, memory-mapped, running on whatever hardware is there
+  footer: The project that made local inference ordinary. Its real contribution is GGUF and the quantisation
+    formats — a self-describing file that a laptop can open without a Python environment anywhere in sight.
+  visual:
+    kind: pipeline
+    width: 740
+    caption: layers can be split between CPU and GPU, so a model larger than VRAM still runs — slower,
+      but it runs
+    stages:
+    - text: model weights
+      note: from any framework
+    - text: one GGUF file
+      note: Q4_K_M, Q5_K_M, Q8_0
+      tone: accent
+      via: quantise — self-describing, no external config
+    - text: mapped from disk
+      via: memory-mapped, so pages load on demand and are shared between processes
+    - text: tokens
+      via: hand-written SIMD kernels — AVX2, NEON — plus GPU offload
 tags: [inference]
 relations:
   alternative_to: [vllm, sglang]
@@ -60,16 +81,6 @@ Access. Privacy, offline operation, zero marginal cost, and no dependency on a
 provider — all downstream of being able to run the thing at all.
 
 ## How Does It Work?
-
-```text
-model weights ──▶ quantise to GGUF (Q4_K_M, Q5_K_M, Q8_0 ...)
-                        │ single self-describing file
-                  memory-mapped from disk
-                        │ pages loaded on demand, shared between processes
-                  CPU SIMD kernels (AVX2 / NEON) + optional GPU offload
-                        │ layers can be split between CPU and GPU
-                  tokens out
-```
 
 Memory mapping is the underrated part: a 4 GB model file need not be read into
 RAM in full, and two processes running the same model share the pages.

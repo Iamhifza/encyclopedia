@@ -8,6 +8,29 @@ status: established
 difficulty: intermediate
 one_liner: "Producing a human-readable account of why a model made a particular decision, usually by attributing it to inputs."
 historical_period: statistical-ml
+diagram:
+  kind: figure
+  title: Which inputs moved the answer, and by how much
+  footer: Attribution is what regulated decisions require, and it is not the same as understanding the
+    model. It says which inputs mattered here, not why the model believes what it does.
+  visual:
+    kind: bars
+    caption: attribution for one loan decision — the outcome was approve
+    bars:
+    - label: credit history
+      value: 0.44
+      value_label: '+0.44'
+      accent: true
+    - label: income
+      value: 0.31
+      value_label: '+0.31'
+    - label: postcode
+      value: 0.08
+      value_label: +0.08  ← spurious
+      tone: warn
+    - label: age
+      value: 0.05
+      value_label: −0.05
 tags: [safety]
 relations:
   different_from: [mechanistic-interpretability]
@@ -61,17 +84,24 @@ features, and satisfies documentation requirements.
 
 ## How Does It Work?
 
-```text
-input                 attribution              output
-income      ████████████ +0.31
-postcode    ███ +0.08          ← spurious feature, caught by inspection
-age         ██ −0.05
-history     ██████████████████ +0.44
-                                          ▶ approved
 
-perturbation: change one feature, observe the change in output
-gradients:    ∂output/∂input, at this input
-```
+Attribution methods assign a share of the output to each input. Perturbation
+methods change one feature and observe the effect — LIME fits a simple model
+locally, SHAP averages over orderings to get a principled decomposition.
+Gradient methods differentiate the output with respect to the input, which is
+cheaper and noisier.
+
+For a loan decision the result is a list: credit history contributed most,
+income next, postcode a small amount — and that last one is why anyone runs this.
+A spurious feature carrying weight is visible in the attribution and invisible in
+the accuracy score, which is precisely the thing an audit is looking for.
+
+The distinction worth holding is between attribution and understanding.
+Attribution says which inputs moved this decision; it does not say what the model
+represents or why. That is mechanistic interpretability, a different and harder
+project. Attribution is nonetheless what regulated decisions require, and its
+limits — different methods disagreeing, explanations that can be manipulated
+independently of behaviour — are worth stating when you present one.
 
 ## Mental Model
 

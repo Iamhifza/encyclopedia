@@ -11,6 +11,26 @@ origin:
   circa: true
   attribution: Ha and Schmidhuber's "World Models"; roots in model-based control and Kalman filtering
 historical_period: deep-learning
+diagram:
+  kind: figure
+  title: Learn how the world moves, then plan inside the model of it
+  footer: Planning against a learned model is far cheaper than acting in the world, and only as good as
+    the model — errors compound over a rollout, which is why long horizons remain hard.
+  visual:
+    kind: pipeline
+    width: 740
+    caption: planning means rolling candidate action sequences forward through the dynamics model and
+      picking the best, without acting at all
+    stages:
+    - text: an observation
+      note: pixels, sensors, text
+    - text: a latent state z
+      via: encoder — compress to what matters
+    - text: predicted next state, and reward
+      tone: accent
+      via: dynamics model, given z and a candidate action
+    - text: an action, chosen
+      via: search over rollouts, then act once
 tags: [architecture]
 relations:
   different_from: [foundation-model]
@@ -58,13 +78,24 @@ them.
 
 ## How Does It Work?
 
-```text
-observation ──▶ encoder ──▶ latent state z
-                              │
-        (z, action) ──▶ dynamics model ──▶ predicted z′ ──▶ predicted reward
-                              │
-             plan by rolling forward candidate action sequences
-```
+
+Learn a model of how the environment evolves, then use it to plan. An encoder
+compresses each observation into a compact latent state; a dynamics model
+predicts, given that state and a candidate action, what the next state and reward
+will be. Both are learned from experience.
+
+Planning then happens entirely inside the learned model. Roll candidate action
+sequences forward through the dynamics model, score the imagined outcomes, pick
+the best first action, execute only that one, and re-plan from the new
+observation. Acting in the real world is expensive; imagining is not, which is
+why this is far more sample-efficient than model-free reinforcement learning.
+
+The whole thing rests on the dynamics model's accuracy, and errors compound over
+a rollout — a small mistake at step one is a large one by step twenty. That is
+why long horizons remain hard and why methods spend so much effort on keeping
+plans short and re-planning often. The term also gets used loosely for whatever
+implicit model of the world a large language model has picked up, which is a
+different and much more contested claim.
 
 ## Mental Model
 

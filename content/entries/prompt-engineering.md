@@ -10,6 +10,25 @@ origin:
   year: 2020
   attribution: Emerged with GPT-3's few-shot prompting; the term spread through 2021-2022
 historical_period: foundation-model
+diagram:
+  kind: figure
+  section: Evolution
+  title: The scope kept widening, and the name kept changing
+  visual:
+    kind: lineage
+    per_row: 4
+    caption: each stage absorbed the last rather than replacing it — you still write the prompt, it is
+      just no longer the whole job
+    milestones:
+    - text: prompt engineering
+      note: phrasing one request
+    - text: context engineering
+      note: what is in the window
+    - text: agent scaffolding
+      note: tools and a loop
+    - text: harness engineering
+      note: everything around the model
+      tone: accent
 tags: [agents, culture]
 relations:
   evolved_into: [context-engineering]
@@ -85,10 +104,6 @@ largely faded, absorbed into AI engineering and into the broader practice of
 context engineering, as prompts became one component of a much larger assembly.
 
 ## Evolution
-
-```text
-prompt engineering → context engineering → agent scaffolding → harness engineering
-```
 
 Whether this chain is genuine technical evolution or largely renaming is a fair
 question, and the honest answer is: partly both. What changed materially is

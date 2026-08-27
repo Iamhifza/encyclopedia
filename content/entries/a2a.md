@@ -10,6 +10,26 @@ origin:
   year: 2025
   attribution: Announced by Google in April 2025 with partner organisations; subsequently placed under open governance
 historical_period: agentic
+diagram:
+  kind: figure
+  title: Agents as long-running peers, not as tools
+  footer: The distinction from MCP is the unit of work. A tool call returns; an A2A task may run for hours,
+    stream progress, and be checked on — which is why it needs its own protocol rather than a longer timeout.
+  visual:
+    kind: pipeline
+    width: 740
+    caption: neither agent sees the other's internals — only the card, the task and what comes back
+    stages:
+    - text: fetch the Agent Card
+      note: capabilities, auth, endpoints
+    - text: create a task
+      via: a goal, not a function call
+    - text: streaming status updates
+      note: minutes to hours
+      via: the remote agent works autonomously
+    - text: artefacts and a result
+      tone: accent
+      via: returned when the task completes, or fails
 tags: [protocol, agents]
 relations:
   different_from: [mcp]
@@ -57,14 +77,23 @@ long-running task lifecycle between independently built agents.
 
 ## How Does It Work?
 
-```text
-agent A                                   agent B
-  │ fetch Agent Card (capabilities, auth)   │
-  │ ──────────────────────────────────────▶ │
-  │ create task ─────────────────────────▶  │  works autonomously
-  │ ◀──────── streaming status updates ──── │  (minutes to hours)
-  │ ◀──────── artefacts / result ────────── │
-```
+
+An agent publishes an Agent Card — a document describing what it can do, how to
+authenticate, and where to send work. Another agent fetches that card, creates a
+task rather than calling a function, and receives streaming status updates while
+the remote agent works.
+
+The unit of work is what distinguishes this from MCP. A tool call is a request
+and a response, usually in under a second. An A2A task is a goal handed to a peer
+that may work on it for minutes or hours, report progress, ask a clarifying
+question, and eventually return artefacts. Neither side sees the other's
+internals, its model, or its own tools.
+
+Whether this layer is needed is still open. Much of what gets described as
+multi-agent collaboration is one system calling another over an ordinary API, and
+a protocol earns its place only when agents genuinely need to discover each other
+and coordinate long-running work across organisational boundaries. That case
+exists; it is rarer than the enthusiasm suggests.
 
 ## Mental Model
 

@@ -11,6 +11,26 @@ origin:
   circa: true
   attribution: Long-standing idea; named and popularised in the deep learning era, notably by Yann LeCun
 historical_period: statistical-ml
+diagram:
+  kind: figure
+  title: Hide part of the data and predict it from the rest
+  footer: This is the trick the whole field runs on. Labels are scarce and expensive; raw data is neither,
+    and a manufactured objective turns every document into supervision.
+  visual:
+    kind: mapping
+    width: 780
+    head:
+    - raw data, with a piece withheld
+    - the target it manufactures
+    rows:
+    - left: '"the cache stores keys and ___"'
+      right: values
+      tone: accent
+    - left: an image with a patch masked out
+      right: the missing patch
+    - left: two crops of the same photograph
+      right: these two belong together
+    caption: no annotator is involved anywhere, which is why it scales to the whole internet
 tags: [training]
 relations:
   alternative_to: [supervised-learning]
@@ -53,13 +73,6 @@ It removes the annotation bottleneck, and in doing so makes it possible to train
 models with hundreds of billions of parameters on trillions of tokens.
 
 ## How Does It Work?
-
-```text
-raw text:      "the cache stores keys and values"
-manufactured
-supervision:   input  "the cache stores keys and [?]"
-               target "values"
-```
 
 The model never sees a human label. The loss comes from reconstructing what was
 deliberately removed.

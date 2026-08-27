@@ -8,6 +8,45 @@ status: modern
 difficulty: intermediate
 one_liner: "Sending each request to the cheapest model that can handle it, and escalating only when it cannot."
 historical_period: agentic
+diagram:
+  kind: steps
+  title: Most requests do not need the expensive model
+  footer: Savings of five to ten times are ordinary, because difficulty is heavily skewed. The risk is
+    a router that misclassifies quietly — so the escalation path matters more than the classifier.
+  steps:
+  - title: Classify first, then send
+    visual:
+      kind: bars
+      caption: typical traffic distribution, and where the cost sits
+      bars:
+      - label: small model
+        value: 0.8
+        value_label: ~80% of requests
+        accent: true
+      - label: mid
+        value: 0.15
+        value_label: ~15%
+      - label: frontier
+        value: 0.05
+        value_label: ~5%, most of the bill
+  - title: Or skip the classifier and cascade
+    notes:
+    - label: Trade
+      text: no difficulty model to train, but a failed attempt is paid for before the escalation
+    visual:
+      kind: pipeline
+      width: 700
+      stages:
+      - text: try the small model
+        note: cheap
+      - text: check the answer
+        via: a verifier, a schema, or self-consistency
+      - text: good enough — done
+        note: most of the time
+        tone: ok
+      - text: otherwise escalate, and pay twice
+        tone: warn
+        via: the same request, to a bigger model
 tags: [protocol, inference]
 relations:
   depends_on: [ai-gateway]
@@ -53,18 +92,6 @@ avoidable spend in LLM applications.
 Cost and latency, without the blunt alternative of downgrading everyone.
 
 ## How Does It Work?
-
-```text
-request
-   │
-   ├─▶ classify difficulty ──┬─▶ small model      (most traffic)
-   │   (heuristic, learned,  ├─▶ mid model
-   │    or embedding-based)  └─▶ frontier model   (hard, rare)
-   │
-   └─ OR cascade: try small ──▶ verify ──▶ good enough? ──▶ done
-                                    │ no
-                                    └──▶ escalate, pay once more
-```
 
 The cascade needs no difficulty prediction at all — it substitutes a
 *verification* signal, which for code (tests pass) or structured output (schema

@@ -11,6 +11,45 @@ origin:
   year: 2024
   attribution: Named and popularised by Microsoft Research; graph-based retrieval itself is older
 historical_period: agentic
+diagram:
+  kind: steps
+  title: Build the graph once, then query it two different ways
+  footer: Indexing costs an LLM call per chunk and then some, which is why this is reserved for corpora
+    where connections between documents are the point — and why it is rebuilt rarely.
+  steps:
+  - title: Indexing, offline and expensive
+    visual:
+      kind: pipeline
+      width: 720
+      stages:
+      - text: chunks
+        note: as in ordinary RAG
+      - text: 'triples: entity — relation — entity'
+        via: an LLM reads each chunk and extracts them
+      - text: one node per real entity
+        via: resolve duplicates — "IBM" and "International Business Machines"
+      - text: communities, each with a summary
+        tone: accent
+        via: detect clusters in the graph, then summarise each one
+  - title: Two query modes, for two kinds of question
+    visual:
+      kind: columns
+      width: 740
+      columns:
+      - title: Local
+        lines:
+        - '"what did X do?"'
+        - match the entity
+        - traverse its neighbours
+        - answer from that subgraph
+      - title: Global
+        accent: true
+        lines:
+        - '"what themes run through this?"'
+        - map over community summaries
+        - reduce to one answer
+        - no single chunk contains it
+      caption: the global mode is what ordinary retrieval cannot do at all
 tags: [retrieval]
 relations:
   is_a: [rag]
@@ -62,17 +101,6 @@ questions about relationships, and reasoning that requires connecting entities
 mentioned in different documents.
 
 ## How Does It Work?
-
-```text
-INDEXING (expensive, offline)
-  chunks ──▶ LLM extracts (entity, relation, entity)
-         ──▶ resolve duplicates ("IBM" = "International Business Machines")
-         ──▶ build graph ──▶ detect communities ──▶ summarise each community
-
-QUERYING
-  local  : match entities ──▶ traverse neighbours ──▶ answer from that subgraph
-  global : map over community summaries ──▶ reduce ──▶ corpus-level answer
-```
 
 The indexing pass runs an LLM over every chunk, which is the whole cost problem:
 it is orders of magnitude more expensive than embedding the same corpus.

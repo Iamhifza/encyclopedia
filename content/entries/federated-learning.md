@@ -11,6 +11,26 @@ origin:
   year: 2016
   attribution: McMahan et al. at Google, introducing federated averaging
 historical_period: deep-learning
+diagram:
+  kind: flow
+  title: The model travels; the data does not
+  loop: many rounds, until the model converges
+  footer: Privacy by architecture rather than by policy — though weight updates leak information, so serious
+    deployments add differential privacy or secure aggregation on top.
+  nodes:
+  - title: Broadcast
+    note: the current model, to everyone
+    caption: server to clients
+  - title: Train locally
+    note: on data that never leaves
+    accent: true
+    caption: phones, hospitals, banks
+  - title: Send updates
+    note: weights only, never examples
+    caption: clients to server
+  - title: Aggregate
+    note: a weighted average
+    caption: and round again
 tags: [training]
 relations:
   related_to: [distributed-systems, supervised-learning, data-curation, small-language-model]
@@ -58,17 +78,24 @@ Learning from data you are not permitted to collect.
 
 ## How Does It Work?
 
-```text
-server                          clients (phones, hospitals, banks)
-  │ broadcast model ─────────▶  train locally on private data
-  │                                        │
-  │ ◀──────── weight updates only ─────────┘
-  │
-  aggregate (weighted average)
-  │
-  repeat for many rounds
-                    data never moves
-```
+
+A server broadcasts the current model to participating clients. Each client
+trains on its own local data for a few steps and sends back only the weight
+updates. The server averages those updates, weighted by how much data each client
+had, and broadcasts the new model. Repeat for many rounds.
+
+The data never moves, which is the point. Phone keyboards learn from typing that
+stays on the phone; hospitals contribute to a shared model without exporting
+patient records; banks collaborate on fraud detection without pooling
+transactions. Privacy comes from the architecture rather than from a policy
+promise.
+
+Two things complicate it. Client data is not independent and identically
+distributed — each client's distribution is skewed in its own way, which slows
+convergence and can destabilise it. And weight updates leak: it is possible to
+reconstruct training examples from gradients, so serious deployments layer
+differential privacy or secure aggregation on top rather than treating "the data
+stayed put" as sufficient.
 
 ## Mental Model
 

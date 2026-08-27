@@ -12,6 +12,30 @@ origin:
   circa: true
   attribution: Splitwise (Microsoft) and DistServe established the approach; deployed at scale from 2024
 historical_period: agentic
+diagram:
+  kind: figure
+  title: The two phases want different machines
+  footer: The cost is moving the KV cache between pools, which needs a fast interconnect. Worth it at
+    scale because the two pools can then be sized against their own measured demand instead of a compromise
+    between them.
+  visual:
+    kind: columns
+    width: 760
+    caption: the cache crosses once, at the handover
+    columns:
+    - title: Prefill pool
+      lines:
+      - compute-bound
+      - high tensor parallelism
+      - short residency per request
+      - sized for prompt volume
+    - title: Decode pool
+      accent: true
+      lines:
+      - bandwidth-bound
+      - big batches, more memory
+      - long residency per request
+      - sized for concurrent users
 tags: [inference]
 relations:
   depends_on: [prefill, decode, kv-cache]
@@ -60,19 +84,6 @@ independently when a workload is lopsided — prompt-heavy RAG traffic needs far
 more prefill capacity than a chat workload generating long answers.
 
 ## How Does It Work?
-
-```text
-request
-   │
-   ▼
-┌── PREFILL POOL ──────┐        ┌── DECODE POOL ───────────┐
-│ compute-bound        │  KV    │ bandwidth-bound          │
-│ high tensor          │ cache  │ big batches, more memory │
-│ parallelism          │ ─────▶ │ per-token generation     │
-│ short residency      │        │ long residency           │
-└──────────────────────┘        └──────────────────────────┘
-        scale independently against measured demand
-```
 
 The transfer is the crux: the KV cache for a long prompt is gigabytes, and it has
 to arrive before the first token can be produced. This is why the technique
