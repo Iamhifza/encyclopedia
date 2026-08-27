@@ -8,6 +8,27 @@ status: foundational
 difficulty: intermediate
 one_liner: "Improving a model by repeatedly taking a small step in whichever direction reduces the error fastest."
 historical_period: early-computing
+diagram:
+  kind: flow
+  title: Downhill, one mini-batch at a time
+  loop: billions of times, on a surface nobody can see
+  footer: Nothing guarantees this finds the best solution, and in high dimensions it does not need to
+    — almost all local minima turn out to be about as good as each other, which is a fact about the landscape
+    rather than about the method.
+  nodes:
+  - title: Mini-batch
+    note: a sample, not the whole set
+    caption: noisy, and cheap
+  - title: Loss
+    note: how wrong, on this batch
+    caption: one number
+  - title: Gradient
+    note: ∂L/∂θ for every parameter
+    accent: true
+    caption: which way is downhill
+  - title: Step
+    note: θ ← θ − η · adjusted gradient
+    caption: the optimiser decides how far
 tags: [training]
 relations:
   depends_on: [backpropagation, loss-function]
@@ -58,14 +79,6 @@ despite the loss surface being wildly non-convex.
 Fitting billions of parameters without ever solving anything analytically.
 
 ## How Does It Work?
-
-```text
-repeat:
-    take a mini-batch of examples
-    forward pass  ──▶ predictions ──▶ loss
-    backward pass ──▶ ∂L/∂θ for every parameter        (backpropagation)
-    θ ← θ − η · (adjusted gradient)                    (the optimiser's job)
-```
 
 Why mini-batches rather than the whole dataset? Computing the exact gradient over
 trillions of tokens per step is impossible, and it turns out to be unnecessary: a

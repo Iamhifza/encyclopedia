@@ -63,6 +63,24 @@ diagram:
       - label: doc
         values: [null, null, 0.8, null, null, null, 0.45, null, null, null, 0.6, null]
       caption: 'sparsity is the point: an inverted index only ever visits the terms a query actually contains'
+diagrams:
+- kind: figure
+  section: Example
+  title: Where this sits in the line
+  visual:
+    kind: lineage
+    per_row: 4
+    caption: each one kept what the last got right — rarity is still in all of them
+    milestones:
+    - text: TF-IDF
+      note: 1972 · sparse, exact
+      tone: accent
+    - text: BM25
+      note: 1994 · saturation
+    - text: dense retrieval
+      note: 2020 · paraphrase
+    - text: hybrid, then RAG
+      note: both, plus a model
 tags: [retrieval, history]
 relations:
   part_of: [information-retrieval]
@@ -123,7 +141,6 @@ $$w_{t,d} = \text{tf}(t,d) \times \log\frac{N}{\text{df}(t)}$$
 
 ## How Does It Work?
 
-
 Give every term a weight that is high when the term is frequent in this document
 and rare across the corpus. Frequency says the document is about the term;
 rarity says the term distinguishes it from everything else. Multiply the two and
@@ -147,12 +164,6 @@ rare words are addresses.
 ## Example
 
 The lineage running from here is the spine of the retrieval domain:
-
-```text
-TF-IDF (1972) ──▶ BM25 (1994) ──▶ dense retrieval (2020) ──▶ hybrid ──▶ RAG
-   sparse,           saturation      dense, learned,        both,      plus a
-   exact terms       and length      handles paraphrase     fused      model
-```
 
 Each step fixed a specific defect in the last. BM25 added saturation and length
 normalisation; dense retrieval added meaning; hybrid retrieval put the sparse

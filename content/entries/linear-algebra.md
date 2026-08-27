@@ -8,6 +8,26 @@ status: foundational
 difficulty: beginner
 one_liner: "The mathematics of vectors and matrices, which is what a neural network is doing in essentially every operation."
 historical_period: pre-computing
+diagram:
+  kind: figure
+  title: One layer is one matrix multiply, and the shapes have to chain
+  footer: Nearly every runtime error in model code is a shape error, and nearly every shape error is an
+    inner dimension that does not match. Reading a stack trace is mostly reading these numbers.
+  visual:
+    kind: pipeline
+    width: 720
+    caption: inner dimensions must match and vanish; outer dimensions survive — that single rule explains
+      every shape in a transformer
+    stages:
+    - text: x
+      note: (32, 512)  batch × features
+    - text: x @ W₁
+      note: (32, 2048)
+      via: W₁ is (512, 2048)
+    - text: x @ W₁ @ W₂
+      note: (32, 512)
+      tone: accent
+      via: W₂ is (2048, 512) — back to where we started
 tags: [training]
 relations:
   used_by: [neural-network, attention, embedding, gpu]
@@ -56,18 +76,6 @@ It gives a compact notation and, crucially, an efficient implementation: a matri
 multiply maps directly onto hardware built to do exactly that.
 
 ## How Does It Work?
-
-```text
-one layer, in full:
-
-  x       (batch 32, features 512)
-  W       (512, 2048)
-  x @ W   (32, 2048)        ← every output is a weighted sum of every input
-
-the shapes must chain:
-  (32,512) @ (512,2048) @ (2048,512) ──▶ (32,512)
-        inner dimensions match, outer dimensions survive
-```
 
 Nearly every error in framework code is a shape error, and reading shapes is the
 practical skill this subject buys you.

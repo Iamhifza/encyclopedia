@@ -8,6 +8,30 @@ status: foundational
 difficulty: beginner
 one_liner: "Finding structure in data that has no labels at all, such as grouping similar items together."
 historical_period: early-computing
+diagram:
+  kind: figure
+  title: Find structure without being told what to look for
+  footer: Largely displaced by self-supervised learning, which manufactures a supervision signal from
+    the data itself and scales far better. These methods survive as analysis tools rather than as ways
+    to train anything large.
+  visual:
+    kind: columns
+    width: 740
+    caption: no labels in either case — the structure is assumed to be in the data already
+    columns:
+    - title: Clustering
+      lines:
+      - group points that are near each other
+      - k-means moves centroids to the mean
+      - of whatever was assigned to them
+      - you choose k, which is the hard part
+    - title: Dimensionality reduction
+      accent: true
+      lines:
+      - find the directions of most variance
+      - keep the top few, discard the rest
+      - 1000 dimensions down to 50
+      - most of the variation retained
 tags: [training]
 relations:
   alternative_to: [supervised-learning]
@@ -56,16 +80,24 @@ Exploration and organisation of data nobody has annotated, which is most data.
 
 ## How Does It Work?
 
-```text
-CLUSTERING (k-means)              DIMENSIONALITY REDUCTION (PCA)
-  ● ●     ○ ○                       find the directions of
- ● ● ●   ○ ○ ○                      greatest variance, keep
-  ● ●     ○ ○                       the top few, discard the rest
-     ▲       ▲
-   centroids move to the mean       1000 dimensions → 50, with
-   of their assigned points,        most of the variation retained
-   repeat until stable
-```
+
+Given data with no labels, find structure that is assumed to be there already.
+Clustering groups points that are near one another: k-means assigns each point to
+the nearest of k centroids, moves each centroid to the mean of whatever was
+assigned to it, and repeats until nothing moves. Choosing k is the hard part, and
+the method will not tell you.
+
+Dimensionality reduction takes the other approach. PCA finds the directions along
+which the data varies most, keeps the top few, and discards the rest — a thousand
+dimensions down to fifty, with most of the variation retained. t-SNE and UMAP do
+something related for visualisation, at the cost of distorting global structure.
+
+Self-supervised learning has largely displaced this for anything large. Rather
+than hoping structure emerges from geometry, it manufactures a supervision signal
+from the data itself — predict the masked word, predict the next frame — which
+scales far better and produces representations that transfer. These methods
+survive as analysis and visualisation tools rather than as ways to train
+anything.
 
 ## Mental Model
 

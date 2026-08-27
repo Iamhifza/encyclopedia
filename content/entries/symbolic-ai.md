@@ -11,6 +11,46 @@ origin:
   year: 1956
   attribution: The Dartmouth workshop and the physical symbol system hypothesis of Newell and Simon
 historical_period: classical-ai
+diagram:
+  kind: figure
+  title: Facts, rules, and a derivation you can read
+  footer: The explanation is not generated afterwards — it is the derivation itself. That property is
+    exactly what neural systems lack, and exactly why neurosymbolic work keeps being attempted.
+  visual:
+    kind: pipeline
+    width: 740
+    caption: 'and it fails where the world is not crisp: penguins, exceptions, and everything that resists
+      being written as a rule'
+    stages:
+    - text: facts
+      note: bird(tweety) · penguin(opus)
+    - text: rules
+      note: ∀x bird(x) → can_fly(x)
+    - text: matched and chained
+      via: the inference engine fires what applies
+    - text: a derivation
+      tone: accent
+      via: every step inspectable — and the chain is the explanation
+diagrams:
+- kind: figure
+  section: Evolution
+  title: It did not disappear; it dispersed
+  visual:
+    kind: lineage
+    per_row: 4
+    caption: the paradigm lost, and its techniques are load-bearing everywhere — knowledge graphs, planners,
+      constraint solvers, type systems, rules engines, formal verification
+    milestones:
+    - text: symbolic AI
+      note: 1956–70s
+    - text: expert systems
+      note: 1980s
+    - text: AI winter
+      note: knowledge bottleneck
+      tone: warn
+    - text: statistical learning
+      note: 1990s on
+      tone: accent
 tags: [history, symbolic]
 relations:
   alternative_to: [neural-network]
@@ -60,15 +100,25 @@ someone can write down.
 
 ## How Does It Work?
 
-```text
-knowledge base                    inference engine
-  bird(tweety)                      match rules against facts
-  ∀x bird(x) → can_fly(x)           chain conclusions
-  penguin(opus)                     produce a derivation
-  ∀x penguin(x) → ¬can_fly(x)              │
-                                    every step is inspectable
-                                    and the chain IS the explanation
-```
+
+Represent knowledge as explicit symbols and relations, and reason by applying
+rules of inference. Facts go into a knowledge base — bird(tweety), penguin(opus)
+— alongside rules that quantify over them. An inference engine matches rules
+against facts, chains the conclusions, and produces a derivation.
+
+The derivation is the point. Every step is a rule application against named
+facts, so the chain can be inspected, audited, and handed to someone as the
+reason for the conclusion. The explanation is not generated after the fact by a
+second system; it *is* the computation. Nothing in a neural network has this
+property, and that is what neurosymbolic research keeps trying to recover.
+
+Where it fails is everything that resists being written down as a rule. Penguins
+break the flying rule, and every patch introduces further exceptions; perception,
+language and common sense are made almost entirely of such cases. The knowledge
+had to be elicited by hand, and it did not scale. The techniques nevertheless
+survive everywhere — knowledge graphs, planners, constraint solvers, type
+systems, rules engines, formal verification — which makes "symbolic AI lost" true
+about the paradigm and false about the toolkit.
 
 ## Mental Model
 
@@ -86,13 +136,6 @@ existing behaviour. And most fundamentally, much of what humans know — how a f
 looks, how a sentence sounds wrong — cannot be written down as rules at all.
 
 ## Evolution
-
-```text
-symbolic AI → expert systems → (AI winter) → statistical learning
-                    │
-                    └──▶ knowledge graphs · planners · constraint solvers ·
-                         type systems · rules engines · formal verification
-```
 
 The programme did not vanish. It dispersed into infrastructure, and stopped being
 called AI.

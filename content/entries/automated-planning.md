@@ -8,6 +8,41 @@ status: established
 difficulty: advanced
 one_liner: "Working out an ordered sequence of actions that gets from the current state to a desired one."
 historical_period: classical-ai
+diagram:
+  kind: steps
+  title: Actions declare what they need and what they change
+  footer: Explicit preconditions are what an LLM planner lacks. It will happily emit a step whose precondition
+    does not hold — which is why the interesting systems let a model propose the plan and a planner verify
+    it.
+  steps:
+  - title: Every action is a contract
+    notes:
+    - label: Goal
+      text: at(cup, sink), from a world where the cup is on the table
+    visual:
+      kind: mapping
+      width: 780
+      head:
+      - PICK-UP(x, loc) requires
+      - and afterwards
+      rows:
+      - left: at(robot, loc)
+        right: holding(x)
+        tone: accent
+      - left: at(x, loc)
+        right: ¬at(x, loc)
+      - left: holding(nothing)
+        right: ¬holding(nothing)
+  - title: A plan is a sequence whose contracts all hold
+    visual:
+      kind: chips
+      items:
+      - MOVE→table
+      - PICK-UP cup
+      - MOVE→sink
+      - PUT-DOWN cup
+      caption: each step's preconditions are checked against the state projected by every step before
+        it — which is what makes the plan verifiable before anything moves
 tags: [symbolic, agents]
 relations:
   used_by: [ai-agent, agent-loop]
@@ -57,19 +92,23 @@ discovering a problem halfway through is expensive.
 
 ## How Does It Work?
 
-```text
-initial:  at(robot, kitchen) · holding(nothing) · at(cup, table)
-goal:     at(cup, sink)
 
-action PICK-UP(x, loc)
-  pre:  at(robot, loc) · at(x, loc) · holding(nothing)
-  eff:  holding(x) · ¬at(x, loc)
+Describe the world as a set of facts, describe each action by what it requires
+and what it changes, and give a goal. A planner then searches for a sequence of
+actions whose preconditions all hold when they are reached and whose combined
+effects satisfy the goal.
 
-plan: MOVE(kitchen→table) · PICK-UP(cup, table) ·
-      MOVE(table→sink) · PUT-DOWN(cup, sink)
-      │
-      each step's preconditions verified against the projected state
-```
+The representation is what does the work. PICK-UP requires that the robot is in
+the same place as the object and is holding nothing; afterwards it is holding the
+object and the object is no longer where it was. Because each action declares
+this explicitly, a candidate plan can be verified against the state it projects,
+step by step, before anything is executed.
+
+That guarantee is precisely what a language model asked to plan does not offer.
+It will produce a fluent sequence containing a step whose precondition does not
+hold, and nothing in the process notices. Which is why the interesting current
+systems combine the two: the model proposes, in natural language, and a planner
+checks whether the proposal is actually executable.
 
 ## Mental Model
 

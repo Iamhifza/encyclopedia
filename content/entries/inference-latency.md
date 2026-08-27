@@ -11,6 +11,35 @@ origin:
   circa: true
   attribution: Metric vocabulary standardised by LLM serving benchmarks and providers
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: Two numbers, and they are not interchangeable
+  footer: 'Streaming exists because these are separable: a user who sees the first word quickly tolerates
+    a slower stream after it. Optimising the wrong one of the two is the commonest performance mistake
+    in serving.'
+  visual:
+    kind: segments
+    width: 760
+    label: one request, end to end
+    caption: queueing is the part you control by provisioning; prefill scales with the prompt; decode
+      scales with the answer
+    segments:
+    - text: queueing
+      value: 18
+      tone: warn
+    - text: prefill
+      value: 26
+    - text: decode — one step per token
+      value: 56
+      tone: accent
+    spans:
+    - from: 0
+      to: 1
+      text: time to first token
+    - from: 2
+      to: 2
+      text: time per output token, repeated
+      tone: accent
 tags: [inference]
 relations:
   different_from: [throughput]
@@ -57,11 +86,22 @@ model size.
 
 ## How Does It Work?
 
-```text
-request ──┬── queueing ──┬── prefill ──┬── decode ─────────────────▶
-          │              │             │  t  t  t  t  t  t  t
-          └──────── TTFT ──────────────┘  └─ TPOT ─┘
-```
+
+A request spends its time in three places, and they behave differently. It queues
+until the scheduler admits it. It runs one prefill pass over the whole prompt.
+Then it decodes, one forward pass per output token, until it stops.
+
+Two numbers summarise this. Time to first token covers queueing plus prefill —
+what the user experiences as the wait before anything appears. Time per output
+token covers each decode step after that — what they experience as the speed of
+the stream. They have different causes: TTFT scales with prompt length and with
+how loaded the server is, TPOT with memory bandwidth and batch size.
+
+Streaming exists because the two are separable. A user who sees the first word
+quickly will tolerate a slower stream after it, and the same total duration feels
+completely different depending on which half it was spent in. Optimising the
+wrong one of the two is the commonest performance mistake in serving — and a
+single average latency number hides which one you have.
 
 ## Mental Model
 

@@ -11,6 +11,30 @@ origin:
   circa: true
   attribution: Feigenbaum's DENDRAL project at Stanford; MYCIN followed in the 1970s
 historical_period: classical-ai
+diagram:
+  kind: figure
+  title: Rules on one side, an engine that fires them on the other
+  footer: 'They worked, narrowly, and then failed to scale: every rule had to be elicited from a human
+    expert, and the knowledge base became unmaintainable long before it became complete. That bottleneck
+    is what statistical learning removed.'
+  visual:
+    kind: columns
+    width: 740
+    caption: 'the separation is the design: domain knowledge is data, and the engine is generic'
+    columns:
+    - title: Knowledge base
+      lines:
+      - IF fever AND stiff neck
+      - THEN suspect meningitis
+      - IF suspect meningitis
+      - THEN order lumbar puncture
+    - title: Inference engine
+      accent: true
+      lines:
+      - match rules against known facts
+      - fire the ones that apply
+      - add conclusions as new facts
+      - repeat until nothing new fires
 tags: [history, symbolic]
 relations:
   alternative_to: [supervised-learning]
@@ -55,14 +79,24 @@ everywhere; their rules can be.
 
 ## How Does It Work?
 
-```text
-KNOWLEDGE BASE                INFERENCE ENGINE
-IF fever AND stiff-neck  ──▶  match rules against known facts
-THEN suspect meningitis       fire the ones that apply
-                              add conclusions as new facts
-IF suspect meningitis    ──▶  repeat until nothing new fires
-THEN order lumbar puncture    explain the chain on request
-```
+
+Separate the knowledge from the machinery. Domain experts write rules of the form
+IF condition THEN conclusion into a knowledge base; a generic inference engine
+matches those rules against known facts, fires the ones that apply, adds their
+conclusions as new facts, and repeats until nothing new fires.
+
+Chaining can run either direction. Forward from what is known toward whatever
+follows; backward from a hypothesis toward the facts that would establish it.
+Either way the sequence of fired rules is a derivation, so the system can explain
+its conclusion by replaying it — a property that mattered enormously in medicine
+and diagnosis, and one that neural systems still cannot offer.
+
+They worked in narrow domains and then hit a wall that had nothing to do with
+computing power. Every rule had to be elicited from a human expert, experts
+disagree, and the knowledge base grew unmaintainable — interacting rules, missing
+exceptions, no way to test coverage — long before it grew complete. Removing that
+bottleneck by learning from data instead is the whole reason statistical methods
+displaced them.
 
 ## Mental Model
 

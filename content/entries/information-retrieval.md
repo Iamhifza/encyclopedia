@@ -34,6 +34,32 @@ diagram:
       - tokenise, expand, rewrite
       - look up candidates
       - score, rank, rerank, return
+diagrams:
+- kind: figure
+  section: Evolution
+  title: Sixty years of replacing the scoring function
+  visual:
+    kind: lineage
+    per_row: 4
+    caption: the shape never changed — index, retrieve, rank, return — only what does the ranking
+    milestones:
+    - text: Boolean
+      note: match or not
+    - text: TF-IDF
+      note: '1972'
+    - text: BM25
+      note: '1994'
+    - text: learning to rank
+      note: 2000s
+    - text: dense retrieval
+      note: '2020'
+    - text: hybrid
+      note: fused
+    - text: RAG
+      note: a model reads
+    - text: agentic RAG
+      note: the model decides
+      tone: accent
 tags: [retrieval]
 relations:
   evolved_into: [dense-retrieval]
@@ -123,10 +149,12 @@ century later.
 
 ## Evolution
 
-```text
-Boolean matching → TF-IDF → BM25 → learning to rank
-  → dense retrieval → hybrid retrieval → RAG → agentic RAG
-```
+
+The shape of the field has not changed since the 1960s: index offline, retrieve
+candidates online, rank them, return the top few. What keeps being replaced is
+the scoring function in the middle — and each replacement kept what the last one
+got right rather than discarding it, which is why BM25 is still a live baseline
+and why hybrid retrieval exists at all.
 
 ## Common Confusions
 

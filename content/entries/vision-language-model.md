@@ -11,6 +11,31 @@ origin:
   circa: true
   attribution: CLIP established joint image-text representation; Flamingo and successors added generative multimodal reasoning
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: Turn the image into tokens, then it is just a language model
+  footer: 'The projector is usually all that gets trained, which is why capable VLMs appeared so quickly:
+    a strong vision encoder and a strong language model already existed, and only the bridge between them
+    was missing.'
+  visual:
+    kind: columns
+    width: 740
+    caption: both streams end as tokens in one sequence, and from there the language model cannot tell
+      which came from where
+    columns:
+    - title: The image
+      lines:
+      - ViT encoder
+      - patch embeddings
+      - a learned projector
+      - → visual tokens
+    - title: The text
+      accent: true
+      lines:
+      - ordinary tokeniser
+      - —
+      - —
+      - → text tokens
 tags: [architecture]
 relations:
   is_a: [foundation-model]
@@ -55,14 +80,6 @@ Tasks where the input is not text: document understanding, chart reading, UI
 interaction, visual question answering, and describing scenes.
 
 ## How Does It Work?
-
-```text
-image ──▶ ViT encoder ──▶ patch embeddings ──▶ projector ──▶ [visual tokens]
-                                                                    │
-text  ──▶ tokenizer ──────────────────────────────────▶ [text tokens]
-                                                                    │
-                        one sequence ──▶ language model ──▶ output
-```
 
 Images are expensive in tokens: a high-resolution page can consume thousands.
 

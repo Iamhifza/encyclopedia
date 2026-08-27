@@ -11,6 +11,28 @@ origin:
   circa: true
   attribution: Olah and collaborators at OpenAI and later Anthropic; the Circuits research thread
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: Localise, intervene, then predict something new
+  footer: The last step is what separates this from storytelling. A circuit description that explains
+    behaviour already observed is cheap; one that predicts a behaviour nobody had looked for is evidence.
+  visual:
+    kind: pipeline
+    width: 740
+    caption: ablation and activation patching are the instruments — remove or substitute a component and
+      see whether the behaviour survives
+    stages:
+    - text: a specific behaviour
+      note: narrow enough to test
+    - text: candidate layers, heads and features
+      via: localise — where does the behaviour live?
+    - text: the components it actually depends on
+      via: ablate and patch — causal necessity, not correlation
+    - text: a circuit description
+      note: a mechanism, stated
+    - text: a prediction that holds
+      tone: accent
+      via: 'the real test: what does the story say should also be true?'
 tags: [safety]
 relations:
   depends_on: [sparse-autoencoder, transformer]
@@ -64,13 +86,23 @@ something.
 
 ## How Does It Work?
 
-```text
-pick a behaviour ──▶ localise: which layers, heads, features are involved
-                          │ ablate / patch to test causal necessity
-                          ▼
-                  describe the circuit ──▶ predict novel behaviour
-                                            (the real test of the story)
-```
+
+Pick a behaviour narrow enough to test. Localise it: which layers, attention
+heads and features are involved when the model does this? Then intervene —
+ablate a component and see whether the behaviour survives, or patch activations
+from one input into another and see whether the behaviour transfers. Correlation
+is cheap; these interventions are what establish causal necessity.
+
+What comes out is a circuit description: a claim about which components do what,
+and in what order, to produce the behaviour. Induction heads, which notice a
+repeated pattern and continue it, are the best-known example.
+
+The final step is the one that separates this from storytelling. A circuit
+description that explains behaviour already observed is easy to produce and hard
+to falsify. A description that predicts a behaviour nobody had looked for — and
+which then holds — is evidence. Superposition is the standing obstacle: features
+are not aligned with neurons, so a single neuron participates in many unrelated
+circuits, which is why sparse autoencoders became central to the field.
 
 ## Mental Model
 

@@ -8,6 +8,28 @@ status: established
 difficulty: intermediate
 one_liner: "Producing an image from a text description, in practice almost always with a diffusion model."
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: Denoise toward the prompt, twenty to fifty times
+  footer: 'Guidance scale is the dial worth knowing: low gives loose, varied images that sometimes ignore
+    you, high gives literal, saturated ones with less diversity. Most defaults sit deliberately in the
+    middle.'
+  visual:
+    kind: pipeline
+    width: 740
+    caption: denoising happens in a compressed latent space, not on pixels — which is what made this affordable
+      enough to run on a consumer card
+    stages:
+    - text: '"a lighthouse in a storm, oil painting"'
+      note: the prompt
+    - text: a text embedding
+      via: text encoder
+    - text: a latent, denoised step by step
+      note: ~20–50 steps
+      tone: accent
+      via: start from noise; the embedding conditions every step via cross-attention
+    - text: an image
+      via: VAE decoder — latent back to pixels
 tags: [architecture]
 relations:
   depends_on: [diffusion-model, embedding]
@@ -59,19 +81,24 @@ that would never have justified commissioning an artist.
 
 ## How Does It Work?
 
-```text
-"a lighthouse in a storm, oil painting"
-        │
-   text encoder ──▶ embeddings
-        │
-        ▼ conditions (via cross-attention)
-  noise ──▶ denoise ──▶ denoise ──▶ ... ──▶ latent ──▶ decoder ──▶ image
-             ~20-50 steps                              (VAE)
 
-guidance scale: how hard to push toward the prompt
-   low  → loose, varied, sometimes ignores you
-   high → literal, saturated, less diverse
-```
+Encode the prompt to an embedding, start from pure noise, and denoise toward an
+image over twenty to fifty steps, with the text embedding conditioning every step
+through cross-attention. What comes out is a latent, which a decoder turns into
+pixels.
+
+Working in latent space rather than on pixels is what made this affordable. A
+512×512 image is a quarter of a million values; its latent is a few thousand. The
+diffusion model never sees a pixel — an autoencoder handles the translation at
+each end — and that single decision is the difference between a datacentre and a
+consumer graphics card.
+
+Guidance scale is the dial worth understanding. It controls how hard each step is
+pushed toward the prompt versus toward whatever the model would produce
+unconditioned. Low values give varied, loose images that sometimes ignore what
+you asked for; high values give literal, saturated, less diverse ones. Defaults
+sit deliberately in the middle, and moving it is usually more effective than
+rewriting the prompt.
 
 ## Mental Model
 

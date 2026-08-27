@@ -10,6 +10,47 @@ origin:
   year: 2024
   attribution: Popularised by OpenAI's o1 and subsequently DeepSeek-R1, Claude extended thinking and others
 historical_period: agentic
+diagram:
+  kind: steps
+  title: Spend tokens before answering
+  footer: 'The scaling knob moved: for these models, more compute at inference buys accuracy in the way
+    more compute at training used to. It also makes cost and latency depend on the question rather than
+    on the answer''s length.'
+  steps:
+  - title: Most of the output is not the answer
+    visual:
+      kind: segments
+      width: 720
+      label: one response
+      caption: the thinking is usually hidden or summarised, and is billed
+      segments:
+      - text: prompt
+        value: 8
+      - text: thinking — attempt, check, discard, retry
+        value: 76
+        tone: accent
+      - text: answer
+        value: 16
+  - title: And it buys accuracy, up to a point
+    visual:
+      kind: plot
+      width: 700
+      height: 190
+      x_range: [0, 100]
+      y_range: [0, 1.05]
+      x_label: thinking tokens
+      y_label: accuracy
+      caption: the curve flattens, and every token on it costs money and latency
+      curves:
+      - label: accuracy
+        tone: accent
+        points: [[0.0, 0.3], [2.5, 0.367], [5.0, 0.426], [7.5, 0.479], [10.0, 0.526], [12.5, 0.569], [
+            15.0, 0.606], [17.5, 0.64], [20.0, 0.67], [22.5, 0.697], [25.0, 0.721], [27.5, 0.742], [30.0,
+            0.761], [32.5, 0.778], [35.0, 0.794], [37.5, 0.807], [40.0, 0.819], [42.5, 0.83], [45.0, 0.84],
+          [47.5, 0.848], [50.0, 0.856], [52.5, 0.863], [55.0, 0.869], [57.5, 0.875], [60.0, 0.879], [
+            62.5, 0.884], [65.0, 0.888], [67.5, 0.891], [70.0, 0.894], [72.5, 0.897], [75.0, 0.899], [
+            77.5, 0.902], [80.0, 0.904], [82.5, 0.905], [85.0, 0.907], [87.5, 0.908], [90.0, 0.91], [
+            92.5, 0.911], [95.0, 0.912], [97.5, 0.913], [100.0, 0.913]]
 tags: [architecture]
 relations:
   successor_of: [large-language-model]
@@ -64,13 +105,24 @@ and planning in agent loops.
 
 ## How Does It Work?
 
-```text
-prompt ──▶ [ thinking tokens: attempt, check, discard, retry ... ] ──▶ answer
-             │                                                          │
-             └── often hidden or summarised for the user ───────────────┘
 
-more thinking tokens ──▶ higher accuracy, higher cost, higher latency
-```
+The model is trained — usually with reinforcement learning against verifiable
+answers — to produce an extended chain of intermediate tokens before committing
+to a response. Within that chain it attempts approaches, checks them, discards
+what fails, and tries again. The user typically sees a summary, or nothing, but
+the tokens are generated and billed.
+
+What changed is where the scaling knob sits. For most of the field's history,
+accuracy came from more compute at training time. For these models it also comes
+from more compute at inference time: allow more thinking tokens and accuracy
+rises, along a curve that flattens. The trade is explicit rather than hidden.
+
+Which makes them a different economic proposition. Cost and latency now depend on
+how hard the question is rather than on how long the answer is, and a
+straightforward request can cost many times what a non-reasoning model would
+charge for the same output. The strength is real on maths, code and multi-step
+logic — where the verifier that trained them exists — and much less clear
+elsewhere.
 
 ## Mental Model
 

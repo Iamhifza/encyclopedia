@@ -8,6 +8,40 @@ status: foundational
 difficulty: advanced
 one_liner: "The mathematics of surprise: how much information a message carries, and how far one distribution sits from another."
 historical_period: early-computing
+diagram:
+  kind: figure
+  title: Entropy is how surprised you should expect to be
+  footer: Cross-entropy loss is this quantity, measured between what the model predicted and what actually
+    came next. Training a language model is literally minimising surprise, which is why loss is reported
+    in nats or bits.
+  visual:
+    kind: plot
+    width: 700
+    height: 210
+    x_range: [-4, 4]
+    y_range: [0, 1.1]
+    x_label: possible outcomes
+    y_label: probability
+    caption: a distribution that is nearly flat cannot be compressed; one that is nearly a spike compresses
+      to almost nothing
+    curves:
+    - label: high entropy
+      tone: muted
+      points: [[-4.0, 0.309], [-3.8, 0.305], [-3.6, 0.299], [-3.4, 0.294], [-3.2, 0.29], [-3.0, 0.285],
+        [-2.8, 0.282], [-2.6, 0.281], [-2.4, 0.28], [-2.2, 0.281], [-2.0, 0.283], [-1.8, 0.286], [-1.6,
+          0.29], [-1.4, 0.295], [-1.2, 0.3], [-1.0, 0.305], [-0.8, 0.31], [-0.6, 0.314], [-0.4, 0.317],
+        [-0.2, 0.319], [0.0, 0.32], [0.2, 0.319], [0.4, 0.317], [0.6, 0.314], [0.8, 0.31], [1.0, 0.305],
+        [1.2, 0.3], [1.4, 0.295], [1.6, 0.29], [1.8, 0.286], [2.0, 0.283], [2.2, 0.281], [2.4, 0.28],
+        [2.6, 0.281], [2.8, 0.282], [3.0, 0.285], [3.2, 0.29], [3.4, 0.294], [3.6, 0.299], [3.8, 0.305],
+        [4.0, 0.309]]
+    - label: low entropy
+      tone: accent
+      points: [[-4.0, 0.0], [-3.8, 0.0], [-3.6, 0.0], [-3.4, 0.0], [-3.2, 0.0], [-3.0, 0.0], [-2.8, 0.0],
+        [-2.6, 0.0], [-2.4, 0.0], [-2.2, 0.0], [-2.0, 0.0], [-1.8, 0.0], [-1.6, 0.0], [-1.4, 0.002], [
+          -1.2, 0.011], [-1.0, 0.045], [-0.8, 0.138], [-0.6, 0.331], [-0.4, 0.619], [-0.2, 0.9], [0.0,
+          1.02], [0.2, 0.9], [0.4, 0.619], [0.6, 0.331], [0.8, 0.138], [1.0, 0.045], [1.2, 0.011], [1.4,
+          0.002], [1.6, 0.0], [1.8, 0.0], [2.0, 0.0], [2.2, 0.0], [2.4, 0.0], [2.6, 0.0], [2.8, 0.0],
+        [3.0, 0.0], [3.2, 0.0], [3.4, 0.0], [3.6, 0.0], [3.8, 0.0], [4.0, 0.0]]
 tags: [training]
 relations:
   used_by: [loss-function, rlhf, tokenization]
@@ -55,13 +89,6 @@ For AI, it supplies the training objective and the vocabulary for comparing
 distributions — which is what learning is.
 
 ## How Does It Work?
-
-```text
-high entropy (uniform)          low entropy (peaked)
-▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄               ▁▁▁▁▁█▁▁▁▁▁▁▁▁▁
-maximum surprise per            almost no surprise:
-symbol; nothing compresses      compresses to almost nothing
-```
 
 A model trained by cross-entropy is being pushed toward the second picture: put
 your probability mass where the data actually is.

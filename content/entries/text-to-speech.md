@@ -8,6 +8,25 @@ status: established
 difficulty: intermediate
 one_liner: "Generating natural-sounding speech from text, increasingly with the speaker's voice and tone under control."
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: Speech as tokens, and a voice from three seconds of reference
+  footer: Prosody, emphasis and emotion come from the token model rather than from markup or rules, which
+    is why current systems sound natural and why they cannot be precisely directed. Cloning a voice from
+    seconds of audio is the same capability, and the same problem.
+  visual:
+    kind: pipeline
+    width: 740
+    caption: 'the codec is what made this tractable: audio becomes a discrete sequence, so the same machinery
+      that models text can model speech'
+    stages:
+    - text: text, plus ~3 seconds of reference audio
+      note: what and who
+    - text: audio tokens
+      tone: accent
+      via: an autoregressive or diffusion model over a learned codec
+    - text: a waveform
+      via: codec decoder
 tags: [architecture]
 relations:
   related_to: [speech-recognition, diffusion-model, autoregressive-generation, tokenization]
@@ -56,16 +75,6 @@ Making generated speech sound like a person rather than a machine, and doing it
 fast enough for real-time conversation.
 
 ## How Does It Work?
-
-```text
-text ──▶ text encoder ──┐
-                        ├──▶ token model ──▶ audio tokens ──▶ codec decoder ──▶ waveform
-reference audio ────────┘         (autoregressive
-  (3 seconds is enough)            or diffusion)
-
-prosody, emphasis and emotion come from the token model,
-not from markup or rules
-```
 
 The neural audio codec is the enabling piece: it compresses a waveform into a
 short sequence of discrete tokens, which is what allows language-model machinery

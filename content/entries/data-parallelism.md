@@ -12,6 +12,30 @@ origin:
   circa: true
   attribution: Standard practice from early large-scale deep learning; ZeRO and FSDP reshaped it from 2019
 historical_period: deep-learning
+diagram:
+  kind: figure
+  title: Same model everywhere, different examples
+  footer: The simplest parallelism and the first one to reach for. Its limit is that every device needs
+    the whole model — once that stops fitting, tensor or pipeline parallelism has to come in underneath
+    it.
+  visual:
+    kind: pipeline
+    width: 740
+    caption: the all-reduce is what keeps the replicas identical; without it they would drift apart within
+      one step
+    stages:
+    - text: a global batch of 512
+      note: one optimiser step
+    - text: 64 examples on each of eight GPUs
+      via: shard the batch
+    - text: eight different gradient tensors
+      via: each replica runs forward and backward on its own shard
+    - text: one averaged gradient, on every device
+      tone: accent
+      via: all-reduce across the group
+    - text: replicas still bit-identical
+      note: and round again
+      via: every device applies the identical update
 tags: [hardware, training]
 relations:
   alternative_to: [tensor-parallelism, pipeline-parallelism]
@@ -66,17 +90,6 @@ Wall-clock training time. It does not, in its classic form, let you train a
 larger model; it lets you train the same model faster.
 
 ## How Does It Work?
-
-```text
-global batch of 512
-   ├── GPU0: 64 examples ──▶ gradients ─┐
-   ├── GPU1: 64 examples ──▶ gradients ─┤
-   ├── ...                              ├──▶ ALL-REDUCE (average)
-   └── GPU7: 64 examples ──▶ gradients ─┘         │
-                                                   ▼
-              every GPU applies the identical averaged update
-              → all replicas remain bit-identical
-```
 
 Modern implementations overlap the all-reduce with the backward pass: gradients
 for late layers are ready first and can start communicating while earlier layers

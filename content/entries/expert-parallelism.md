@@ -12,6 +12,28 @@ origin:
   circa: true
   attribution: GShard and Switch Transformer established the pattern for training trillion-parameter MoE models
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: The tokens travel to the experts and back
+  footer: 'Two all-to-all collectives per layer, which is the most demanding communication pattern in
+    the stack. An unbalanced router makes it worse: some devices idle while others queue.'
+  visual:
+    kind: pipeline
+    width: 740
+    caption: experts are too large to replicate, so the tokens move instead — the opposite trade from
+      data parallelism
+    stages:
+    - text: tokens arrive, spread across devices
+      note: any device, any expert
+    - text: each token assigned to its top experts
+      via: the router scores
+    - text: every token now sits where its expert lives
+      tone: accent
+      via: all-to-all dispatch — the expensive step
+    - text: each expert processes what reached it
+      note: ordinary FFN work
+    - text: tokens back where they started, transformed
+      via: all-to-all combine
 tags: [hardware, inference]
 relations:
   depends_on: [mixture-of-experts, all-reduce, gpu-cluster]
@@ -61,21 +83,6 @@ Fitting a model whose total parameters vastly exceed one device's memory, while
 keeping per-token computation small.
 
 ## How Does It Work?
-
-```text
-tokens arrive on GPU0                experts live across GPU0-3
-       │
-   router assigns each token
-       │
-   ┌───┴──── ALL-TO-ALL dispatch ────────────┐
-   ▼         ▼          ▼          ▼
- GPU0      GPU1       GPU2       GPU3
- exp 0,1   exp 2,3    exp 4,5    exp 6,7
-   │         │          │          │
-   └───── ALL-TO-ALL combine ──────┘
-       │
-   tokens return to where they came from, processed
-```
 
 Two all-to-all collectives per MoE layer, and all-to-all is the most demanding
 collective there is — every device talking to every other simultaneously.

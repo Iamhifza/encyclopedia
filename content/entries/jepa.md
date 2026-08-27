@@ -10,6 +10,31 @@ origin:
   year: 2022
   attribution: Proposed by Yann LeCun in "A Path Towards Autonomous Machine Intelligence"; I-JEPA and V-JEPA followed at Meta
 historical_period: foundation-model
+diagram:
+  kind: figure
+  title: Predict the representation, not the pixels
+  footer: The argument is that reconstructing pixels wastes capacity on detail that carries no meaning
+    — the exact texture of grass. Predicting in embedding space lets the model discard what does not matter,
+    which is the whole bet.
+  visual:
+    kind: columns
+    width: 740
+    caption: the target encoder is an exponential moving average of the context encoder, which is what
+      stops both collapsing to a constant
+    columns:
+    - title: Masked autoencoder
+      lines:
+      - predict the missing pixels
+      - loss in pixel space
+      - spends capacity on texture
+      - reconstruction is the objective
+    - title: JEPA
+      accent: true
+      lines:
+      - predict the missing embedding
+      - loss in representation space
+      - free to discard detail
+      - abstraction is the objective
 tags: [architecture]
 relations:
   is_a: [world-model]
@@ -62,12 +87,25 @@ model.
 
 ## How Does It Work?
 
-```text
-context patches ──▶ encoder ──▶ ──┐
-                                   predictor ──▶ predicted target embedding
-target position ──────────────────┘                    ║ compare
-target patches ──▶ target encoder (EMA) ──▶ actual target embedding
-```
+
+Mask part of an input, and train a model to predict the *representation* of the
+masked part rather than its raw content. A context encoder embeds what is
+visible; a predictor guesses the embedding of what is hidden; a target encoder —
+an exponential moving average of the context encoder, not trained directly —
+produces the embedding being guessed at.
+
+The argument against pixel reconstruction is that most of a pixel's information
+is irrelevant. Predicting the exact texture of grass or the precise noise in a
+shadow spends capacity on detail that carries no meaning, and a model rewarded
+for getting it right learns to represent it. Predicting in embedding space lets
+the model discard whatever it decides does not matter.
+
+The risk is collapse: if both encoders can simply output a constant, the
+prediction is trivially perfect and nothing is learned. The moving-average target
+encoder is what prevents that — it changes slowly enough to be a stable target
+and is never optimised to make the task easy. Whether the resulting
+representations are better than reconstruction-based ones is still being argued,
+which is what makes this a live research direction rather than a settled method.
 
 ## Mental Model
 

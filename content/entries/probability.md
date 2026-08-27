@@ -8,6 +8,31 @@ status: foundational
 difficulty: beginner
 one_liner: "The mathematics of uncertainty, and the language in which every model output is really a distribution rather than an answer."
 historical_period: pre-computing
+diagram:
+  kind: figure
+  title: The model never picks a word; it produces a distribution
+  footer: Every decoding knob — temperature, top-k, top-p — is a way of reshaping this before one sample
+    is drawn. The model's part is the same either way.
+  visual:
+    kind: bars
+    caption: '"the cat sat on the ___" — the top five of roughly 100,000 tokens'
+    bars:
+    - label: mat
+      value: 0.31
+      value_label: '0.31'
+      accent: true
+    - label: floor
+      value: 0.18
+      value_label: '0.18'
+    - label: sofa
+      value: 0.12
+      value_label: '0.12'
+    - label: table
+      value: 0.09
+      value_label: '0.09'
+    - label: bicycle
+      value: 0.004
+      value_label: '0.00003'
 tags: [training]
 relations:
   used_by: [sampling, supervised-learning, loss-function]
@@ -56,18 +81,22 @@ principled way to combine evidence.
 
 ## How Does It Work?
 
-```text
-model output for "the cat sat on the ___"
 
-  mat     0.31   ████████████
-  floor   0.18   ███████
-  sofa    0.12   ████
-  table   0.09   ███
-  ...     
-  bicycle 0.00003
-                 ← a full distribution over ~100,000 tokens
-                   sampling picks one; the rest are discarded
-```
+A language model does not choose a word. It produces a probability distribution
+over its entire vocabulary — roughly a hundred thousand entries — for every
+position. Sampling then draws one token from that distribution and discards the
+rest.
+
+This is worth being literal about, because it explains most of the model's
+observable behaviour. The same prompt gives different answers because a different
+sample was drawn. Temperature, top-k and top-p all reshape the distribution
+before sampling and change nothing about what the model computed. Greedy decoding
+takes the maximum and is therefore deterministic, and also more repetitive.
+
+It also explains the confidence problem. The probability assigned to a token is a
+statement about what text is likely, not about what is true. A model can put 0.9
+on a fabricated citation and the number is entirely sincere — it is measuring
+fluency, and fluency is what it was trained to measure.
 
 ## Mental Model
 

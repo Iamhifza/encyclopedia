@@ -8,6 +8,41 @@ status: foundational
 difficulty: intermediate
 one_liner: "Systematically exploring possible moves or states to find one that reaches a goal."
 historical_period: classical-ai
+diagram:
+  kind: figure
+  title: Expand the most promising node first
+  footer: A* is optimal when the heuristic never overestimates the remaining cost. Everything modern —
+    beam search, MCTS, an agent deciding which tool to try — is this same question of where to spend the
+    next expansion.
+  visual:
+    kind: tree
+    width: 820
+    caption: f(n) = cost already paid + estimated cost remaining. The frontier is ordered by f, so E is
+      expanded before B — and a merely inaccurate heuristic costs time, not correctness
+    levels:
+    - start
+    - frontier
+    - expanded
+    root:
+      text: start
+      children:
+      - text: A  f=7
+        children:
+        - text: D  f=9
+          tone: muted
+          note: stays on the frontier
+        - text: E  f=6
+          tone: accent
+          note: lowest f — expand next
+      - text: B  f=11
+        tone: muted
+        children:
+        - text: F  f=12
+          tone: muted
+          note: parked
+        - text: G  f=13
+          tone: muted
+          note: parked
 tags: [symbolic]
 relations:
   used_by: [reasoning-model, automated-planning]
@@ -60,16 +95,6 @@ Finding a solution in a space too large to enumerate, by ordering exploration
 intelligently.
 
 ## How Does It Work?
-
-```text
-              start
-            /   |   \
-          A     B     C          expand promising nodes first
-         / \        /   \
-        D   E      F     G       heuristic estimates distance to goal
-             \
-             GOAL                A* = cost so far + estimated cost remaining
-```
 
 The heuristic is everything. A good one turns an intractable search into a
 direct walk; a bad one degenerates to brute force.
