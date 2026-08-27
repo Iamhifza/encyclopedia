@@ -1147,12 +1147,33 @@ def _vis_tree(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
 # named steps where the only extra information is which one you are standing on.
 # --------------------------------------------------------------------------
 
+LINEAGE_GAP = 30
+LINEAGE_MIN_W = 120
+
+
+def _lineage_shape(spec: dict[str, Any]) -> tuple[float, int, float]:
+    """(pill width, milestones per row, row width).
+
+    Pills used to be an even division of the row, so a long milestone name
+    simply ran out of its pill — the same hard-coded-width defect as chips, fan,
+    matrix and tree. The pill is sized from the widest name; if that many will
+    not fit across the canvas, fewer go on each row rather than the text being
+    clipped.
+    """
+    items = spec.get("milestones", [])
+    pill = max([LINEAGE_MIN_W] + [_chip_w(i) for i in items]) if items else LINEAGE_MIN_W
+    limit = float(spec.get("width", W - PAD * 2))
+    per_row = int(spec.get("per_row", 4))
+    while per_row > 2 and per_row * pill + (per_row - 1) * LINEAGE_GAP > limit:
+        per_row -= 1
+    return pill, per_row, per_row * pill + (per_row - 1) * LINEAGE_GAP
+
+
 def _vis_lineage(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
     items = spec.get("milestones", [])
     if not items:
         return "", 0.0
-    w = float(spec.get("width", VIS_W))
-    per_row = int(spec.get("per_row", 4))
+    bw, per_row, w = _lineage_shape(spec)
     rows = [items[i:i + per_row] for i in range(0, len(items), per_row)]
     out: list[str] = []
     cy = y
@@ -1160,8 +1181,7 @@ def _vis_lineage(spec: dict[str, Any], x: float, y: float) -> tuple[str, float]:
 
     for r, row in enumerate(rows):
         n = len(row)
-        gap = 30
-        bw = (w - gap * (per_row - 1)) / per_row
+        gap = LINEAGE_GAP
         for i, item in enumerate(row):
             tone = _tone(item)
             bx = x + i * (bw + gap)
@@ -1357,8 +1377,10 @@ def _visual_width(spec: dict[str, Any] | None) -> float:
     if kind == "chips":
         items = spec.get("items", [])
         return sum(_chip_w(i) for i in items) + max(len(items) - 1, 0) * 12
+    if kind == "lineage":
+        return _lineage_shape(spec)[2]
     if kind in ("stack", "columns", "table", "segments", "plot", "passes",
-                "pipeline", "mapping", "scatter", "lineage"):
+                "pipeline", "mapping", "scatter"):
         return float(spec.get("width", VIS_W))
     if kind == "matrix":
         rows = spec.get("rows", [])
